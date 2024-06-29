@@ -1,0 +1,120 @@
+.surveyBG {
+    background-image:url(/public/surveyBG.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    overflow: hidden;
+}
+.surveyForm {
+    width: 420px;
+    height: 600px;
+    background: white;
+    color:#A95050;
+    display: -moz-grid-group;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ffffff;
+    border-radius: 50px;
+    margin-left: 509px;
+    margin-top: 105px;
+    padding: 40px;
+    box-sizing: border-box;
+    font-size: 20px;
+}
+
+.form-title {
+    display: flex;
+    font-size: 25px;
+    justify-content: center;
+}
+.surveyField {
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+    margin-top: 10px;
+    justify-content: space-evenly;
+    
+}
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.user-name .u-name {
+    border: 1px solid #DFB5B5;
+    border-radius: 50px;
+    width: 200px;
+    height: 29px;
+    background-color: #DFB5B5;
+    color: #A95050;
+    padding: 5px;
+    font-size: 15px;  
+}
+
+.dob {
+    display: flex;
+    gap: 30px;
+    
+}
+
+.gender {
+    display: flex;
+    gap: 20px;
+}
+.dob .date {
+    height: 35px;
+    border-radius: 50px;
+    border: 1px solid var(--light-pink);
+    background-color: var(--light-pink);
+    color: var(--heavy-pink);
+    padding: 5px;
+    font-size: 15px;
+}
+
+.skin-type {
+    display: flex;
+    gap: 30px;
+}
+.skin-type .skin-type-select {
+    height: 35px;
+    border-radius: 50px;
+    border: 1px solid var(--light-pink);
+    background-color: var(--light-pink);
+    color: var(--heavy-pink);
+    padding: 5px;
+    font-size: 15px;
+}
+
+.skin-prob {
+    display: flex;
+    gap: 30px;
+}
+
+.skin-prob .skin-prob-select{
+    height: 35px;
+    border-radius: 50px;
+    border: 1px solid var(--light-pink);
+    background-color: var(--light-pink);
+    color: var(--heavy-pink);
+    padding: 5px;
+    font-size: 15px;
+}
+
+.price-segment {
+    margin-left: 30px;
+}
+
+.finish {
+    color: var(--heavy-pink);
+    background-color: var(--light-pink);
+    border: 1px solid var(--light-pink);
+    border-radius: 50px;
+    height: 36px;
+    width: 68px;
+    font-size: 17px;
+    margin-left: 135px;
+}
+
+

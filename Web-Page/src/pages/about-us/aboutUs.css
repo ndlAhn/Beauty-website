@@ -1,0 +1,22 @@
+
+.aboutUs-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 80px;
+    gap: 27px;
+    
+}
+.welcome-img {
+    width: 900px;
+    height: 500px;
+    position: relative;
+}
+
+.intro {
+    text-indent: 50px;
+    /* text-align-last: justify; */
+    font-size: 18px;
+}
+

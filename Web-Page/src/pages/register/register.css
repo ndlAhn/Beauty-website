@@ -1,0 +1,129 @@
+
+.Background{
+    background-image:url(/public/LoginTheme.png);
+    background-size: cover;
+      background-repeat: no-repeat;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      overflow: hidden;
+}
+.formBg {
+    width: 420px;
+    background: white;
+    color:#A95050;
+    display: -moz-grid-group;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ffffff;
+    margin-top: 198px;
+    margin-bottom: 41px;
+    margin-right: 72px;
+    margin-left: 950px;
+    border-radius: 50px;
+}
+.formTitle {
+    margin-left: 138px;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
+    height: 50px;
+    width: 60px;
+}
+
+.registerField label {
+    margin-left: 50px;
+    font-size: 20px;
+    display: flex; /* Or display: grid; */
+    grid-auto-rows: auto;
+    gap: 5px;
+}
+
+.registerField input {
+    margin-left: 52px;
+    height: 40px;
+    width: 300px;
+    font-size: 120%;
+    border-radius: 50px;
+    border: none;
+    background-color:#DFB5B5;
+    color: #A95050;
+    padding-left: 10px;
+}
+.registerField .iconUser {
+    position: absolute;
+    margin-left: 333px;
+    top: 348px;
+    color: rgb(255, 255, 255);
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+}
+
+.registerField .iconLock1 {
+    position: absolute;
+    margin-left: 333px;
+    top: 433px;
+    color: rgb(255, 255, 255);
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+}
+.registerField .iconLock2 {
+    position: absolute;
+    margin-left: 333px;
+    top: 517px;
+    color: rgb(255, 255, 255);
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+}
+
+
+.signinField {
+    top: 30px;
+    left: 63px;
+    display: grid;
+    grid-auto-rows: auto;
+    gap: 1px;
+}
+
+.signinField .signinButton {
+    margin-top: 20px;
+    margin-left: 158px;
+    height: 50px;
+    width: 100px;
+    font-size: 25px;
+    border: none;
+    background-color: #A95050;
+    border-radius: 50px;
+    color: #ffffff;
+
+}
+
+.signinField .sSignin {
+    margin-left: 154px;
+}
+
+.signinIcon {   
+        top: 5px;
+        margin-left: 153px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+}
+.signinIcon .FIcon {
+    width: 15%;
+    height: 15%;
+    color: #3B5998;
+}
+
+.signinIcon .EIcon {
+    width: 20%;
+    height: 20%;
+    color: #F44336;
+}
+
+.Register {
+    margin-left: 95px;
+}
