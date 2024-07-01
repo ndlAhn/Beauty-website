@@ -2,6 +2,8 @@ import './dropdown.css';
 import { ImProfile } from "react-icons/im";
 import { MdLogout } from "react-icons/md";
 import { CiSettings } from "react-icons/ci";
+import { IoIosSettings } from "react-icons/io";
+
 function DropDown () {
     return(
         <div>
@@ -12,7 +14,7 @@ function DropDown () {
                         <li className="drop-list-list">Profile</li>
                     </span>
                     <span className="user-profile-list-span">
-                        <CiSettings className="user-drop-list-icon" />
+                        <IoIosSettings className="user-drop-list-icon" />
                         <li className ="drop-list-list">Setting</li>
                     </span>
                     <span className="user-profile-list-span">

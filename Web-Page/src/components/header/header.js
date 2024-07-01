@@ -1,16 +1,22 @@
 import './header.css';
 import Logo from './Logo.png';
+import { useNavigate } from 'react-router-dom';
 import { CiSearch } from "react-icons/ci";
 import { FaRegUser } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa6";
 import { FaRegBell } from "react-icons/fa";
+import { FaRegEdit } from "react-icons/fa";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { IoIosCreate } from "react-icons/io";
 import { useState} from 'react';
 import DropDown from '../dropdown/UserDropDown/dropdown.js';
 import ProductDropDown from '../dropdown/ProductDropDown/ProductDropDown.js';
+
 function Header() {
 const [openProfile, setOpenProfile] = useState(false);
+const navigate = useNavigate();
+const handleNavigation = (path) => {
+    navigate(path);
+};
 
     return (
         <div>
@@ -27,12 +33,19 @@ const [openProfile, setOpenProfile] = useState(false);
                 </div>        
                 
                 <div className ="right-side">
-                    <IoIosCreate className="review-icon" />
+                    <FaRegEdit className="review-icon" onClick={handleNavigation('/create-review')}/>
                     <FaRegHeart className="like-icon" />
                     <FaRegBell className="notice-icon" />
-                    <div>
-                    <FaRegUser className="user-icon" onClick={()=> setOpenProfile
-                    ((prev) => !prev)} />
+                    <div onMouseEnter={e=>{setOpenProfile(true)}} onMouseLeave={e=>{
+                        setTimeout(()=>
+                    {
+                        setOpenProfile(false)
+                    },10000)
+                         }}>
+                    <FaRegUser className="user-icon"  />
+                    {
+               openProfile && <DropDown /> 
+            }
                     </div>
                     
                     
@@ -40,27 +53,34 @@ const [openProfile, setOpenProfile] = useState(false);
             </div>
             
             {/* Open profile drop down */}
-            {
-               openProfile && <DropDown /> 
-            }
+            
             
                 
             <div className="nav-bar">
                 <ul className ="nav-bar-ul">
-                    <li className="nav-bar-header"><a href="#home">Home</a></li>
-                    <li className="nav-bar-header"><a href="#news">News</a></li>
-                    <li className="nav-bar-header"><a href="#products">Products</a></li>
-                    <li className="nav-bar-header"><a href="#reviews">Reviews</a></li>
-                    <li className="nav-bar-header"><a href="#recommendations">Recommendations</a></li>
-                    <li className="nav-bar-header"><a href="#comparison">Comparison</a></li>
-                    <li className="nav-bar-header"><a href="#ingredients">Ingredients</a></li>
-                    <li className="nav-bar-header"><a href="#about-us">About us</a></li>
+                    <li className="nav-bar-header"><a 
+                    href="/">Home</a></li>
+                    <li className="nav-bar-header"><a 
+                    href="/news">News</a></li>
+                    <li className="nav-bar-header"><a 
+                    href="/products">Products</a></li>
+                    <li className="nav-bar-header"><a 
+                    href="/reviews">Reviews</a></li>
+                    <li className="nav-bar-header"><a 
+                    href="/recommendations">Recommendations</a></li>
+                    <li className="nav-bar-header"><a 
+                    href="/comparison">Comparison</a></li>
+                    <li className="nav-bar-header"><a 
+                    href="/ingredients">Ingredients</a></li>
+                    <li className="nav-bar-header"><a 
+                    href="/about-us">About us</a></li>
                 </ul>
             </div>
             </div>
             
             <ProductDropDown />
 
+            
         </div>
     </div>
 );

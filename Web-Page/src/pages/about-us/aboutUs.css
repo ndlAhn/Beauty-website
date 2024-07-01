@@ -1,4 +1,13 @@
 
+.aboutUs-wrapper {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    overflow-y: auto;
+    color: var(--text-color-blue);
+    font-weight: 500;
+}
+
 .aboutUs-content{
     display: flex;
     flex-direction: column;

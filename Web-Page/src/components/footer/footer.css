@@ -38,7 +38,23 @@
     justify-content: center;
     margin: 20px;
 }
-.footer-icon {
+.footer-fb-icon {
+    height: 40px;
+    width: 40px;
+    color: #3b5998;
+}
+.footer-t-icon {
+    color: #000000;
+    height: 40px;
+    width: 40px;
+}
+.footer-z-icon {
+    color: #0A68FE;
+    height: 50px;
+    width: 50px;
+}
+.footer-ig-icon {
+    color: #CD486B;
     height: 40px;
     width: 40px;
 }

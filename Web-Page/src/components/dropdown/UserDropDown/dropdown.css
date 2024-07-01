@@ -1,7 +1,7 @@
 .user-drop-list {
     position: absolute;
-    top: 4.7rem;
-    right: 6.1rem;
+    top: 5.2rem;
+    right: 7.55rem;
     width: 140px;
     height: 120px;
     padding-top: 15px;
@@ -45,6 +45,9 @@
     color: var(--text-color-blue)
   }
   
+  .user-profile-list-span {
+    cursor: pointer;
+  } 
   
   /* .user-profile-list-span {
     transition: transform 0.5s;

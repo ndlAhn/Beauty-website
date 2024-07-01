@@ -44,10 +44,10 @@ function Footer() {
 
         <div className="social-icons">
 
-            <FaFacebookSquare className="footer-icon" />
-            <FaSquareInstagram className="footer-icon" />
-            <AiFillTikTok className="footer-icon" />
-            <SiZalo className="footer-icon" />
+            <FaFacebookSquare className="footer-fb-icon" />
+            <FaSquareInstagram className="footer-ig-icon" />
+            <AiFillTikTok className="footer-t-icon" />
+            <SiZalo className="footer-z-icon" />
 
         </div>
     </div>

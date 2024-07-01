@@ -8,7 +8,8 @@ function AboutUs() {
     return(
         <div className="aboutUs-wrapper">
             <Header />
-            <div className="aboutUs-content"> 
+            <div className="aboutUs-content">
+                <h2 style={{color: "var(--text-color-blue)"}}>ABOUT US</h2>
                 <img src={Welcome} alt="welcome image" className="welcome-img"/>
                 <p className="intro">Welcome to <strong>Beauty Insight</strong>, your ultimate destination for all things beauty! 
                 Whether you're a skincare enthusiast, makeup lover, or just beginning your beauty journey, 

@@ -1,3 +1,5 @@
+
+
 .header {
     display: flex;
     gap: 20px;
@@ -6,7 +8,24 @@
     background-color: var(--light-pink);
     justify-content: center;
     border-bottom: 1px solid var(--heavy-pink);
+    align-items: center;
 }
+
+.search{
+  display: flex;
+  align-items: center;
+  flex-direction:row;
+  justify-content: space-between;
+  background-color: white;
+  width: 600px;
+  height: 36px;
+  border-radius: 10px;
+  padding: 0 10px;
+
+
+
+}
+
 .header .left-side .logo {
     height: 90px;
     width: 110px;
@@ -14,23 +33,24 @@
 
 
 .header .search-text {
-    width: 600px;
-    height: 36px;
+    height: 100%;
+    width: 90%;
     font-size: 18px;
-    margin-left: 43px;
-    margin-top: 25px;
     border: none;
     border-radius: 50px;
-    color: var(--heavy-pink);
+    color: var(--text-color-blue);
     text-indent: 10px;
+    background-color: white;
+}
+
+.search-text:focus
+{
+  outline: none;
 }
 
 .search-icon {
-    transform: translateX(-109%);
     width: 34px;
     height: 30px;
-    position: absolute;
-    margin-top: 28px;
 }
 
 .right-side {
@@ -41,16 +61,22 @@
 }
 
  .user-icon, .like-icon, .notice-icon {
-    margin-top: 20px;
     width: 35px;
     height: 35px;
     color: var(--text-color-blue);
     
 }
+.user-icon:hover, .like-icon:hover, .notice-icon:hover, .review-icon:hover {
+    cursor: pointer;
+    opacity: 0.6;
+    
+}
+.search-icon:hover {
+  cursor: pointer;
+}
 .review-icon {
-    width: 40px;
-    height: 40px;
-    margin-top: 19px;
+    width: 37px;
+    height: 37px;
     color: var(--text-color-blue);
 
 }
@@ -88,7 +114,8 @@
   }
   
   .nav-bar-header a:hover:not(.active) {
-    background-color: var(--pink-grey);
+    background-color: var(--heavy-pink);
+    color: white;
   }
   
   .active {
@@ -107,14 +134,17 @@
 } 
 .user-drop-list {
   position: absolute;
-  top: 4.7rem;
-  right: 6.1rem;
+  top: 5.3rem;
+  right: 7.8rem;
   width: 140px;
   height: 120px;
-  padding-top: 15px;
   border-radius: 15px;
   background-color: var(--back-drop-list);
   border: 1px solid gray;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding:0; 
 }
 .user-drop-list::before {
     content: '';
@@ -130,11 +160,13 @@
 }
 .user-profile-list {
   display: flex;
-  flex-direction: column;
-  justify-content: left;
+  flex-direction: row;
   background-color: rgba(255, 255, 255, 0);
-  list-style: none;
-  gap: 5px;
+  padding:0;
+  width:100%; 
+  padding: 0px 5px;
+  box-sizing: border-box;
+  align-items: center;
 }
 .user-profile-list-span {
   display: flex;
@@ -151,6 +183,7 @@
   height: 25px;
   color: var(--text-color-blue)
 }
+
 
 
 /* .user-profile-list-span {
