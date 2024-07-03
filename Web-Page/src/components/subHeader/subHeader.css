@@ -1,0 +1,27 @@
+.sub-header {
+    height: 90px;
+    background-color: var(--light-pink);
+    border-bottom: 1px solid rgba(22, 24, 35, 0.12);
+    display: flex;
+    justify-content: space-between;
+}
+.sub-header .left-side {
+    width: 230px;
+    display:flex;
+    justify-content: center;
+}
+.sub-header .left-side .logo {
+    height: 90px;
+    width: 110px;
+}
+.sub-header .right-side {
+    width: 230px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.sub-header-icon {
+    width: 40px;
+    height: 40px;
+    color: var(--text-color-blue);
+}

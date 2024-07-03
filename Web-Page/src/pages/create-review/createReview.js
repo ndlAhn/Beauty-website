@@ -1,40 +1,90 @@
 import './createReview.css';
-import Header from '../../components/header/header.js';
-import Footer from '../../components/footer/footer.js';
+import Sidebar from '../../components/sidebar/sidebar.js';
+import SubHeader from "../../components/subHeader/subHeader.js";
+import { IoIosCloudUpload } from "react-icons/io";
+
 function CreateReview () {
     return (
         <div>
-            <div className="create-review-content">
-               <h2 className="write-review-title">WRITE REVIEW</h2>
-                <h4>Title</h4>
-                <input className="input-title" type="text" required/>
-                <h4>Introduction</h4>
-                <input className="input-intro" type="text" required/>
-                <h4>Picture</h4>    
-                <h4>1. Pakaging</h4>
-                <input className="input-pakage" type="text" required/>
-                <h4>2. Ingredients</h4>
-                <input className="input-ingredients" type="text" required/>
-                <h4>3. Uses</h4>
-                <input className="input-uses" type="text" required/>
-                <h4>4. Target user</h4>
-                <input className="input-target" type="text" required/>
-                <h4>5. Review</h4>
-                <input className="input-review" type="text" required/>
-                <h4>6. Pros & Cons</h4>
-                <input className="input-pros" type="text" required/>
-                <input className="input-cons" type="text" required/>
-                <h4>Product User Guide</h4>
-                <input className="input-guide" type="text"/>
-                <h4>Conclusion</h4>
-                <input className="input-conclu" type="text" required/>
-                <br />
-                <button type ="button">Post review</button>
-                <button type="button">Preview post</button>
+            <SubHeader/>
+            <div className="create-review-wrap">
+            <Sidebar />
+            
+            <div className="create-review-area">
+                <div className="create-review-content">
+                <h3 className="write-review-title">WRITE REVIEW</h3>
+                <div className="review-input-area">
+                    <h5>Title</h5>
+                    <textarea className="input-title" type="text" required/>   
+                </div>
+                <div className="review-input-area">
+                    <h5>Introduction</h5>
+                    <textarea className="input-intro" type="text" required/>
+                </div>
+                
+                <div className="review-input-area">
+                    <h5>Picture</h5>
+                    <div className="upload-area">
+                        <IoIosCloudUpload className="upload-icon" />
+                        <button className="upload-btn">Upload picture</button>
+                    </div>
+                    
+                </div>
+
+                <div className="review-input-area">
+                    <h5>1. Pakaging</h5>
+                    <textarea className="input-pakage" type="text" required/>
+                </div>   
+                
+                <div className="review-input-area">
+                    <h5>2. Ingredients</h5>
+                    <textarea className="input-ingredients" type="text" required/>
+                </div>
+                
+                <div className="review-input-area">
+                    <h5>3. Uses</h5>
+                    <textarea className="input-uses" type="text" required/>
+                </div>
+                
+                <div className="review-input-area">
+                    <h5>4. Target user</h5>
+                    <textarea className="input-target" type="text" required/>
+                </div>
+                
+                <div className="review-input-area">
+                    <h5>5. Review</h5>
+                    <textarea className="input-review" type="text" required/>
+                </div>
+                
+                <div className="review-input-area">
+                    <h5>6. Pros & Cons</h5>
+                    <textarea className="input-pros" placeholder="Input the advantages..." type="text" required/>
+                    <textarea className="input-cons" placeholder="Input the disadvantages..."type="text" required/> 
+                </div>
+                
+                <div className="review-input-area">
+                    <h5>Product User Guide</h5>
+                    <textarea className="input-guide" type="text"/>   
+                </div>
+                
+                <div className="review-input-area">
+                    <h5>Conclusion</h5>
+                    <textarea className="input-conclu" type="text" required/>
+                </div>
+
+            </div>
+                <div className="post-area">
+                    <button className="post-btn" type ="button">POST REVIEW</button>
+                </div>
+                
+            
+                
             </div>
             
-            
+            </div>
         </div>
+            
+        
     )
 }
 export default CreateReview;

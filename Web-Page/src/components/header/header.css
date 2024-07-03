@@ -53,7 +53,7 @@
     height: 30px;
 }
 
-.right-side {
+.header .right-side {
     display: flex;
     gap: 25px;
     margin-left: 130px;
