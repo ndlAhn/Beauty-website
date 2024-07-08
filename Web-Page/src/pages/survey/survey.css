@@ -1,4 +1,4 @@
-.surveyBG {
+.survey-bg {
     background-image:url(/public/surveyBG.png);
     background-size: cover;
     background-repeat: no-repeat;
@@ -6,115 +6,67 @@
     margin: 0;
     display: flex;
     overflow: hidden;
+    padding: 8% 0 0 35%;
 }
-.surveyForm {
-    width: 420px;
-    height: 600px;
-    background: white;
-    color:#A95050;
-    display: -moz-grid-group;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #ffffff;
-    border-radius: 50px;
-    margin-left: 509px;
-    margin-top: 105px;
+
+.survey-form-bg {
+    background-color: white;
+    width: 45%;
+    height: 80%;
     padding: 40px;
-    box-sizing: border-box;
-    font-size: 20px;
+    color: var(--heavy-pink);
+    border-radius: 5%;
 }
 
-.form-title {
-    display: flex;
-    font-size: 25px;
-    justify-content: center;
+.user-name, .dob, .gender, .skin-type, .skin-prob {
+    display: flex; 
+    gap: 10px;
+    font-size: 18px;
+    padding-top: 15px;
 }
-.surveyField {
-    display: flex;
+.user-name .u-name, .dob .date, .skin-type .skin-type-select, .skin-prob-select {
+    height: 40px;
+    padding: 5px;
+    background-color: var(--light-pink);
+    border-radius: 5px;
+    color: var(--text-color-blue);
+    border: none;
+}
+.price-segments {
+    display: flex; 
     flex-direction: column;
-    height: 400px;
-    margin-top: 10px;
-    justify-content: space-evenly;
-    
+    gap: 5px;
+    font-size: 18px;
+    padding-top: 15px;
 }
-.user-name {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-}
-.user-name .u-name {
-    border: 1px solid #DFB5B5;
-    border-radius: 50px;
-    width: 200px;
-    height: 29px;
-    background-color: #DFB5B5;
-    color: #A95050;
-    padding: 5px;
-    font-size: 15px;  
-}
-
-.dob {
-    display: flex;
-    gap: 30px;
-    
-}
-
-.gender {
-    display: flex;
-    gap: 20px;
-}
-.dob .date {
-    height: 35px;
-    border-radius: 50px;
-    border: 1px solid var(--light-pink);
-    background-color: var(--light-pink);
-    color: var(--heavy-pink);
-    padding: 5px;
-    font-size: 15px;
-}
-
-.skin-type {
-    display: flex;
-    gap: 30px;
-}
-.skin-type .skin-type-select {
-    height: 35px;
-    border-radius: 50px;
-    border: 1px solid var(--light-pink);
-    background-color: var(--light-pink);
-    color: var(--heavy-pink);
-    padding: 5px;
-    font-size: 15px;
-}
-
-.skin-prob {
-    display: flex;
-    gap: 30px;
-}
-
-.skin-prob .skin-prob-select{
-    height: 35px;
-    border-radius: 50px;
-    border: 1px solid var(--light-pink);
-    background-color: var(--light-pink);
-    color: var(--heavy-pink);
-    padding: 5px;
-    font-size: 15px;
-}
-
 .price-segment {
-    margin-left: 30px;
+    display: flex; 
+    flex-direction: column;
+}
+
+.gender-input {
+    display: flex;
+    gap: 5px;
+}
+
+.drug-store, .mid-end, .high-end {
+    display: flex;
+    gap:10px;
 }
 
 .finish {
-    color: var(--heavy-pink);
-    background-color: var(--light-pink);
-    border: 1px solid var(--light-pink);
-    border-radius: 50px;
-    height: 36px;
-    width: 68px;
-    font-size: 17px;
-    margin-left: 135px;
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
 }
 
-
+.finish-btn {
+    background-color: var(--heavy-pink);
+    border: none;
+    width: 80px;
+    height: 40px;
+    border-radius: 5px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}

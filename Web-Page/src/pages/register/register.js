@@ -1,43 +1,49 @@
 import './register.css';
-import { FaRegUser } from "react-icons/fa";
-import { RiLockPasswordLine } from "react-icons/ri";
 import { FaFacebook } from "react-icons/fa6";
 import { MdOutlineMail } from "react-icons/md";
 
 function Register() {
     return(
         <div>
-            <div className="Background">
-            <form className="formBg">
-                <div className="formTitle">
+            <div className="register-bg">
+                <div className="register-form-bg">
+                    <form className="register-form">
+                <div className="register-title">
                     <h3>Register</h3>
                 </div>
-                    <div className="registerField">
-                        <label for ="Uname">User name:</label><br />
-                        <input className="Uname" type="text" id="Uname" name="Uname" ></input><br /> 
-                        < FaRegUser className="iconUser" />  
-                        <label for ="Password">Password:</label><br />
-                        <input type="text" id="Password" name="Password" ></input><br />
-                        < RiLockPasswordLine className="iconLock1" />
-                        <label for ="rPassword">Re-enter password:</label><br />
-                        <input type="text" id="rPassword" name="rPassword" ></input><br />
-                        < RiLockPasswordLine className="iconLock2" />
+                    <div className="register-field">
+                        
+                           <label htmlFor ="Uname">User name</label>
+                            <input className="Uname" type="text" id="Uname" name="Uname" /> 
+                       
+                         
+                
+                            <label htmlFor ="password">Password</label>
+                            <input type="text" id="Password" name="Password" />   
+                      
+                        
+                       
+                            <label htmlFor ="en-password">Re-enter password</label>
+                            <input type="text" id="rPassword" name="rPassword" />
+
+                        
+        
 
                     </div>
                         
                         
-                    <div className="signinField"> 
-                        <button className="signinButton">Sign in</button> <br />
-                        <label className="sSignin" for="sSignin">Or sign in with:</label> <br />
+                    <div className="re-signin-field"> 
+                        <button className="re-signin-btn">Sign up</button>
+                        <label className="re-signin-text" htmlFor="re-signin">Or register in with:</label>
                     </div>    
-                    <div className="signinIcon">
-                            <FaFacebook className="FIcon" />
-                            <MdOutlineMail className="EIcon" />
+                    <div className="re-signin-icon">
+                            <FaFacebook className="f-icon" />
+                            <MdOutlineMail className="e-icon" />
                     </div>
-                        <p className="Register" >Already have an account <a href="#">Sign up</a></p>
-                     
-                        
+                        <p className="register" >Already have an account <a href="#">Sign up</a></p>                 
             </form>
+                </div>
+            
             </div>
         </div>
     )

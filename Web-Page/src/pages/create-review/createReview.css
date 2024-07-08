@@ -69,9 +69,10 @@
     background-color: var(--heavy-pink);
     color: white;
     font-weight: bold;
-    border: none;
-    
-         
+    border: none;   
+}
+.asterisk {
+    display:flex;
 }
 
 /* .review-input-area {

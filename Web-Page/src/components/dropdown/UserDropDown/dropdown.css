@@ -48,6 +48,9 @@
   .user-profile-list-span {
     cursor: pointer;
   } 
+  .user-profile-list-span{
+    padding: 5px;
+  }
   
   /* .user-profile-list-span {
     transition: transform 0.5s;

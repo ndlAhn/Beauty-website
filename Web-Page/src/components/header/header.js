@@ -33,14 +33,15 @@ const handleNavigation = (path) => {
                 </div>        
                 
                 <div className ="right-side">
-                    <FaRegEdit className="review-icon" onClick={handleNavigation('/create-review')}/>
+                    <FaRegEdit className="review-icon" /> 
+                    {/* <FaRegEdit className="review-icon" onClick={handleNavigation('/create-review')}/> */}
                     <FaRegHeart className="like-icon" />
                     <FaRegBell className="notice-icon" />
                     <div onMouseEnter={e=>{setOpenProfile(true)}} onMouseLeave={e=>{
                         setTimeout(()=>
                     {
                         setOpenProfile(false)
-                    },10000)
+                    },2000)
                          }}>
                     <FaRegUser className="user-icon"  />
                     {

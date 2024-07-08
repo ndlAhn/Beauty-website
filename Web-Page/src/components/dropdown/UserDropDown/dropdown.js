@@ -13,10 +13,10 @@ function DropDown () {
                         <ImProfile className="user-drop-list-icon" />    
                         <li className="drop-list-list">Profile</li>
                     </span>
-                    <span className="user-profile-list-span">
+                    {/* <span className="user-profile-list-span">
                         <IoIosSettings className="user-drop-list-icon" />
                         <li className ="drop-list-list">Setting</li>
-                    </span>
+                    </span> */}
                     <span className="user-profile-list-span">
                         <MdLogout className="user-drop-list-icon" />
                         <li className ="drop-list-list">Logout</li>

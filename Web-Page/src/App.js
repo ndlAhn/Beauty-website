@@ -8,6 +8,7 @@ import Homepage from './pages/home/homepage';
 import AboutUs from './pages/about-us/aboutUs';
 import Review from './pages/reviews/review';
 import CreateReview from './pages/create-review/createReview';
+import Profile from './pages/profile/profile';
 function App() {
 
   
@@ -22,6 +23,7 @@ function App() {
         <Route path="/news" element={<News />} />
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/reviews" element = {<Review />} />
+        <Route path="/profile" element = {<Profile />} />
       </Routes>
     </Router>
     )
