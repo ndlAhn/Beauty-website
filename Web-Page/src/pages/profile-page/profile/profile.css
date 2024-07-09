@@ -1,0 +1,19 @@
+.profile-wrap{
+    display:flex;
+}
+.profile-content-wrap {
+    width: 100%;
+    padding: 30px 50px;
+    background-color: #f8f8f8 ;
+}
+.profile-content {
+    padding: 20px 30px;
+    color: var(--text-color-blue);
+    background-color: white ;
+    width: 100%;
+}
+.profile-img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+}

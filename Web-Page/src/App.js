@@ -8,7 +8,7 @@ import Homepage from './pages/home/homepage';
 import AboutUs from './pages/about-us/aboutUs';
 import Review from './pages/reviews/review';
 import CreateReview from './pages/create-review/createReview';
-import Profile from './pages/profile/profile';
+import Profile from './pages/profile-page/profile/profile';
 function App() {
 
   

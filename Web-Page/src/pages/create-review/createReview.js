@@ -1,5 +1,5 @@
 import './createReview.css';
-import Sidebar from '../../components/sidebar/sidebar.js';
+import Sidebar from '../../components/sidebar/review-sidebar/reviewSidebar.js';
 import SubHeader from "../../components/subHeader/subHeader.js";
 import { IoIosCloudUpload } from "react-icons/io";
 import { CgAsterisk } from "react-icons/cg";
