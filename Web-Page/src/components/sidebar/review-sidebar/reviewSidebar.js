@@ -8,7 +8,7 @@ import { FaRegHeart } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
 function ReviewSidebar () {
     return(
-        <div className="review-sidebar">
+      <div className="review-sidebar">
       <button className="review-sidebar-btn">WRITE REVIEW</button>
       <hr style={{color: "var(--text-color-blue)"}} />
       <nav className="review-sidebar-nav">
@@ -18,9 +18,11 @@ function ReviewSidebar () {
             <Link to="/" className="sidebar-link">Home</Link>
           </li>
           <li>
+            <TbLayoutNavbar className="sidebar-icon" />
             <Link to="/posts" className="sidebar-link">Posts</Link>
           </li>
           <li>
+            <FaRegCommentDots className="sidebar-icon" />
             <Link to="/comments" className="sidebar-link">Comments</Link>
           </li>
         </ul>

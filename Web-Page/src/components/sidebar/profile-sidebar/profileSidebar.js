@@ -9,33 +9,33 @@ import { Link } from 'react-router-dom';
 
 function ProfileSidebar () {
     return(
-        <div className="sidebar-wrap">   
-            <div className="profile-sidebar">
-                <div className="profile-sidebar-item">
-                    <span>
-                        <AiOutlineHome className="sidebar-icon"/>
-                        <a href="/" >Home</a>
-                    </span>
-                    <span>
-                        <RiProfileLine className="sidebar-icon"/>
-                        <a href="/profile" >Profile</a>
-                    </span>
-                    <span>
-                        <MdOutlineSettings className="sidebar-icon"/>
-                        <a href="#" >Personal information</a>
-                    </span>
-                    <span>
-                        <FaRegHeart className="sidebar-icon" />
-                        <a href="#" >Liked posts</a>
-                    </span>
-                    <span>
-                        <FaRegHeart className="sidebar-icon" />
-                        <a href="#" >Liked products</a>
-                    </span>
-
+        <div className="review-sidebar">   
+            <nav className="review-sidebar-nav">
+                <ul>
+                <li>
+                    <AiOutlineHome className="profile-sidebar-icon"/>
+                    <Link to="/" className="sidebar-link">Home</Link>
+                </li>
+                <li>
                     
-                </div>
-            </div>
+                    <RiProfileLine className="profile-sidebar-icon"/>
+                    <Link to="/profile" className="sidebar-link">Profile</Link>
+                </li>
+                <li>
+                    <MdOutlineSettings className="pi-icon"/>
+                    <Link to="/personal-information" className="sidebar-link">Personal information</Link>
+                </li>
+                <li>
+                    <FaRegHeart className="post-icon" />
+                     <Link to="/Liked-posts" className="sidebar-link">Liked posts</Link>
+                </li>
+                <li>
+                    <FaRegHeart className="profile-sidebar-icon" />
+                    <Link to="/Liked-products" className="sidebar-link">Liked products</Link>
+                </li>
+
+                </ul>
+            </nav>
         </div>
     )
 }

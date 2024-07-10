@@ -3,7 +3,7 @@
 }
 .profile-content-wrap {
     width: 100%;
-    padding: 30px 50px;
+    padding: 30px 60px;
     background-color: #f8f8f8 ;
 }
 .profile-content {
@@ -14,6 +14,49 @@
 }
 .profile-img {
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    width: 130px;
+    height: 130px;
+}
+.user-profile {
+    display: flex;
+}
+.profile-name {
+    padding-left: 40px;
+    display:flex;
+    flex-direction: column;
+}
+
+.profile-username {
+    padding-top: 10px;
+    font-size: 30px;
+    padding-bottom: 10px;
+}
+.edit-btn {
+    width: 110px;
+    padding: 10px;
+    background-color: var(--heavy-pink);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    height: 40px;
+}
+.post-fler-flwing {
+    display: flex;
+}
+.count {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding-right: 50px;
+    padding-top: 30px;
+    font-size: 20px;
+}
+
+.story-text {
+    padding-top: 10px;
+    padding-left: 50px;
+    font-size: 20px;
+    height: 30px;
 }
