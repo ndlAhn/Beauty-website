@@ -1,6 +1,6 @@
 import './createReview.css';
-import Sidebar from '../../components/sidebar/review-sidebar/reviewSidebar.js';
-import SubHeader from "../../components/subHeader/subHeader.js";
+import SubHeader from '../../../components/subHeader/subHeader';
+import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSidebar';
 import { IoIosCloudUpload } from "react-icons/io";
 import { CgAsterisk } from "react-icons/cg";
 
@@ -9,7 +9,7 @@ function CreateReview () {
         <div>
             <SubHeader/>
             <div className="create-review-wrap">
-            <Sidebar />
+            <ReviewSidebar />
             
             <div className="create-review-area">
                 <div className="create-review-content">

@@ -27,7 +27,7 @@ function ProfileSidebar () {
                 </li>
                 <li>
                     <FaRegHeart className="post-icon" />
-                     <Link to="/Liked-posts" className="sidebar-link">Liked posts</Link>
+                     <Link to="/liked-posts" className="sidebar-link">Liked posts</Link>
                 </li>
                 <li>
                     <FaRegHeart className="profile-sidebar-icon" />

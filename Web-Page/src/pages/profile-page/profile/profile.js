@@ -1,7 +1,7 @@
 import './profile.css';
 import SubHeader from '../../../components/subHeader/subHeader';
 import ProfileSidebar from '../../../components/sidebar/profile-sidebar/profileSidebar';
-import { RxAvatar } from "react-icons/rx";
+
 
 function Profile() {
     return (
@@ -41,8 +41,24 @@ function Profile() {
                         <label className="story-text">Share story or quote...</label>
                     </div>
                     <hr style={{color: "var(--text-color-blue)"}} />
-
-                    
+                    <h4>Recent Posts</h4>
+                    <div className="pro5-post">
+                        
+                        <div className="first-post">
+                            
+                        </div>
+                        <p>Post title</p> 
+                        
+                        
+                    </div>
+                    <h4>Liked</h4>
+                    <div className ="pro5-like">
+                       
+                        <div className="first-post">
+                            
+                        </div>
+                        <p>Post title</p>
+                    </div>
                 </div>
             </div>
             </div>

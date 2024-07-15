@@ -1,0 +1,78 @@
+.personal-wrap{
+    display:flex;
+}
+.personal-content-wrap {
+    width: 100%;
+    padding: 30px 60px;
+    background-color: #f8f8f8 ;
+}
+.personal-content {
+    padding: 30px 50px;
+    color: var(--text-color-blue);
+    background-color: white ;
+    width: 100%;
+}
+.info-field {
+    display: flex;
+    padding-top: 25px;
+}
+.personal-label {
+    font-size: 25px;
+    padding-right: 20px;
+}
+.profile-input {
+    height: 40px;
+    width: 250px;
+    border: 1px solid #b4b4b4;
+    padding-left: 5px;
+    border-radius: 5px;
+    font-size: 20px;
+    color: var(--text-color-blue)
+}
+.personal-gender {
+    padding-right: 20px;
+    margin-top: 5px;
+}
+.personal-gender-label {
+    font-size: 20px;
+    padding-left: 10px;
+}
+.personal-gender-input {
+    width: 15px;
+    height: 15px;
+}
+.personal-segment-label {
+    font-size: 20px;
+    padding-left: 15px;
+}
+.price-segments {
+    padding-left: 20px ;
+}
+.personal-price {
+    padding-bottom: 10px;
+}
+.personal-segment-input {
+    width: 15px;
+    height: 15px;
+
+}
+.personal-label-price {
+    font-size: 25px;
+    padding-top: 20px;
+}
+.save {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+.save-btn {
+    height: 40px;
+    width: 130px;
+    color: var(--text-color-blue);
+    justify-content: center;
+    background-color: var(--heavy-pink);
+    color: white;
+    font-weight: bold;
+    border: none;
+}
