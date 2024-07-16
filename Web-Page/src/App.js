@@ -13,12 +13,14 @@ import PersonalInfo from './pages/profile-page/personal-information/personalInfo
 import LikedPost from './pages/profile-page/liked-posts/likePost';
 import LikedProduct from './pages/profile-page/liked-product/likedProduct';
 import Posts from './pages/review-pages/posts/posts';
+import Comment from './pages/review-pages/comments/comments';
 function App() {
 
   
     return(
     <Router>
       <Routes>
+        <Route path="/comments" element={<Comment />} />
         <Route path="/create-review" element={<CreateReview />} />
         <Route path="/posts" element={<Posts />} />
         <Route path="/" element={<Homepage />} />
