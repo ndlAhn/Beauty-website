@@ -1,9 +1,9 @@
-import './products.css';
-import Header from '../../components/header/header.js';
-import Footer from '../../components/footer/footer.js';
+import './recommendations.css';
+import Header from '/Users/lananh/Desktop/Pre-thesis/Web-Page/src/components/header/header.js';
+import Footer from '/Users/lananh/Desktop/Pre-thesis/Web-Page/src/components/footer/footer.js';
 import { FiFilter } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa";
-function Products() {
+function Recommendations() {
     return(
         <div>
             <Header />
@@ -14,22 +14,15 @@ function Products() {
                         <FiFilter className='news-filter' />
                         </div>
                     </div>
+                    <h3>Recommendation</h3>
                     <div className="home-news-content">
-                        <h3>Product information</h3>
-                        <p className='products-descript'>Transform your skincare routine with the perfect skin care products. At Beauty Insight, we guide you to find the best products tailored to your skin type, whether it's oily, dry, sensitive, or combination. 
-                        Elevate your daily routine that leaves your skin feeling fresh, clean, and rejuvenated.</p>
+                        <p className='products-descript'>Welcome to Beauty Insight's skincare product recommendations!
+                        Our Website curate a selection of the best products tailored to your skin type and concerns. 
+                        Whether you need hydration, anti-aging solutions, acne treatments, or daily essentials, we've got you covered.
+                        Explore top-rated cleansers, moisturizers, serums, and more, all backed by expert reviews and user feedback. 
+                        Achieve your best skin with our personalized recommendations and discover the perfect products to enhance your skincare routine.
+                        </p>
                         
-                        <h3>Hot products</h3>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
                     </div>
                     <div className="home-news-content">
                         <h3>Cleansing</h3>
@@ -198,4 +191,4 @@ function Products() {
     )
 }
 
-export default Products;
+export default Recommendations;

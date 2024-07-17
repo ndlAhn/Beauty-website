@@ -14,12 +14,19 @@ import LikedPost from './pages/profile-page/liked-posts/likePost';
 import LikedProduct from './pages/profile-page/liked-product/likedProduct';
 import Posts from './pages/review-pages/posts/posts';
 import Comment from './pages/review-pages/comments/comments';
+import Ingredients from './pages/ingredients/ingredients';
+import Products from './pages/products/products';
+import Recommendations from './pages/profile-page/recommendations/recommendations';
+
 function App() {
 
   
     return(
     <Router>
       <Routes>
+        <Route path="/recommendations" element={<Recommendations />} />
+      <Route path="/products" element={<Products />} />
+      <Route path="/ingredients" element={<Ingredients />} />
         <Route path="/comments" element={<Comment />} />
         <Route path="/create-review" element={<CreateReview />} />
         <Route path="/posts" element={<Posts />} />
