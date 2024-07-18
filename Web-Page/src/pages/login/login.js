@@ -31,7 +31,7 @@ function Login() {
                             <a className="f-pass" href= "#" >Forgot password?</a>
                         </div>
                         <div className="signup-field"> 
-                            <button className="login-btn">Login</button>
+                            <button className="login-btn">Sign in</button>
                             <label className="s-login" htmlFor="sLogin">Or sign up using:</label> <br />
                         </div>    
                         <div className="login-icon">
