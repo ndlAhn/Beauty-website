@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Login from './pages/login/login';
 import Register from './pages/register/register';
 import Survey from './pages/survey/survey';
@@ -17,36 +17,38 @@ import Comment from './pages/review-pages/comments/comments';
 import Ingredients from './pages/ingredients/ingredients';
 import Products from './pages/products/products';
 import Recommendations from './pages/profile-page/recommendations/recommendations';
+import { useContext, useEffect } from 'react';
+import StateContext from './context/context.context';
 
 function App() {
-
-  
-    return(
-    <Router>
-      <Routes>
-        <Route path="/recommendations" element={<Recommendations />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/ingredients" element={<Ingredients />} />
-        <Route path="/comments" element={<Comment />} />
-        <Route path="/create-review" element={<CreateReview />} />
-        <Route path="/posts" element={<Posts />} />
-        <Route path="/" element={<Homepage />} />
-        <Route path="/log-in" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/survey" element={<Survey />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/about-us" element={<AboutUs />} />
-        <Route path="/reviews" element = {<Review />} />
-        <Route path="/profile" element = {<Profile />} />
-        <Route path="/personal-information" element = {<PersonalInfo />} />
-        <Route path="/liked-posts" element = {<LikedPost />} />
-        <Route path="/liked-products" element = {<LikedProduct />} />
-      </Routes>
-    </Router>
-    )
-  
+    const [state, dispatchState] = useContext(StateContext);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (state.login === false) {
+            navigate('/log-in');
+        }
+        console.log(state);
+    }, [state]);
+    return (
+        <Routes>
+            <Route path="/recommendations" element={<Recommendations />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/ingredients" element={<Ingredients />} />
+            <Route path="/comments" element={<Comment />} />
+            <Route path="/create-review" element={<CreateReview />} />
+            <Route path="/posts" element={<Posts />} />
+            <Route path="/" element={<Homepage />} />
+            <Route path="/log-in" element={<Login />} />
+            <Route path="/survey" element={<Survey />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/reviews" element={<Review />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/personal-information" element={<PersonalInfo />} />
+            <Route path="/liked-posts" element={<LikedPost />} />
+            <Route path="/liked-products" element={<LikedProduct />} />
+        </Routes>
+    );
 }
-
-
 
 export default App;

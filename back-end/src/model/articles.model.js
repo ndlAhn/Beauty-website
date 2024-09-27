@@ -1,10 +1,9 @@
-const {DataTypes} = require('sequelize')
+const { DataTypes } = require('sequelize');
 module.exports = (sequelize, Sequelize) => {
-    const Articles = sequelize.define("articles", {
+    const Articles = sequelize.define('articles', {
         article_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             primaryKey: true,
-            autoIncrement: true,
         },
         title: {
             type: DataTypes.STRING,
@@ -15,19 +14,20 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
         },
         img_url: {
-            type: DataTypes.STRING, 
+            type: DataTypes.STRING,
             allowNull: true,
         },
         article_category: {
             type: DataTypes.ENUM({
-                values: ['', 'another value']}),
+                values: ['', 'another value'],
+            }),
         },
         publish_at: {
-            type: DataTypes.DATE, 
+            type: DataTypes.DATE,
             allowNull: false,
         },
         source_name: {
-            type: DataTypes.STRING, 
+            type: DataTypes.STRING,
             allowNull: false,
         },
         create_at: {
@@ -35,9 +35,6 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: DataTypes.NOW,
             allowNull: false,
         },
-
-    },
-    
-    )
+    });
     return Articles;
 };

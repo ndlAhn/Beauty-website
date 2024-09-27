@@ -1,8 +1,8 @@
 import './recommendations.css';
-import Header from '/Users/lananh/Desktop/Pre-thesis/Web-Page/src/components/header/header.js';
-import Footer from '/Users/lananh/Desktop/Pre-thesis/Web-Page/src/components/footer/footer.js';
 import { FiFilter } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa";
+import Header from '../../../components/header/header';
+import Footer from '../../../components/footer/footer';
 function Recommendations() {
     return(
         <div>

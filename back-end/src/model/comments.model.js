@@ -1,10 +1,9 @@
-const {DataTypes} = require('sequelize')
+const { DataTypes } = require('sequelize');
 module.exports = (sequelize, Sequelize) => {
-    const Comments = sequelize.define("comments", {
+    const Comments = sequelize.define('comments', {
         comment_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             primaryKey: true,
-            autoIncrement: true,
         },
         comment_text: {
             type: DataTypes.TEXT,
@@ -15,9 +14,6 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: DataTypes.NOW,
             allowNull: false,
         },
-
-    },
-    
-    )
+    });
     return Comments;
 };

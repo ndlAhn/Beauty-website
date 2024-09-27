@@ -1,10 +1,9 @@
-const {DataTypes} = require('sequelize')
+const { DataTypes } = require('sequelize');
 module.exports = (sequelize, Sequelize) => {
-    const Product_reviews = sequelize.define("product_reviews", {
+    const Product_reviews = sequelize.define('product_reviews', {
         review_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             primaryKey: true,
-            autoIncrement: true,
         },
         title: {
             type: DataTypes.STRING,
@@ -31,9 +30,6 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: DataTypes.NOW,
             allowNull: false,
         },
-
-    },
-    
-    )
+    });
     return Product_reviews;
 };

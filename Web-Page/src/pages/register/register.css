@@ -1,29 +1,30 @@
-
-.register-bg{
-    background-image:url(/public/LoginTheme.png);
+.register-bg {
+    background-image: url(/public/LoginTheme.png);
     background-size: cover;
     background-repeat: no-repeat;
     height: 100vh;
     overflow: hidden;
     display: flex;
     justify-content: flex-end;
-    padding: 15% 5% 0 0;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
 }
 .register-form-bg {
     background-color: white;
     border-radius: 5%;
-    width: 30%;
-    height: 93%;
+    width: 400px;
     display: flex;
     flex-direction: column;
     padding: 15px;
     color: var(--heavy-pink);
+    height: fit-content;
 }
-.register-form{
-    padding: 10px;
+.register-form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    width: 100%;
+    align-items: center;
 }
 .register-title {
     display: flex;
@@ -39,6 +40,7 @@
     color: var(--heavy-pink);
     font-size: 20px;
     gap: 10px;
+    width: 100%;
 }
 
 .register-field input {
@@ -50,7 +52,7 @@
     color: var(--text-color-blue);
 }
 
-.re-signin-field{
+.re-signin-field {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -73,14 +75,19 @@
     font-weight: bold;
     font-size: 20px;
 }
-.re-signin-icon{
+.re-signin-icon {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
 }
-.login-register-field{
+.login-register-field {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#gender {
+    color: var(--heavy-pink);
+    outline: unset;
 }

@@ -1,13 +1,14 @@
-const express = require('express')
-const app = express()
-const port = 5001
-const db = require("./models")
+const express = require('express');
+const app = express();
+const port = 5000;
+const db = require('./model');
+const cors = require('cors');
 
-db.sequelize.sync({alter:true})
+app.use(cors());
 
+// db.sequelize.sync({ alter: true });
+require('./controller/user.controller')(app);
 
-app.listen(port,() => 
-{
-    console.log("Listen on port ",port)
-})
-
+app.listen(port, () => {
+    console.log('Listen on port ', port);
+});
