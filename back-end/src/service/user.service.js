@@ -1,5 +1,5 @@
 const db = require('../model');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 
 const Users = db.Users;
@@ -7,16 +7,16 @@ const Users = db.Users;
 exports.create = async (req, res) => {
     try {
         console.log(req.body);
-        // const newUserId = uuidv4();
-        // const newUser = {
-        //     user_id: newUserId,
-        //     name: req.body.name,
-        //     username: req.body.username,
-        //     password: req.body.password,
-        //     dob: req.body.dob,
-        //     gender: req.body.gender,
-        // };
-        // await Users.create(newUser);
+        const newUserId = uuidv4();
+        const newUser = {
+            user_id: newUserId,
+            name: req.body.name,
+            username: req.body.username,
+            password: req.body.password,
+            dob: req.body.dob,
+            gender: req.body.gender,
+        };
+        await Users.create(newUser);
         res.status(200).send(req.body);
     } catch (error) {
         console.error('Error creating user:', error);
@@ -78,3 +78,27 @@ exports.getAll = async (req, res) => {
             });
         });
 };
+
+exports.update = async (req,res)=>
+{
+    try{
+        Users.update({
+            skin_type:req.body.skinType,
+            skin_prob:req.body.skinProb
+        },{where:{
+            username:req.body.username
+        }})
+        .then(result=>
+        {
+            res.status(200).send("Cập nhật thành công")
+            
+
+        }
+        )
+    }
+    catch(err)
+    {
+        console.log(err)
+        res.status(500).send("Error due to ",err);
+    }
+}

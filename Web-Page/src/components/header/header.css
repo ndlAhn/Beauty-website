@@ -1,9 +1,7 @@
-
-
 .header {
     display: flex;
     gap: 20px;
-    max-width: 100% ;
+    max-width: 100%;
     height: 90px;
     background-color: var(--light-pink);
     justify-content: center;
@@ -11,26 +9,22 @@
     align-items: center;
 }
 
-.search{
-  display: flex;
-  align-items: center;
-  flex-direction:row;
-  justify-content: space-between;
-  background-color: white;
-  width: 600px;
-  height: 36px;
-  border-radius: 10px;
-  padding: 0 10px;
-
-
-
+.search {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: white;
+    width: 600px;
+    height: 36px;
+    border-radius: 10px;
+    padding: 0 10px;
 }
 
 .header .left-side .logo {
     height: 90px;
     width: 110px;
 }
-
 
 .header .search-text {
     height: 100%;
@@ -43,9 +37,8 @@
     background-color: white;
 }
 
-.search-text:focus
-{
-  outline: none;
+.search-text:focus {
+    outline: none;
 }
 
 .search-icon {
@@ -57,28 +50,30 @@
     display: flex;
     gap: 25px;
     margin-left: 130px;
-    color: var(--heavy-pink); 
+    color: var(--heavy-pink);
 }
 
- .user-icon, .like-icon, .notice-icon {
+.user-icon,
+.like-icon,
+.notice-icon {
     width: 35px;
     height: 35px;
     color: var(--text-color-blue);
-    
 }
-.user-icon:hover, .like-icon:hover, .notice-icon:hover, .review-icon:hover {
+.user-icon:hover,
+.like-icon:hover,
+.notice-icon:hover,
+.review-icon:hover {
     cursor: pointer;
     opacity: 0.6;
-    
 }
 .search-icon:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 .review-icon {
     width: 37px;
     height: 37px;
     color: var(--text-color-blue);
-
 }
 
 .nav-bar-ul {
@@ -94,57 +89,53 @@
 }
 
 .nav-bar-header {
-
     float: right;
-    border-right:1px solid var(--heavy-pink);
-  }
-  
-  .nav-bar-header:last-child {
-    border-right: none;
-  }
-  
-  .nav-bar-header a {
-    display: block;
-    color: var(--text-color-blue) ;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
+    border-right: 1px solid var(--heavy-pink);
     font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .nav-bar-header a:hover:not(.active) {
+    font-weight: 500;
+    padding: 0px 10px;
+}
+
+.nav-bar-header:hover {
+    cursor: pointer;
+}
+
+.nav-bar-header:last-child {
+    border-right: none;
+}
+
+.nav-bar-header a:hover:not(.active) {
     background-color: var(--heavy-pink);
     color: white;
-  }
-  
-  .active {
+}
+
+.active {
     background-color: var(--pink-grey);
-  }
+}
 
 .container {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 }
 .wel-img {
-  width: 1000px;
-  height: 500px;
-  border-radius: 5%;
-  margin-left: 160px;
-} 
+    width: 1000px;
+    height: 500px;
+    border-radius: 5%;
+    margin-left: 160px;
+}
 .user-drop-list {
-  position: absolute;
-  top: 5.3rem;
-  right: 7.8rem;
-  width: 140px;
-  height: 120px;
-  border-radius: 15px;
-  background-color: var(--back-drop-list);
-  border: 1px solid gray;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding:0; 
+    position: absolute;
+    top: 5.3rem;
+    right: 7.8rem;
+    width: 140px;
+    height: 120px;
+    border-radius: 15px;
+    background-color: var(--back-drop-list);
+    border: 1px solid gray;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
 }
 .user-drop-list::before {
     content: '';
@@ -159,32 +150,28 @@
     transform: rotate(44deg);
 }
 .user-profile-list {
-  display: flex;
-  flex-direction: row;
-  background-color: rgba(255, 255, 255, 0);
-  padding:0;
-  width:100%; 
-  padding: 0px 5px;
-  box-sizing: border-box;
-  align-items: center;
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(255, 255, 255, 0);
+    padding: 0;
+    width: 100%;
+    padding: 0px 5px;
+    box-sizing: border-box;
+    align-items: center;
 }
 .user-profile-list-span {
-  display: flex;
-  gap: 10px;
-  
-  
+    display: flex;
+    gap: 10px;
 }
 .drop-list-list {
-  font-size: 16px;
-  color: var(--text-color-blue);
+    font-size: 16px;
+    color: var(--text-color-blue);
 }
 .user-drop-list-icon {
-  width: 25px;
-  height: 25px;
-  color: var(--text-color-blue)
+    width: 25px;
+    height: 25px;
+    color: var(--text-color-blue);
 }
-
-
 
 /* .user-profile-list-span {
   transition: transform 0.5s;

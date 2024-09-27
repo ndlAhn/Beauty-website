@@ -1,40 +1,55 @@
+import { useContext } from 'react';
+import instance from '../../axios/instance';
+import { SURVEY } from '../../constant/endPoint';
 import './survey.css';
+import StateContext from '../../context/context.context';
+import { useNavigate } from 'react-router-dom';
 
 function Survey() {
+    const [state, dispatchState] = useContext(StateContext);
+    const navigate = useNavigate();
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const formData = {
+            skinType: e.target.skinType.value,
+            skinProb: e.target.skinProb.value,
+        };
+        instance
+            .post(SURVEY, { ...formData, ...state.userData })
+            .then((res) => {
+                console.log(res.data);
+                navigate('/');
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
     return (
         <div>
             <div className="survey-bg">
                 <div className=" survey-form-bg">
-                    <form className="survey-form">
+                    <form className="survey-form" onSubmit={handleSubmit}>
                         <div className="form-title">
                             <h3>Personal Information</h3>
                         </div>
                         <div className="survey-field">
-                            <div className="user-name">
-                                <label className="text-name" htmlFor="Uname">
-                                    Name:
-                                </label>
-                                <input className="u-name" type="text" id="Uname" name="Uname" required></input>
-                            </div>
-
                             <div className="skin-type">
                                 <label htmlFor="skintype">Skin type:</label>
-                                <select className="skin-type-select" name="skintype" id="skin-type">
-                                    <option value="oily-skin-t">Oily skin</option>
-                                    <option value="dry-skin">Dry skin</option>
-                                    <option value="normal-skin">Normal skin</option>
-                                    <option value="com-skin">Combination skin</option>
-                                    <option value="sensitve-skin">Sensitive skin</option>
+                                <select className="skin-type-select" name="skinType" id="skin-type">
+                                    <option value="oily">Oily skin</option>
+                                    <option value="dry">Dry skin</option>
+                                    <option value="normal">Normal skin</option>
+                                    <option value="combination">Combination skin</option>
+                                    <option value="sensitive-skin">Sensitive skin</option>
                                 </select>
                             </div>
                             <div className="skin-prob">
                                 <label htmlFor="skin-prob">Skin problem:</label>
-                                <select className="skin-prob-select" name="skinprob" id="skin-prob">
-                                    <option value="none">None</option>
+                                <select className="skin-prob-select" name="skinProb" id="skin-prob">
                                     <option value="acne">Acne</option>
                                     <option value="aging">Aging</option>
-                                    <option value="dried-skin">Dried skin</option>
-                                    <option value="oily-skin-p">Oily skin</option>
+                                    <option value="dried">Dried skin</option>
+                                    <option value="oily">Oily skin</option>
                                 </select>
                             </div>
                             <div className="price-segments">
@@ -58,7 +73,9 @@ function Survey() {
                             </div>
                         </div>
                         <div className="finish">
-                            <button className="finish-btn">Finish</button>
+                            <button type="submit" className="finish-btn">
+                                Finish
+                            </button>
                         </div>
                     </form>
                 </div>

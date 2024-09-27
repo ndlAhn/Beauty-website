@@ -32,6 +32,16 @@ module.exports = (sequelize, Sequelize) => {
                 defaultValue: 'user',
                 allowNull: false,
             },
+            skin_type: {
+                type: DataTypes.ENUM('oily', 'dry', 'normal', 'combination', 'sensitive'),
+                defaultValue: 'normal',
+                allowNull: false,
+            },
+            skin_prob: {
+                type: DataTypes.ENUM('acne', 'aging', 'dried', 'oily'),
+                defaultValue: 'aging',
+                allowNull: true,
+            },
         },
         {
             timestamp: false,
