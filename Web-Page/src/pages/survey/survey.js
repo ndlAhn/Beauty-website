@@ -41,6 +41,7 @@ function Survey() {
                                     <option value="normal">Normal skin</option>
                                     <option value="combination">Combination skin</option>
                                     <option value="sensitive-skin">Sensitive skin</option>
+                                    <option value="sensitive-skin">Acne-pront skin</option>
                                 </select>
                             </div>
                             <div className="skin-prob">
@@ -50,6 +51,9 @@ function Survey() {
                                     <option value="aging">Aging</option>
                                     <option value="dried">Dried skin</option>
                                     <option value="oily">Oily skin</option>
+                                    <option value="enlarged pores">Enlarged pores</option>
+                                    <option value="scarring">Scarring</option>
+                                    <option value="skin recovery">Skin recovery</option>
                                 </select>
                             </div>
                             <div className="price-segments">

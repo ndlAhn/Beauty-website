@@ -13,7 +13,7 @@ import PersonalInfo from './pages/profile-page/personal-information/personalInfo
 import LikedPost from './pages/profile-page/liked-posts/likePost';
 import LikedProduct from './pages/profile-page/liked-product/likedProduct';
 import Posts from './pages/review-pages/posts/posts';
-import Comment from './pages/review-pages/comments/comments';
+import CreateProduct from './pages/review-pages/comments/createProduct';
 import Ingredients from './pages/ingredients/ingredients';
 import Products from './pages/products/products';
 import Recommendations from './pages/profile-page/recommendations/recommendations';
@@ -21,20 +21,20 @@ import { useContext, useEffect } from 'react';
 import StateContext from './context/context.context';
 
 function App() {
-    const [state, dispatchState] = useContext(StateContext);
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (state.login === false) {
-            navigate('/log-in');
-        }
-        console.log(state);
-    }, [state]);
+    // const [state, dispatchState] = useContext(StateContext);
+    // const navigate = useNavigate();
+    // useEffect(() => {
+    //     if (state.login === false) {
+    //         navigate('/log-in');
+    //     }
+    //     console.log(state);
+    // }, [state]);
     return (
         <Routes>
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/products" element={<Products />} />
             <Route path="/ingredients" element={<Ingredients />} />
-            <Route path="/comments" element={<Comment />} />
+            <Route path="/CreateProduct" element={<CreateProduct />} />
             <Route path="/create-review" element={<CreateReview />} />
             <Route path="/posts" element={<Posts />} />
             <Route path="/" element={<Homepage />} />

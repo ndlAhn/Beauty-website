@@ -6,6 +6,7 @@ import { RiProfileLine } from "react-icons/ri";
 import { MdOutlineSettings } from "react-icons/md";
 import { FaRegHeart } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
+
 function ReviewSidebar () {
     return(
       <div className="review-sidebar">
@@ -23,8 +24,9 @@ function ReviewSidebar () {
           </li>
           <li>
             <FaRegCommentDots className="sidebar-icon" />
-            <Link to="/comments" className="sidebar-link">Comments</Link>
+            <Link to="/CreateProduct" className="sidebar-link">Add Product</Link>
           </li>
+
         </ul>
       </nav>
     </div>

@@ -4,6 +4,8 @@ import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSide
 import { MdDeleteOutline } from "react-icons/md";
 import { IoIosSearch } from "react-icons/io";
 import { FiFilter } from "react-icons/fi";
+import { MdEdit } from "react-icons/md";
+
 function Posts() {
     return(
         <div>
@@ -17,6 +19,7 @@ function Posts() {
                     <div className="posts-search-filter">
                         <div className="posts-search-area">
                         <input className="posts-search" placeholder="Find post..."></input>
+                        
                         <IoIosSearch className="posts-search-icon" />
                         </div>
                         <FiFilter className="posts-filter" />
@@ -60,6 +63,7 @@ function Posts() {
                         </div>
                         
                         <div className="post-manage">
+                            <MdEdit  className="edit-icon" />
                             <MdDeleteOutline className="trashcan" />
                         </div>
                         <div className="post-date">
