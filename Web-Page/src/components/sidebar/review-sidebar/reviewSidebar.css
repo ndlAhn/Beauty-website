@@ -74,7 +74,20 @@
     font-weight: bold;
     height: 50px;
   }
-  
+  .sidebar-icon-incredient{
+    display: block;
+    width: 100%;
+    padding: 10px;
+    color: var(--heavy-pink);
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    height: 50px;
+  }
   .review-sidebar-btn:hover {
     background-color: #c4858c;
   }
@@ -99,7 +112,7 @@
     margin-bottom: 10px;
   }
   
-  .review-sidebar-nav li:hover {
+  .review-sidebar-nav li:hover, .idebar-icon-incredient li:hover{
     background-color: #f0f0f0;
   }
   

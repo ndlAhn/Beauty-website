@@ -6,6 +6,10 @@ import { RiProfileLine } from "react-icons/ri";
 import { MdOutlineSettings } from "react-icons/md";
 import { FaRegHeart } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
+import { GrAddCircle } from "react-icons/gr";
+import { IoWaterOutline } from "react-icons/io5";
+
+
 
 function ReviewSidebar () {
     return(
@@ -23,8 +27,12 @@ function ReviewSidebar () {
             <Link to="/posts" className="sidebar-link">Posts</Link>
           </li>
           <li>
-            <FaRegCommentDots className="sidebar-icon" />
-            <Link to="/CreateProduct" className="sidebar-link">Add Product</Link>
+            <GrAddCircle className="sidebar-icon" />
+            <Link to="/create-product" className="sidebar-link">New product</Link>
+          </li>
+          <li>
+            <GrAddCircle className="sidebar-icon" />
+            <Link to="/create-incredient" className="sidebar-link">New incredient</Link>
           </li>
 
         </ul>
