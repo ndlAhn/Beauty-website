@@ -19,7 +19,8 @@ import Products from './pages/products/products';
 import Recommendations from './pages/profile-page/recommendations/recommendations';
 import { useContext, useEffect } from 'react';
 import StateContext from './context/context.context';
-import AddIncredient from './pages/review-pages/addIncredient/addIncredient'
+import AddIncredient from './pages/review-pages/addIncredient/addIncredient';
+import ReviewProducts from './pages/review-product/review-product';
 
 function App() {
     // const [state, dispatchState] = useContext(StateContext);
@@ -49,6 +50,7 @@ function App() {
             <Route path="/liked-posts" element={<LikedPost />} />
             <Route path="/liked-products" element={<LikedProduct />} />
             <Route path="/create-incredient" element={<AddIncredient />} />
+            <Route path="/review-product" element={<ReviewProducts />} />
         </Routes>
     );
 }
