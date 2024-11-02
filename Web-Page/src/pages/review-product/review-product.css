@@ -46,7 +46,7 @@
 .review-product-content-wrap {
     background-color: #f8f8f8;
     padding: 20px 30px 10px 30px;
-    width: 70%;
+    width: 65%;
 }
 .title-liked{
     display: flex;
@@ -57,5 +57,21 @@
 }
 .product-recommend-right-side{
     padding: 10px 10px 10px 10px;
-    width: 30%;
+    width: 100%;
+}
+.product-right-side{
+    display:flex;
+    flex-direction: column;
+}
+.product-right-side .home-news {
+    width: 200px;
+    height: 200px;
+    
+}
+.product-recommend-product-infor{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+
 }

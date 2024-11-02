@@ -80,9 +80,29 @@ function ReviewProducts() {
                 </div>
 
                 {/* Right hand side */}
-                <div className='product-recommend-right-side'>
+                <div className="product-right-side">
+                    <div className='product-recommend-right-side'>
                     <h3>Discover Products You'll Adore</h3>
+                    </div>
+                    <div className='product-recommend-product-infor'>
+                         <div className="home-news">
+                            <div className="home-new-picture">
+                                <p>Product's picture</p>
+                            </div>
+                                <p className="home-new-title">Product's name</p>
+                                <FaRegHeart />
+                        </div>
+                        <div className="home-news">
+                            <div className="home-new-picture">
+                                <p>Product's picture</p>
+                            </div>
+                                <p className="home-new-title">Product's name</p>
+                                <FaRegHeart />
+                        </div>
+                    </div>
+                   
                 </div>
+                
             </div>
             <Footer />
         </div>
