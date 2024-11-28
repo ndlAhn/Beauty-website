@@ -12,6 +12,7 @@ function DropDown() {
     const navigate = useNavigate();
 
     const [state, dispatchState] = useContext(StateContext);
+    const test = 0;
     return (
         <div>
             <div className="user-drop-list">
