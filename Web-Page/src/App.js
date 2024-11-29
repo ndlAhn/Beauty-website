@@ -23,14 +23,14 @@ import AddIncredient from './pages/review-pages/addIncredient/addIncredient';
 import ReviewProducts from './pages/review-product/review-product';
 
 function App() {
-    // const [state, dispatchState] = useContext(StateContext);
-    // const navigate = useNavigate();
-    // useEffect(() => {
-    //     if (state.login === false) {
-    //         navigate('/log-in');
-    //     }
-    //     console.log(state);
-    // }, [state]);
+    const [state, dispatchState] = useContext(StateContext);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (state.login === false) {
+            navigate('/log-in');
+        }
+        console.log(state);
+    }, [state]);
     return (
         <Routes>
             <Route path="/recommendations" element={<Recommendations />} />

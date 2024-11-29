@@ -15,24 +15,22 @@ exports.create = async (req, res) => {
             pros: req.body.pros,
             cons: req.body.cons,
             description: req.body.description,
-            product_id:req.body.productId,
-            user_id:req.body.userId,
+            product_id: req.body.productId,
+            user_id: req.body.userId,
         };
         await ProductReviews.create(newProductReviews);
-        res.status(200).send("Create Product Review Succeed ");
+        res.status(200).send('Create Product Review Succeed ');
     } catch (error) {
         console.error('Error creating user:', error);
         res.status(500).send('Internal Server Error');
     }
 };
 
-
-
-exports.getByProductId= async (req, res) => {
+exports.getByProductId = async (req, res) => {
     ProductReviews.findAll({
-        where:{
-            product_id:req.body.productId
-        }
+        where: {
+            product_id: req.body.productId,
+        },
     })
         .then((result) => {
             res.status(200).send(result);
@@ -46,11 +44,11 @@ exports.getByProductId= async (req, res) => {
 
 exports.getProductsByName = async (req, res) => {
     Products.findAll({
-        where:{
-            product_name:{
-                [Op.like]:req.body.productName
-            }
-        }
+        where: {
+            product_name: {
+                [Op.like]: req.body.productName,
+            },
+        },
     })
         .then((result) => {
             res.status(200).send(result);
@@ -62,28 +60,39 @@ exports.getProductsByName = async (req, res) => {
         });
 };
 
-
-
-exports.update = async (req,res)=>
-{
-    try{
-        Users.update({
-            skin_type:req.body.skinType,
-            skin_prob:req.body.skinProb
-        },{where:{
-            username:req.body.username
-        }})
-        .then(result=>
-        {
-            res.status(200).send("Cập nhật thành công")
-            
-
-        }
-        )
+exports.update = async (req, res) => {
+    try {
+        Users.update(
+            {
+                skin_type: req.body.skinType,
+                skin_prob: req.body.skinProb,
+            },
+            {
+                where: {
+                    username: req.body.username,
+                },
+            },
+        ).then((result) => {
+            res.status(200).send('Cập nhật thành công');
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Error due to ', err);
     }
-    catch(err)
-    {
-        console.log(err)
-        res.status(500).send("Error due to ",err);
+};
+
+exports.getProductReviewsByUserId = async (req, res) => {
+    try {
+        ProductReviews.findAll({
+            where: {
+                user_id: req.body,
+            },
+        }).then((result) => {
+            res.status(200).send(result);
+        });
+        res.send(req.body);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Error due to ', err);
     }
-}
+};
