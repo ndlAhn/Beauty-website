@@ -20,17 +20,17 @@ import Recommendations from './pages/profile-page/recommendations/recommendation
 import { useContext, useEffect } from 'react';
 import StateContext from './context/context.context';
 import AddIncredient from './pages/review-pages/addIncredient/addIncredient';
-import ReviewProducts from './pages/review-product/review-product';
-
+import ProductDetails from './pages/product-details/productDetails';
+import ReviewDetails from './pages/review-details/reviewDetails';
 function App() {
-    const [state, dispatchState] = useContext(StateContext);
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (state.login === false) {
-            navigate('/log-in');
-        }
-        console.log(state);
-    }, [state]);
+    // const [state, dispatchState] = useContext(StateContext);
+    // const navigate = useNavigate();
+    // useEffect(() => {
+    //     if (state.login === false) {
+    //         navigate('/log-in');
+    //     }
+    //     console.log(state);
+    // }, [state]);
     return (
         <Routes>
             <Route path="/recommendations" element={<Recommendations />} />
@@ -50,7 +50,8 @@ function App() {
             <Route path="/liked-posts" element={<LikedPost />} />
             <Route path="/liked-products" element={<LikedProduct />} />
             <Route path="/create-incredient" element={<AddIncredient />} />
-            <Route path="/review-product" element={<ReviewProducts />} />
+            <Route path="/product-details" element={<ProductDetails />} />
+            <Route path="/review-details" element={<ReviewDetails />} />
         </Routes>
     );
 }

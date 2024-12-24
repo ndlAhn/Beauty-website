@@ -1,9 +1,9 @@
-import './review-product.css';
+import './productDetails.css';
 
 import Header from '../../components/header/header.js';
 import Footer from '../../components/footer/footer.js';
 import { FaRegHeart } from "react-icons/fa";
-function ReviewProducts() {
+function ProductDetails() {
     return (
         <div>
             <Header />
@@ -31,7 +31,7 @@ function ReviewProducts() {
                             <a href='' class="triangle-before">Price range</a>
                             <a href='' class="triangle-before">Skin type</a>
                             <a href='' class="triangle-before">Skin proplem</a>
-                            <a href='' class="triangle-before">Incredient</a>
+                            <a href='' class="triangle-before">Ingredient</a>
                             <a href='' class="triangle-before">Product description</a>
                             <a href='' class="triangle-before">Uses</a>
                             <a href='' class="triangle-before">Warning</a>
@@ -108,4 +108,4 @@ function ReviewProducts() {
         </div>
     )
 }
-export default ReviewProducts;
+export default ProductDetails;

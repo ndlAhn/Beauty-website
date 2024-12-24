@@ -1,0 +1,82 @@
+.review-details-wrap {
+    padding: 10px 100px 10px 100px;
+    color: var(--text-color-blue);
+}
+.review-details-content-wrap {
+    background-color: #f8f8f8;
+    padding: 20px 30px 0 30px;
+}
+.review-details-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+.element-review-details {
+    display:flex;
+    flex-direction: column;
+}
+.review-script{
+    padding-left: 30px;
+}
+
+
+.review-details-pros-cons-wrap {
+    display:flex;
+    height: 60%;
+    width: 100%;
+    padding-left: 30px;
+    gap: 10px;
+}
+.review-details-pros-cons-wrap p {
+    font-weight: bold;
+}
+.review-details-pros, .review-details-cons {
+    width: 100%;
+    height: 100%;
+    border: 1px dashed var(--text-color-blue); 
+    border-radius: 5px;
+}
+.custom-line {
+    height: 1px; /* Độ dày của dòng */
+    background-color: black; /* Màu của dòng */
+    width: 100%; /* Chiều rộng dòng */
+    margin: 10px 10px; /* Khoảng cách trên và dưới dòng */
+    border: none; /* Loại bỏ viền nếu có */
+}
+.review-detais-reviewer {
+    display:flex;
+    gap: 10px;
+}  
+.review-details-comment .comment {
+    bodder-radius: 10px;
+    width: 100%;
+    height: 100%;
+}
+.review-details-comment-area{
+    display:flex;
+    flex-direction: column;
+    width: 50%;
+    height: 100px;
+    
+}
+.review-details-comment {
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.upload-comment-btn {
+    width: 20%;
+    height: 40%;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    background-color: var(--heavy-pink);
+}
+.review-details-comment-upload-btn {
+    display: flex;
+    width: 50%;
+    height: 100%;
+    justify-content: center;
+}
