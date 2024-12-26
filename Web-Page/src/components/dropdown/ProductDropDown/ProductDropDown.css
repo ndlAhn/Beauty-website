@@ -1,0 +1,30 @@
+.product-drop-list-wrap {
+    height: 40%;
+    width: 30%;
+    position: absolute;
+    margin-left: 444px;
+    background-color: var(--light-pink);
+    padding-top: 10px;
+
+}
+.product-drop-down-wrap{
+    display:flex;
+}
+
+.product-drop-menu {
+    list-style: none;
+}
+.product-drop-list-wrap li {
+    font-size: 14px;
+}
+.product-drop-category{
+    font-size: 16px;
+}
+.product-category-menu{
+    margin-top: -16px;
+    margin-left: 15px;
+}
+.product-drop-down-left-side, .product-drop-down-right-side{
+    height: 100%;
+    width: 50%;
+}

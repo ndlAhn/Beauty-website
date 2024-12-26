@@ -68,7 +68,7 @@
 .upload-comment-btn {
     width: 20%;
     height: 40%;
-    border: none;
+    border: nonef;
     border-radius: 5px;
     color: white;
     font-weight: bold;
@@ -79,4 +79,38 @@
     width: 50%;
     height: 100%;
     justify-content: center;
+}
+.comment-header {
+    display: flex;
+    flex-direction: column;
+}
+.comment-history {
+    align-items: center;
+}
+.comment-history-section {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    margin-top: -19px;
+    padding-left: 15px;
+}
+.user-comment {
+    font-weight: bold;
+}
+.clock-icon {
+    color: var(--heavy-pink);
+}
+.user-comment-script{
+    padding-left: 15px;
+    margin-top: -17px;
+}
+.reply-icon {
+    color: var(--heavy-pink);
+    rotate: 180deg;
+}
+.reply-comment-section {
+    font-size: 15px;
+    display: flex;
+    margin-top: -10px;
+    padding-left: 30px;
 }

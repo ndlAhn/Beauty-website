@@ -68,7 +68,7 @@ function createProduct() {
                             <option value="exfoliating-toner">Exfoliating Toner</option>
                             </optgroup>
                             <optgroup label="Serums">
-                            <option value="brightening-serum">Brightening Serum</option>
+                            <option value="brightening-serum">Moisturizing Serum</option>
                             <option value="anti-aging-serum">Anti-aging Serum</option>
                         </optgroup>
                         <optgroup label="Moisturizers">
@@ -78,6 +78,7 @@ function createProduct() {
                         <optgroup label="Sunscreens">
                             <option value="physical-sunscreen">Physical Sunscreen</option>
                             <option value="chemical-sunscreen">Chemical Sunscreen</option>
+                            <option value="chemical-sunscreen">Hybrid Sunscreen</option>
                         </optgroup>
                             <optgroup label="Spot Treatments">
                             <option value="acne-treatment">Acne Treatment</option>

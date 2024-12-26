@@ -2,6 +2,11 @@ import './reviewDetails.css';
 
 import Header from '../../components/header/header.js';
 import Footer from '../../components/footer/footer.js';
+import { FaRegClock } from "react-icons/fa";
+import { BsReply } from "react-icons/bs";
+
+
+
 function ReviewDetails() { 
     return(
         <div>
@@ -103,6 +108,7 @@ function ReviewDetails() {
                         <h6>REVIEW BY:</h6>
                         <h6 className='review-detais-reviewer-name'>Reviewer's name</h6>
                         <h6>UPDATED:</h6>
+                        <h6>22/5/2002</h6>
                     </div>
                     <div className='review-details-comment'>
                         <h5>Comments</h5>
@@ -113,8 +119,30 @@ function ReviewDetails() {
                         <div className='review-details-comment-upload-btn'>
                             <button className='upload-comment-btn'>Upload comment</button> 
                         </div>
-                        
-                    </div>
+                        <div className='review-details-user-comment'>
+                            <div className='comment-header'>
+                                <p className='user-comment'>User's name</p>
+                                
+                                <div className='comment-history-section'>
+                                    <div className='comment-history'>
+                                        <FaRegClock className='clock-icon' />               
+                                    </div>
+                                <p>22/5/2002</p>
+                                </div>
+                                
+                            </div>
+                            <div className='user-comment-script'>
+                                <p>User's comment</p>
+                                
+                            </div>
+                            <div className='reply-comment-section'>
+                                    <div className='comment-history'>
+                                        <BsReply className='reply-icon' />               
+                                    </div>
+                                <p>Reply</p>
+                            </div>
+                        </div>                      
+                    </div>       
                 </div>                  
             </div>
             <Footer />
