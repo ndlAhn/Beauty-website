@@ -22,6 +22,7 @@ import StateContext from './context/context.context';
 import AddIncredient from './pages/review-pages/addIncredient/addIncredient';
 import ProductDetails from './pages/product-details/productDetails';
 import ReviewDetails from './pages/review-details/reviewDetails';
+import NewsDetails from './pages/news-details/newsDetail';
 function App() {
     // const [state, dispatchState] = useContext(StateContext);
     // const navigate = useNavigate();
@@ -52,6 +53,7 @@ function App() {
             <Route path="/create-incredient" element={<AddIncredient />} />
             <Route path="/product-details" element={<ProductDetails />} />
             <Route path="/review-details" element={<ReviewDetails />} />
+            <Route path="/news-detail" element={<NewsDetails />} />
         </Routes>
     );
 }

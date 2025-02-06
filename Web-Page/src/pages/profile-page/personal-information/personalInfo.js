@@ -23,7 +23,7 @@ function PersonalInfo () {
                             <input className="profile-input" type="date" id="dob" required></input>
                         </div>
                          
-                        <div className="info-field" id='gender'>
+                        <div className="info-field">
                             <label htmlFor ="gender" className="personal-label">Gender:</label>
                             <div className="personal-gender">
                                 <input type="radio" id="male" name="male" value="male" className="personal-gender-input"/>

@@ -14,6 +14,7 @@ function CreateReview () {
             <div className="create-review-area">
                 <div className="create-review-content">
                 <h3 className="write-review-title">WRITE REVIEW</h3>
+                {/* <h3 className="write-review-title">EDIT REVIEW</h3> */}
                 <div className="review-input-area">
                     <span className="asterisk">
                         <h5>Title</h5>
@@ -115,6 +116,9 @@ function CreateReview () {
                 <div className="post-area">
                     <button className="post-btn" type ="button">POST REVIEW</button>
                 </div>
+                {/* <div className="post-area">
+                    <button className="update-btn" type ="button">UPDATE</button>
+                </div> */}
                 
             
                 

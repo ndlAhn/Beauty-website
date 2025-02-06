@@ -3,6 +3,9 @@ import SubHeader from '../../../components/subHeader/subHeader';
 import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSidebar';
 import { IoIosCloudUpload } from "react-icons/io";
 import { CgAsterisk } from "react-icons/cg";
+import { BiEditAlt } from "react-icons/bi";
+import { MdDeleteOutline } from "react-icons/md";
+
 function AddIncredient () {
     return (
         <div>
@@ -46,10 +49,39 @@ function AddIncredient () {
                         <option value="Safe for Pregnancy">Safe for Pregnancy</option>
                     </select>
                 </div>
-            </div>
                 <div className="post-area">
-                    <button className="incredient-btn" type ="button">ADD INCREDIENT</button>
+                    <button className="incredient-btn" type ="button">ADD NEW</button>
+                    <button className="incredient-btn" type ="button">SAVE</button>
                 </div>
+            
+                    
+                
+                <h4 className="write-review-title">INCREDIENT TABLE</h4>
+                <div className='incredient-table-wrapper'>
+                    <table className='incredient-table'>
+                        <tr className='table-title'>
+                            <td className='incredient-name-column'>Incredient name</td>
+                            <td className='incredient-function-column'>Function</td>
+                            <td className='satety-info-column'>Safety Information</td>
+                            <td className='edit-column'>Edit</td>
+                        </tr>
+                        <tr className='table-incredient-content'>
+                            <td className='incredient-name-column'>Name</td>
+                            <td className='incredient-function-column'>Funtion detail</td>
+                            <td className='satety-info-column'>Safety information detail</td>
+                            <td className='edit-column'>
+                                <div className='edit-icon-incredient'>
+                                   <BiEditAlt className='edit-incredient-table-btn' />
+                                   <MdDeleteOutline className='delete-incredient-table-btn'/>
+
+                                </div>
+                                
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+                
                 
             
                 

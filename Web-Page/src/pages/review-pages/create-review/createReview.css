@@ -1,7 +1,7 @@
 .create-review-wrap{
     display:flex;
 }
-.upload-btn {
+.upload-btn, .update-btn {
     border: 1px solid #b4b4b4 ;
 }
 .create-review-area {
@@ -61,7 +61,7 @@
     background-color: white ;
     padding-bottom: 30px;
 }
-.post-btn {
+.post-btn, .update-btn {
     height: 40px;
     width: 130px;
     color: var(--text-color-blue);

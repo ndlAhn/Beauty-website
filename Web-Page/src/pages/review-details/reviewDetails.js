@@ -142,6 +142,9 @@ function ReviewDetails() {
                                 <p>Reply</p>
                             </div>
                         </div>                      
+                    </div>
+                    <div className='admin-delete-post'>
+                        <button className='delete-review-btn'>Delete review</button> 
                     </div>       
                 </div>                  
             </div>

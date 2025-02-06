@@ -20,3 +20,69 @@
     color: var(--text-color-blue);
     font-size: 20px;
 }
+.post-area{
+    gap: 20px;
+}
+.story {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.edit-story{
+    height: 100%;
+    width: 30px;
+    color: var(--heavy-pink);
+}
+.incredient-table-wrapper{
+    width: 100%;
+    height: 300px;
+    overflow: auto;
+    align-items: center;
+}
+.incredient-table {
+    width: 100%;
+    height: 300px;
+    
+}
+.incredient-table th, .incredient-table td {
+    border:1px solid black;
+}
+
+.table-title {
+    height: 45px;
+}
+.incredient-name-column{
+    width: 20%;
+}
+.incredient-function-column, .satety-info-column{
+    width:35%;
+}
+.table-title td {
+    text-align: center;  /* Căn giữa theo chiều ngang */
+    font-weight: bold;  /* Làm đậm chữ */
+    background-color: var(--back-drop-list);
+    height: 50px; /* Độ cao của tiêu đề */
+}
+.table-incredient-content .incredient-name-column ,.table-incredient-content .edit-column {
+
+    text-align: center;
+
+}
+.table-incredient-content .incredient-function-column, .table-incredient-content .satety-info-column{
+    padding: 10px;
+}
+.edit-incredient-table-btn, .delete-incredient-table-btn {
+    width: 30px;
+    height: 30px;
+    color: var(--heavy-pink);
+}
+
+
+/* .table-incredient-content td {
+    align-items: flex-start;
+} */
+/* .incredient-table td {
+    align-items: center;
+    justify-content: center;
+} */
+    
