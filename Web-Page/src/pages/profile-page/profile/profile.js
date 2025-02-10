@@ -4,9 +4,10 @@ import ProfileSidebar from '../../../components/sidebar/profile-sidebar/profileS
 import { useContext, useEffect } from 'react';
 import StateContext from '../../../context/context.context';
 import instance from '../../../axios/instance';
-import { BiEditAlt } from "react-icons/bi";
+import { BiEditAlt } from 'react-icons/bi';
 
 function Profile() {
+    const test = {};
     const [state, dispatchState] = useContext(StateContext);
     useEffect(() => {
         if (state.login === true) {
@@ -58,13 +59,12 @@ function Profile() {
                             </div>
                         </div>
                         <div className="story">
-                            <div className ='story-text-box'>
+                            <div className="story-text-box">
                                 <label className="story-text">Share story or quote...</label>
                             </div>
-                            <div className='edit-story-box'>
-                                <BiEditAlt className='edit-story' />
+                            <div className="edit-story-box">
+                                <BiEditAlt className="edit-story" />
                             </div>
-                            
                         </div>
                         <hr style={{ color: 'var(--text-color-blue)' }} />
                         <h4>Recent Posts</h4>
@@ -76,7 +76,7 @@ function Profile() {
                         <div className="pro5-like">
                             <div className="first-post"></div>
                             {/* <p>Post title</p> */}
-                        </div>                                              
+                        </div>
                     </div>
                 </div>
             </div>
