@@ -1,13 +1,16 @@
 import './createReview.css';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import axios from 'axios';
 import SubHeader from '../../../components/subHeader/subHeader';
 import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSidebar';
 import { IoIosCloudUpload } from 'react-icons/io';
 import { CgAsterisk } from 'react-icons/cg';
 import { MdCancel } from 'react-icons/md';
+import StateContext from '../../../context/context.context';
+import instance from '../../../axios/instance';
 
 function CreateReview() {
+    const [state, dispatchState] = useContext(StateContext);
     const [formData, setFormData] = useState({
         title: '',
         introduction: '',
@@ -57,36 +60,36 @@ function CreateReview() {
             }
         }
         console.log(formData);
-        // try {
-        //     const response = await axios.post('/create-review', formDataToSend, {
-        //         headers: {
-        //             'Content-Type': 'multipart/form-data',
-        //         },
-        //     });
+        try {
+            const response = await instance.post('/create-review', {
+                ...formData,
+                user_id: state.userData.userId,
+            });
 
-        //     if (response.status === 200) {
-        //         alert('Review submitted successfully!');
-        //         setFormData({
-        //             title: '',
-        //             introduction: '',
-        //             pakaging: '',
-        //             ingredients: '',
-        //             uses: '',
-        //             targetUser: '',
-        //             review: '',
-        //             pros: '',
-        //             cons: '',
-        //             guide: '',
-        //             conclusion: '',
-        //             picture: null,
-        //             previewImage: null,
-        //         });
-        //     } else {
-        //         alert('Failed to submit review');
-        //     }
-        // } catch (error) {
-        //     console.error('Error submitting review:', error);
-        // }
+            console.log(response.data);
+            if (response.status === 200) {
+                alert('Review submitted successfully!');
+                setFormData({
+                    title: '',
+                    introduction: '',
+                    pakaging: '',
+                    ingredients: '',
+                    uses: '',
+                    targetUser: '',
+                    review: '',
+                    pros: '',
+                    cons: '',
+                    guide: '',
+                    conclusion: '',
+                    picture: null,
+                    previewImage: null,
+                });
+            } else {
+                alert('Failed to submit review');
+            }
+        } catch (error) {
+            console.error('Error submitting review:', error);
+        }
     };
 
     return (

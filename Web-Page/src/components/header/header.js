@@ -39,8 +39,7 @@ function Header() {
                         </div>
 
                         <div className="right-side">
-                            <FaRegEdit className="review-icon" />
-                            {/* <FaRegEdit className="review-icon" onClick={handleNavigation('/create-review')}/> */}
+                            <FaRegEdit className="review-icon" onClick={() => navigate('/create-review')} />
                             <FaRegHeart className="like-icon" />
                             <FaRegBell className="notice-icon" />
                             <div

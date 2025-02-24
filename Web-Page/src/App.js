@@ -25,13 +25,13 @@ import ReviewDetails from './pages/review-details/reviewDetails';
 import NewsDetails from './pages/news-details/newsDetail';
 function App() {
     const [state, dispatchState] = useContext(StateContext);
-    // const navigate = useNavigate();
-    // useEffect(() => {
-    //     if (state.login === false) {
-    //         navigate('/log-in');
-    //     }
-    //     console.log(state);
-    // }, [state]);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (state.login === false) {
+            navigate('/log-in');
+        }
+        console.log(state);
+    }, [state]);
     return (
         <Routes>
             <Route path="/recommendations" element={<Recommendations />} />

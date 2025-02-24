@@ -14,6 +14,7 @@ db.Ingredients = require('./ingredients.model')(sequelize, Sequelize);
 db.Product_reviews = require('./product_reviews.model')(sequelize, Sequelize);
 db.Comments = require('./comments.model')(sequelize, Sequelize);
 db.Articles = require('./articles.model')(sequelize, Sequelize);
+db.Reviews = require('./review.model')(sequelize, Sequelize);
 
 //table relationship
 //Products
@@ -52,6 +53,13 @@ db.Users.belongsTo(db.Articles, {
     foreignKey: 'user_id',
 });
 db.Users.hasMany(db.Articles, {
+    foreignKey: 'user_id',
+});
+// Reviews
+db.Reviews.belongsTo(db.Users, {
+    foreignKey: 'user_id',
+});
+db.Users.hasMany(db.Reviews, {
     foreignKey: 'user_id',
 });
 
