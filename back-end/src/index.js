@@ -15,8 +15,6 @@ require('./controller/product.controller')(app);
 require('./controller/comment.controller')(app);
 require('./controller/productReview.controller')(app);
 
-
-
 app.listen(port, () => {
     console.log('Listen on port ', port);
 });

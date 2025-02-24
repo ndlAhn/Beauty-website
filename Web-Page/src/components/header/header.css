@@ -173,14 +173,6 @@
     color: var(--text-color-blue);
 }
 
-/* .user-profile-list-span {
-  transition: transform 0.5s;
+.nav-bar-header.product {
+    position: relative;
 }
-
-.user-profile-list:hover .user-profile-list-span {
-  transform: translate(5px);
-}
-*/
-/* .user-profile-list:hover .drop-list-list {
-  font-weight: 600; 
-} */

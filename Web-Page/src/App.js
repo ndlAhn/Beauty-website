@@ -24,7 +24,7 @@ import ProductDetails from './pages/product-details/productDetails';
 import ReviewDetails from './pages/review-details/reviewDetails';
 import NewsDetails from './pages/news-details/newsDetail';
 function App() {
-    // const [state, dispatchState] = useContext(StateContext);
+    const [state, dispatchState] = useContext(StateContext);
     // const navigate = useNavigate();
     // useEffect(() => {
     //     if (state.login === false) {
