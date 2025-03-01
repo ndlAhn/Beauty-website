@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 
 const Reviews = db.Reviews;
+const Users = db.Users; // Thêm truy vấn trực tiếp từ bảng Users
 
 exports.create = async (req, res) => {
     try {
@@ -10,7 +11,7 @@ exports.create = async (req, res) => {
         const reviewId = uuidv4();
         const newReview = {
             review_id: reviewId,
-            user_id: req.body.userId,
+            user_id: req.body.user_id,
             title: req.body.title,
             introduction: req.body.introduction,
             packaging: req.body.packaging,
@@ -22,27 +23,47 @@ exports.create = async (req, res) => {
             cons: req.body.cons,
             guide: req.body.guide,
             conclusion: req.body.conclusion,
-            picture: req.body.picture,
+            img_path: req.body.picture,
         };
 
-        // await Reviews.create(newReview);
-        res.status(200).send({ message: 'Review created successfully', review_id: reviewId });
+        await Reviews.create(newReview);
+        res.status(201).json({ message: 'Review created successfully', review_id: reviewId });
     } catch (error) {
         console.error('Error creating review:', error);
-        res.status(500).send({ message: 'Internal Server Error' });
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
 exports.getAllReviews = async (req, res) => {
     try {
-        const reviews = await Reviews.findAll({
-            where: { user_id: req.body.userId },
-            order: [['createdAt', 'DESC']],
+        // Lấy tất cả reviews
+        const reviews = await Reviews.findAll();
+
+        // Lấy danh sách tất cả user_id từ reviews (tránh gọi API từng cái)
+        const userIds = reviews.map((review) => review.user_id);
+
+        // Lấy thông tin user từ database
+        const users = await Users.findAll({
+            where: { user_id: { [Op.in]: userIds } },
+            attributes: ['user_id', 'name'],
         });
-        res.status(200).send(reviews);
+
+        // Chuyển đổi users thành object { user_id: name }
+        const userMap = users.reduce((acc, user) => {
+            acc[user.user_id] = user.name;
+            return acc;
+        }, {});
+
+        // Gán name cho từng review
+        const reviewsWithUserNames = reviews.map((review) => ({
+            ...review.toJSON(),
+            name: userMap[review.user_id] || 'Unknown', // Nếu không tìm thấy user, trả về 'Unknown'
+        }));
+
+        res.status(200).json(reviewsWithUserNames);
     } catch (error) {
         console.error('Error retrieving reviews:', error);
-        res.status(500).send({ message: 'Internal Server Error' });
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
@@ -50,49 +71,21 @@ exports.getReviewById = async (req, res) => {
     try {
         const review = await Reviews.findOne({
             where: { review_id: req.params.reviewId },
+            include: [
+                {
+                    model: Users,
+                    attributes: ['name'],
+                },
+            ],
         });
 
         if (!review) {
-            return res.status(404).send({ message: 'Review not found' });
+            return res.status(404).json({ message: 'Review not found' });
         }
 
-        res.status(200).send(review);
+        res.status(200).json(review);
     } catch (error) {
         console.error('Error retrieving review:', error);
-        res.status(500).send({ message: 'Internal Server Error' });
-    }
-};
-
-exports.updateReview = async (req, res) => {
-    try {
-        const updatedReview = await Reviews.update(req.body, {
-            where: { review_id: req.params.reviewId },
-        });
-
-        if (updatedReview[0] === 0) {
-            return res.status(404).send({ message: 'Review not found or no changes made' });
-        }
-
-        res.status(200).send({ message: 'Review updated successfully' });
-    } catch (error) {
-        console.error('Error updating review:', error);
-        res.status(500).send({ message: 'Internal Server Error' });
-    }
-};
-
-exports.deleteReview = async (req, res) => {
-    try {
-        const deletedReview = await Reviews.destroy({
-            where: { review_id: req.params.reviewId },
-        });
-
-        if (!deletedReview) {
-            return res.status(404).send({ message: 'Review not found' });
-        }
-
-        res.status(200).send({ message: 'Review deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting review:', error);
-        res.status(500).send({ message: 'Internal Server Error' });
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 };

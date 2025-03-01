@@ -1,1 +1,12 @@
+.review-poster {
+    width: 100%;
+    border-radius: 10px;
+}
 
+.home-new-picture {
+    background-color: unset;
+}
+
+.home-news {
+    height: 520px;
+}
