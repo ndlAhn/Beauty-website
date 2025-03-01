@@ -1,6 +1,6 @@
 require('dotenv').config();
 const db = require('../model');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -103,5 +103,23 @@ exports.update = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).send('Error due to ', err);
+    }
+};
+
+exports.getUserById = async (req, res) => {
+    try {
+        Users.findOne({
+            where: {
+                user_id: req.body.userId,
+            },
+        })
+            .then((result) => {
+                res.status(200).send(result);
+            })
+            .catch((err) => {
+                res.status(500).send(err);
+            });
+    } catch (err) {
+        res.status(500).send(err);
     }
 };

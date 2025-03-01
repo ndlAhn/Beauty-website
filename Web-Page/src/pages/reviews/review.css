@@ -8,5 +8,16 @@
 }
 
 .home-news {
-    height: 520px;
+    height: 400px;
+}
+.home-news-content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.home-news:hover {
+    cursor: pointer;
+    opacity: 0.6;
 }

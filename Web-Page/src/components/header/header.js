@@ -68,8 +68,9 @@ function Header() {
                             <li onClick={handleNavigate} className="nav-bar-header">
                                 News
                             </li>
-                            <li onClick={handleNavigate} className="nav-bar-header product">
-                                Products
+
+                            <li className="nav-bar-header product">
+                                <span onClick={handleNavigate}>Products</span>
                                 <ProductDropDown />
                             </li>
                             <li onClick={handleNavigate} className="nav-bar-header">

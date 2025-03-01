@@ -9,19 +9,19 @@ import { BiEditAlt } from 'react-icons/bi';
 function Profile() {
     const test = {};
     const [state, dispatchState] = useContext(StateContext);
-    useEffect(() => {
-        if (state.login === true) {
-            console.log(state);
-            instance
-                .post('/get-user-product-review', state.userData.userId)
-                .then((res) => {
-                    console.log(res.data);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-    }, [state]);
+    // useEffect(() => {
+    //     if (state.login === true) {
+    //         console.log(state);
+    //         instance
+    //             .post('/get-user-product-review', state.userData.userId)
+    //             .then((res) => {
+    //                 console.log(res.data);
+    //             })
+    //             .catch((err) => {
+    //                 console.log(err);
+    //             });
+    //     }
+    // }, [state]);
     return (
         <div>
             <SubHeader />

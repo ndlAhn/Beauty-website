@@ -23,13 +23,28 @@ import AddIncredient from './pages/review-pages/addIncredient/addIncredient';
 import ProductDetails from './pages/product-details/productDetails';
 import ReviewDetails from './pages/review-details/reviewDetails';
 import NewsDetails from './pages/news-details/newsDetail';
+import instance from './axios/instance';
 function App() {
     const [state, dispatchState] = useContext(StateContext);
     const navigate = useNavigate();
     useEffect(() => {
+        // const token = localStorage.getItem('token');
+        // const userId = localStorage.getItem('token');
+        // if (token && userId) {
+        //     instance
+        //         .post('/get-user-data-by-id')
+        //         .then((res) => {
+        //             console.log(res.data);
+        //         })
+        //         .catch((err) => {
+        //             console.log(err);
+        //         });
+        // }
         if (state.login === false) {
             navigate('/log-in');
         }
+        console.log(localStorage.getItem('token'));
+        console.log(localStorage.getItem('userId'));
         console.log(state);
     }, [state]);
     return (
