@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
-module.exports = (sequelize, Sequelize) => {
+
+module.exports = (sequelize) => {
     const Ingredients = sequelize.define(
         'ingredients',
         {
@@ -7,18 +8,23 @@ module.exports = (sequelize, Sequelize) => {
                 type: DataTypes.STRING,
                 primaryKey: true,
             },
-            ingredient_name: {
+            name: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            ingredient_description: {
+            function: {
                 type: DataTypes.TEXT,
+                allowNull: true,
+            },
+            safety: {
+                type: DataTypes.STRING,
                 allowNull: true,
             },
         },
         {
-            timestamp: false,
+            timestamps: false, // Không cần `createdAt`, `updatedAt`
         },
     );
+
     return Ingredients;
 };
