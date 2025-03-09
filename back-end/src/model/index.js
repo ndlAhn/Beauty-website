@@ -18,11 +18,11 @@ db.Reviews = require('./review.model')(sequelize, Sequelize);
 
 //table relationship
 //Products
-db.Ingredients.belongsTo(db.Products, {
-    foreignKey: 'product_id',
+db.Products.belongsTo(db.Ingredients, {
+    foreignKey: 'ingredient_id',
 });
-db.Products.hasMany(db.Ingredients, {
-    foreignKey: 'product_id',
+db.Ingredients.hasMany(db.Products, {
+    foreignKey: 'ingredient_id',
 });
 
 //Product_reviews

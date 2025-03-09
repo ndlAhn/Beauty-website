@@ -33,7 +33,7 @@ function ReviewSidebar() {
                             Your Post
                         </Link>
                     </li>
-                    {state.userData.role === 'admin' && (
+                    {state.userData?.role === 'admin' && (
                         <li>
                             <GrAddCircle className="sidebar-icon" />
                             <Link to="/create-product" className="sidebar-link">

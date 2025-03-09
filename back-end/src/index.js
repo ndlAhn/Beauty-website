@@ -12,11 +12,10 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Kết nối và đồng bộ cơ sở dữ liệu
-// db.sequelize
-//     .sync({ alter: true })
-//     .then(() => console.log('Database synchronized'))
-//     .catch((err) => console.error('Database sync error:', err));
+db.sequelize
+    .sync({ alter: true })
+    .then(() => console.log('Database synchronized'))
+    .catch((err) => console.error('Database sync error:', err));
 
 require('./controller/user.controller')(app);
 require('./controller/product.controller')(app);

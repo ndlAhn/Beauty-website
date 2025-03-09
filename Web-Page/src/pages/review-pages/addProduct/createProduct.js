@@ -1,197 +1,313 @@
 import './createProduct.css';
+import { useContext, useState, useEffect, useRef } from 'react';
 import SubHeader from '../../../components/subHeader/subHeader';
 import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSidebar';
-import { CgAsterisk } from "react-icons/cg";
-import { IoIosCloudUpload } from "react-icons/io";
-function createProduct() {
-    return(
+import { CgAsterisk } from 'react-icons/cg';
+import { IoIosCloudUpload } from 'react-icons/io';
+import { MdCancel, MdEdit, MdDelete } from 'react-icons/md';
+import StateContext from '../../../context/context.context';
+import instance from '../../../axios/instance';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Button,
+    MenuItem,
+    Select,
+    Typography,
+    TextField,
+    FormControl,
+    InputLabel,
+    TextareaAutosize,
+} from '@mui/material';
+
+function CreateProduct() {
+    const cloudName = 'dppaihihm';
+    const uploadPreset = 'Beauty Web';
+    const uploadWidgetRef = useRef(null);
+    const uploadButtonRef = useRef(null);
+
+    const [publicId, setPublicId] = useState('');
+    const [state] = useContext(StateContext);
+    const [products, setProducts] = useState([]); // Danh sách sản phẩm
+    const [ingredients, setIngredients] = useState([]); // Danh sách ingredient từ database
+    const [formData, setFormData] = useState({
+        product_name: '',
+        product_details: '',
+        brand: '',
+        product_type: '',
+        uses: '',
+        capacity: '',
+        skin_type: '',
+        skin_problem: '',
+        ingredient: '', // ID ingredient được chọn
+        product_description: '',
+        price_range: '',
+        warning: '',
+    });
+
+    useEffect(() => {
+        if (window.cloudinary && uploadButtonRef.current) {
+            uploadWidgetRef.current = window.cloudinary.createUploadWidget(
+                { cloudName, uploadPreset },
+                (error, result) => {
+                    if (!error && result && result.event === 'success') {
+                        console.log('Upload successful:', result.info);
+                        setPublicId(result.info.public_id);
+                    }
+                },
+            );
+        }
+
+        fetchProducts();
+        fetchIngredients();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const res = await instance.get('/get-all-products');
+            setProducts(res.data);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
+    const fetchIngredients = async () => {
+        try {
+            const res = await instance.get('/get-all-ingredients');
+            console.log(res.data);
+            setIngredients(res.data);
+        } catch (error) {
+            console.error('Error fetching ingredients:', error);
+        }
+    };
+
+    const handleUploadClick = () => {
+        if (uploadWidgetRef.current) {
+            uploadWidgetRef.current.open();
+        }
+    };
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await instance.post('/create-product', {
+                ...formData,
+                picture: publicId,
+                user_id: state.userData.userId,
+            });
+
+            if (response.status === 200) {
+                alert('Product created successfully!');
+                fetchProducts();
+                setFormData({
+                    product_name: '',
+                    product_details: '',
+                    brand: '',
+                    product_type: '',
+                    uses: '',
+                    capacity: '',
+                    skin_type: '',
+                    skin_problem: '',
+                    ingredient: '',
+                    product_description: '',
+                    price_range: '',
+                    warning: '',
+                });
+                setPublicId('');
+            } else {
+                alert('Failed to create product');
+            }
+        } catch (error) {
+            console.error('Error submitting product:', error);
+        }
+    };
+
+    const handleDelete = async (productId) => {
+        try {
+            await instance.delete(`/delete-product/${productId}`);
+            alert('Product deleted successfully!');
+            fetchProducts();
+        } catch (error) {
+            console.error('Error deleting product:', error);
+        }
+    };
+
+    return (
         <div>
-        <SubHeader/>
-        <div className="review-post-wrap">
-        <ReviewSidebar />
-            <div className="profile-content-wrap">
-                
-                <div className="profile-content">
-                    <h3 className ="product-title">CREATE PRODUCT</h3>
-                    <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Product name</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    <textarea className="input-title-product" type="text" required/>   
-                </div>
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Product details</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    
-                    <textarea className="input-intro-product" type="text" required/>
-                </div>
-                
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Picture</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    
-                    <div className="upload-area">
-                        <IoIosCloudUpload className="upload-icon" />
-                        <button className="product-upload-btn">Upload picture</button>
+            <SubHeader />
+            <div className="review-post-wrap">
+                <ReviewSidebar />
+                <div className="profile-content-wrap">
+                    <div className="profile-content">
+                        <Typography variant="h4" sx={{ color: '#3c4b57', mb: 2 }}>
+                            CREATE PRODUCT
+                        </Typography>
+                        <form className="create-product-area" onSubmit={handleSubmit}>
+                            {[
+                                { label: 'Product Name', name: 'product_name' },
+                                { label: 'Product Details', name: 'product_details' },
+                                { label: 'Brand', name: 'brand' },
+                                { label: 'Uses', name: 'uses' },
+                                { label: 'Capacity', name: 'capacity' },
+                                { label: 'Product Description', name: 'product_description' },
+                                { label: 'Warning', name: 'warning' },
+                            ].map((field, index) => (
+                                <TextField
+                                    key={index}
+                                    label={field.label}
+                                    name={field.name}
+                                    value={formData[field.name]}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    required
+                                    sx={{ my: 1 }}
+                                />
+                            ))}
+                            {/* Dropdowns */}
+                            {[
+                                {
+                                    label: 'Product Type',
+                                    name: 'product_type',
+                                    options: ['Cleanser', 'Toner', 'Serum'],
+                                },
+                                { label: 'Skin Type', name: 'skin_type', options: ['Oily', 'Dry', 'Combination'] },
+                                { label: 'Skin Problem', name: 'skin_problem', options: ['Acne', 'Aging'] },
+                                {
+                                    label: 'Price Range',
+                                    name: 'price_range',
+                                    options: ['Drugstore', 'Midrange', 'High-end'],
+                                },
+                            ].map((dropdown, index) => (
+                                <FormControl key={index} fullWidth sx={{ my: 1 }}>
+                                    <InputLabel id={`${index}-label`} sx={{ color: '#3c4b57' }}>
+                                        {dropdown.label}
+                                    </InputLabel>
+                                    <Select
+                                        id={index + 'create-product-select'}
+                                        labelId={`${index}-label`}
+                                        name={dropdown.name}
+                                        value={formData[dropdown.name]}
+                                        onChange={handleChange}
+                                        label={dropdown.label}
+                                    >
+                                        {dropdown.options.map((option) => (
+                                            <MenuItem key={option} value={option.toLowerCase()}>
+                                                {option}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            ))}
+                            <FormControl sx={{ marginBottom: '10px' }} fullWidth className="review-input-area">
+                                <Select
+                                    fullWidth
+                                    value={formData.ingredient}
+                                    onChange={handleChange}
+                                    name="ingredient"
+                                    displayEmpty
+                                >
+                                    <MenuItem value="" disabled>
+                                        Select an ingredient
+                                    </MenuItem>
+                                    {ingredients.map((ingredient) => (
+                                        <MenuItem key={ingredient.ingredient_id} value={ingredient.ingredient_id}>
+                                            {ingredient.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <textarea onChange={handleChange} name="description" placeholder="Description"></textarea>
+                            {/* Upload Image */}
+                            <div className="review-input-area">
+                                <span className="asterisk">
+                                    <h5>Picture</h5>
+                                    <CgAsterisk style={{ color: 'red' }} />
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={handleUploadClick}
+                                    ref={uploadButtonRef}
+                                    className="product-upload-btn"
+                                >
+                                    Upload picture
+                                </button>
+                                {publicId && (
+                                    <div className="image-preview">
+                                        <img
+                                            src={`https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.jpg`}
+                                            alt="Uploaded"
+                                            className="preview-img"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="remove-image-btn"
+                                            onClick={() => setPublicId('')}
+                                        >
+                                            <MdCancel size={24} color="red" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="post-area">
+                                <button className="post-product-btn" type="submit">
+                                    POST PRODUCT
+                                </button>
+                            </div>
+                        </form>
+
+                        {/* Table hiển thị danh sách sản phẩm */}
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Image</TableCell>
+                                        <TableCell>Product Name</TableCell>
+                                        <TableCell>Product Type</TableCell>
+                                        <TableCell>Skin Type</TableCell>
+                                        <TableCell>Action</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {products.map((product) => (
+                                        <TableRow key={product.product_id}>
+                                            <TableCell>
+                                                <img
+                                                    src={`https://res.cloudinary.com/${cloudName}/image/upload/${product.picture}.jpg`}
+                                                    alt={product.product_name}
+                                                    width="50"
+                                                />
+                                            </TableCell>
+                                            <TableCell>{product.product_name}</TableCell>
+                                            <TableCell>{product.product_type}</TableCell>
+                                            <TableCell>{product.skin_type}</TableCell>
+                                            <TableCell>
+                                                <Button
+                                                    color="secondary"
+                                                    startIcon={<MdDelete />}
+                                                    onClick={() => handleDelete(product.product_id)}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     </div>
-                    
                 </div>
-
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Brand</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    
-                    <textarea className="input-pakage-product" type="text" required/>
-                </div>
-
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Product type</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    
-                    <select className="product-type-select" name="skinType" id="skin-type" require>
-                        <optgroup label="Cleansers">
-                            <option value="oil-cleanser">Cleansing Oil</option>
-                            <option value="cream-cleanser">Cream Cleanser</option>
-                            <option value="cleansing-water">Cleansing Water</option>
-                        </optgroup>
-                        <optgroup label="Toners">
-                            <option value="hydrating-toner">Hydrating Toner</option>
-                            <option value="exfoliating-toner">Exfoliating Toner</option>
-                            </optgroup>
-                            <optgroup label="Serums">
-                            <option value="brightening-serum">Moisturizing Serum</option>
-                            <option value="anti-aging-serum">Anti-aging Serum</option>
-                        </optgroup>
-                        <optgroup label="Moisturizers">
-                            <option value="gel-moisturizer">Gel Moisturizer</option>
-                            <option value="cream-moisturizer">Cream Moisturizer</option>
-                        </optgroup>
-                        <optgroup label="Sunscreens">
-                            <option value="physical-sunscreen">Physical Sunscreen</option>
-                            <option value="chemical-sunscreen">Chemical Sunscreen</option>
-                            <option value="chemical-sunscreen">Hybrid Sunscreen</option>
-                        </optgroup>
-                            <optgroup label="Spot Treatments">
-                            <option value="acne-treatment">Acne Treatment</option>
-                            <option value="anti-redness-cream">Anti-redness Cream</option>
-                        </optgroup>
-                        <optgroup label="Face Masks">
-                            <option value="hydrating-mask">Hydrating Mask</option>
-                            <option value="cleansing-mask">Cleansing Mask</option>
-                        </optgroup>
-                    </select>
-                </div>
-                
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Uses</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    
-                    <textarea className="input-ingredients-product" type="text" required/>
-                </div>
-                
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Capacity</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    
-                    <textarea className="input-uses-product" type="text" required/>
-                </div>
-                
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Skin type</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    
-                    <select className="skin-type-select-product" name="skinType" id="skin-type" require>
-                        <option value="oily">Oily skin</option>
-                        <option value="dry">Dry skin</option>
-                        <option value="normal">Normal skin</option>
-                        <option value="combination">Combination skin</option>
-                        <option value="sensitive-skin">Sensitive skin</option>
-                        <option value="sensitive-skin">Acne-pront skin</option>
-                        <option value="all-type">All types of skin</option>
-                    </select>
-                </div>
-   
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Skin problem</h5>
-                        <CgAsterisk style={{color: "red"}} />  
-                    </span>
-                        <select className="skin-prob-select-product" name="skinProb" id="skin-prob" require  >
-                            <option value="acne">Acne</option>
-                            <option value="aging">Aging</option>
-                            <option value="dried">Dried skin</option>
-                            <option value="oily">Oily skin</option>
-                            <option value="enlarged pores">Enlarged pores</option>
-                            <option value="scarring">Scarring</option>
-                            <option value="skin recovery">Skin recovery</option>
-                        </select>
-                </div>
-                
-                <div className="review-input-area">
-                    
-                    <span className="asterisk">
-                        <h5>Incredient</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span>
-                    <select className="incredient-select-product" name="incredient" id="incredient" require >
-                        <option value="ingredient1">Ingredient 1</option>
-                        <option value="ingredient2">Ingredient 2</option>
-                        <option value="ingredient3">Ingredient 3</option>
-                        <option value="ingredient4">Ingredient 4</option>
-                        <option value="ingredient5">Ingredient 5</option>
-                    </select>  
-                </div>
-                
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Product description</h5>
-                        <CgAsterisk style={{color: "red"}} />
-                    </span> 
-                    <textarea className="product-description" type="text" required/>
-                </div>
-                
-                <div className="review-input-area">
-                    
-                        <h5>Price range</h5>
-                    <select className="price-select-product" name="incredient" id="incredient" require >
-                        <option value="drug-store">Drug store</option>
-                        <option value="ingredient2">Mid end</option>
-                        <option value="ingredient3">High end</option>
-                    </select>
-                </div>
-                <div className="review-input-area">
-                    <span className="asterisk">
-                        <h5>Warning</h5>
-                    </span>
-                    
-                    <textarea className="input-warning" type="text"/>
-                </div>
-                <div className="post-area">
-                    <button className="post-product-btn" type ="button">POST PRODUCT</button>
-                </div>
-                
-                
-                
-                </div>
-                </div> 
             </div>
         </div>
-        
-    )
+    );
 }
-export default createProduct;
+
+export default CreateProduct;
