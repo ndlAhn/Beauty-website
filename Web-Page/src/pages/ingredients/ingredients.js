@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './ingredients.css';
 import Header from '../../components/header/header.js';
 import Footer from '../../components/footer/footer.js';
-import { FiFilter } from 'react-icons/fi';
+import { FiFilter, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import {
     Table,
     TableBody,
@@ -17,6 +17,7 @@ import {
     Box,
     Typography,
     CircularProgress,
+    Input,
 } from '@mui/material';
 import instance from '../../axios/instance.js';
 
@@ -26,6 +27,8 @@ function Ingredients() {
     const [searchQuery, setSearchQuery] = useState(''); // State để lưu giá trị tìm kiếm
     const [isLoading, setIsLoading] = useState(false); // State để hiển thị loading
     const [error, setError] = useState(null); // State để lưu lỗi
+    const [sortBy, setSortBy] = useState('name'); // State để lưu tiêu chí sắp xếp
+    const [sortOrder, setSortOrder] = useState('asc'); // State để lưu thứ tự sắp xếp (asc/desc)
 
     // Hàm gọi API để lấy tất cả nguyên liệu
     const fetchIngredients = async () => {
@@ -64,6 +67,32 @@ function Ingredients() {
         }
     };
 
+    // Hàm sắp xếp dữ liệu
+    const sortIngredients = (data) => {
+        return data.sort((a, b) => {
+            if (sortBy === 'name') {
+                return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+            } else if (sortBy === 'function') {
+                return sortOrder === 'asc'
+                    ? a.function.localeCompare(b.function)
+                    : b.function.localeCompare(a.function);
+            }
+            return 0;
+        });
+    };
+
+    // Xử lý khi người dùng nhấn vào tiêu đề cột để sắp xếp
+    const handleSort = (column) => {
+        if (sortBy === column) {
+            // Nếu đang sắp xếp theo cột này, đảo ngược thứ tự
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            // Nếu chọn cột khác, đặt lại thứ tự mặc định là 'asc'
+            setSortBy(column);
+            setSortOrder('asc');
+        }
+    };
+
     // Gọi API khi component được render
     useEffect(() => {
         fetchIngredients();
@@ -73,6 +102,10 @@ function Ingredients() {
     const handleSearch = () => {
         searchIngredients();
     };
+
+    // Dữ liệu hiển thị (tất cả nguyên liệu hoặc kết quả tìm kiếm)
+    const displayedIngredients = searchQuery.trim() ? searchResults : allIngredients;
+    const sortedIngredients = sortIngredients([...displayedIngredients]); // Sắp xếp dữ liệu
 
     return (
         <div>
@@ -93,19 +126,19 @@ function Ingredients() {
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Typography variant="h6" gutterBottom>
-                            Enter the names of the ingredients:
-                        </Typography>
-                        <TextField
-                            multiline
-                            rows={4}
-                            placeholder="Enter ingredients separated by commas"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            fullWidth
-                            variant="outlined"
-                            sx={{ mb: 2 }}
-                        />
+                        <div style={{ display: 'flex', flexDirection: 'row' }}>
+                            <Typography variant="h6" gutterBottom>
+                                Enter the names of the ingredients:
+                            </Typography>
+                            <Input
+                                placeholder="Enter ingredients"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                variant="outlined"
+                                sx={{ mb: 2, marginLeft: '10px' }}
+                            />
+                        </div>
+
                         <Button
                             variant="contained"
                             color="primary"
@@ -120,56 +153,13 @@ function Ingredients() {
                         </Typography>
                     </Grid>
 
-                    {/* Bảng kết quả tìm kiếm */}
-                    {searchQuery.trim() && (
-                        <Grid item xs={12}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <FiFilter style={{ marginRight: 8 }} />
-                                <Typography variant="h6">Search Results</Typography>
-                            </Box>
-                            {error ? (
-                                <Typography color="error" paragraph>
-                                    {error}
-                                </Typography>
-                            ) : isLoading ? (
-                                <Box display="flex" justifyContent="center">
-                                    <CircularProgress />
-                                </Box>
-                            ) : (
-                                <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
-                                    <Table>
-                                        <TableHead sx={{ bgcolor: 'primary.main' }}>
-                                            <TableRow>
-                                                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>ID</TableCell>
-                                                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Name</TableCell>
-                                                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
-                                                    Function
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {searchResults.map((ingredient) => (
-                                                <TableRow
-                                                    key={ingredient.ingredient_id}
-                                                    sx={{ '&:hover': { bgcolor: 'action.hover' } }}
-                                                >
-                                                    <TableCell>{ingredient.ingredient_id}</TableCell>
-                                                    <TableCell>{ingredient.name}</TableCell>
-                                                    <TableCell>{ingredient.function}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            )}
-                        </Grid>
-                    )}
-
-                    {/* Bảng tất cả nguyên liệu */}
+                    {/* Bảng kết quả tìm kiếm hoặc tất cả nguyên liệu */}
                     <Grid item xs={12}>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                             <FiFilter style={{ marginRight: 8 }} />
-                            <Typography variant="h6">All Ingredients</Typography>
+                            <Typography variant="h6">
+                                {searchQuery.trim() ? 'Search Results' : 'All Ingredients'}
+                            </Typography>
                         </Box>
                         {error ? (
                             <Typography color="error" paragraph>
@@ -184,18 +174,30 @@ function Ingredients() {
                                 <Table>
                                     <TableHead sx={{ bgcolor: 'primary.main' }}>
                                         <TableRow>
-                                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>ID</TableCell>
-                                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Name</TableCell>
-                                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Function</TableCell>
+                                            <TableCell
+                                                sx={{ color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                                                onClick={() => handleSort('name')}
+                                            >
+                                                Name{' '}
+                                                {sortBy === 'name' &&
+                                                    (sortOrder === 'asc' ? <FiArrowUp /> : <FiArrowDown />)}
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{ color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                                                onClick={() => handleSort('function')}
+                                            >
+                                                Function{' '}
+                                                {sortBy === 'function' &&
+                                                    (sortOrder === 'asc' ? <FiArrowUp /> : <FiArrowDown />)}
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {allIngredients.map((ingredient) => (
+                                        {sortedIngredients.map((ingredient) => (
                                             <TableRow
                                                 key={ingredient.ingredient_id}
                                                 sx={{ '&:hover': { bgcolor: 'action.hover' } }}
                                             >
-                                                <TableCell>{ingredient.ingredient_id}</TableCell>
                                                 <TableCell>{ingredient.name}</TableCell>
                                                 <TableCell>{ingredient.function}</TableCell>
                                             </TableRow>

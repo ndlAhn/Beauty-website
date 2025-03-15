@@ -14,6 +14,9 @@ import {
     Typography,
     Select,
     MenuItem,
+    Grid,
+    Box,
+    CircularProgress,
 } from '@mui/material';
 
 function News() {
@@ -21,62 +24,58 @@ function News() {
     const [selectedNews, setSelectedNews] = useState(null);
     const [open, setOpen] = useState(false);
     const [category, setCategory] = useState('skincare');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchBeautyNews(category);
     }, [category]);
 
     const fetchBeautyNews = async (selectedCategory) => {
+        setIsLoading(true);
+        setError(null);
+
         let apiUrl = '';
 
         switch (selectedCategory) {
             case 'skincare':
-                apiUrl = 'https://www.allure.com/rss/news.xml'; // API có ảnh
+                apiUrl = 'https://newsapi.org/v2/everything?q=skincare&apiKey=104717d2cbc741308f52646449dbfab3'; // Thay YOUR_NEWSAPI_KEY bằng key của bạn
                 break;
             case 'makeup':
-                apiUrl = 'https://makeup-api.herokuapp.com/api/v1/products.json?brand=maybelline';
+                apiUrl = 'https://newsapi.org/v2/everything?q=makeup&apiKey=104717d2cbc741308f52646449dbfab3';
                 break;
             case 'haircare':
-                apiUrl = 'https://www.beautyglimpse.com/api/hair-care/';
+                apiUrl = 'https://newsapi.org/v2/everything?q=haircare&apiKey=104717d2cbc741308f52646449dbfab3';
                 break;
             case 'beauty-trends':
-                apiUrl = 'https://www.cosmeticsdesign.com/Article/rss.xml';
+                apiUrl = 'https://newsapi.org/v2/everything?q=beauty trends&apiKey=104717d2cbc741308f52646449dbfab3';
                 break;
             default:
-                apiUrl = 'https://www.allure.com/rss/news.xml';
+                apiUrl = 'https://newsapi.org/v2/everything?q=beauty&apiKey=104717d2cbc741308f52646449dbfab3';
         }
 
         try {
             const response = await fetch(apiUrl);
             const data = await response.json();
 
-            // Nếu API trả về XML, cần parse dữ liệu
-            if (selectedCategory === 'beauty-trends' || selectedCategory === 'skincare') {
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(data, 'text/xml');
-                const items = Array.from(xml.getElementsByTagName('item'));
-                const parsedNews = items.map((item) => ({
-                    title: item.getElementsByTagName('title')[0].textContent,
-                    urlToImage:
-                        item.getElementsByTagName('media:thumbnail')[0]?.getAttribute('url') || '/default-news.jpg',
-                    description: item.getElementsByTagName('description')[0].textContent,
-                    publishedAt: item.getElementsByTagName('pubDate')[0].textContent,
-                    link: item.getElementsByTagName('link')[0].textContent,
-                }));
-                setNews(parsedNews);
-            } else {
-                // Nếu API không có ảnh, lấy ảnh mặc định
-                const formattedData = data.map((item) => ({
-                    title: item.name,
-                    urlToImage: item.image_link || '/default-news.jpg',
-                    description: item.description || 'No description available.',
-                    publishedAt: 'Unknown',
-                    link: item.product_link || '#',
+            if (data.articles) {
+                const formattedData = data.articles.map((article) => ({
+                    title: article.title,
+                    urlToImage: article.urlToImage || '/default-news.jpg',
+                    description: article.description || 'No description available.',
+                    publishedAt: article.publishedAt,
+                    link: article.url,
+                    content: article.content,
                 }));
                 setNews(formattedData);
+            } else {
+                setNews([]);
             }
         } catch (error) {
             console.error('Error fetching beauty news:', error);
+            setError('Failed to fetch news. Please try again later.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -95,58 +94,80 @@ function News() {
     return (
         <div>
             <Header />
-            <div className="news-wrap">
-                <div className="new-content-wrap">
-                    <div className="news-intro">
-                        <h2>Update new beauty trends with Beauty Insight</h2>
-                        <p>Discover the latest trends, expert advice, and must-try beauty techniques.</p>
-                    </div>
+            <Box sx={{ flexGrow: 1, p: 3 }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        <Typography variant="h4" gutterBottom>
+                            Update New Beauty Trends with Beauty Insight
+                        </Typography>
+                        <Typography variant="body1" paragraph>
+                            Discover the latest trends, expert advice, and must-try beauty techniques.
+                        </Typography>
+                    </Grid>
 
                     {/* Bộ lọc danh mục tin tức */}
-                    <div className="news-filter-wrap">
-                        <FiFilter className="news-filter-icon" />
-                        <Select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="news-filter-select"
-                        >
-                            <MenuItem value="skincare">Skincare</MenuItem>
-                            <MenuItem value="makeup">Makeup</MenuItem>
-                            <MenuItem value="haircare">Haircare</MenuItem>
-                            <MenuItem value="beauty-trends">Beauty Trends</MenuItem>
-                        </Select>
-                    </div>
+                    <Grid item xs={12}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+                            <FiFilter style={{ fontSize: '24px' }} />
+                            <Select
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                variant="outlined"
+                                sx={{ minWidth: 150 }}
+                            >
+                                <MenuItem value="skincare">Skincare</MenuItem>
+                                <MenuItem value="makeup">Makeup</MenuItem>
+                                <MenuItem value="haircare">Haircare</MenuItem>
+                                <MenuItem value="beauty-trends">Beauty Trends</MenuItem>
+                            </Select>
+                        </Box>
+                    </Grid>
 
                     {/* Danh sách tin tức */}
-                    <div className="news-list">
-                        {news.length > 0 ? (
-                            news.map((item, index) => (
-                                <Card key={index} className="news-card" onClick={() => handleOpen(item)}>
-                                    <CardMedia
-                                        component="img"
-                                        height="400px"
-                                        image={item.urlToImage}
-                                        alt={item.title}
-                                        className="news-image"
-                                    />
-                                    <CardContent>
-                                        <Typography variant="h6" component="div" className="news-title">
-                                            {item.title}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" className="news-meta">
-                                            {item.publishedAt !== 'Unknown'
-                                                ? new Date(item.publishedAt).toLocaleDateString()
-                                                : 'Unknown'}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            ))
+                    <Grid item xs={12}>
+                        {isLoading ? (
+                            <Box display="flex" justifyContent="center">
+                                <CircularProgress />
+                            </Box>
+                        ) : error ? (
+                            <Typography color="error" paragraph>
+                                {error}
+                            </Typography>
+                        ) : news.length > 0 ? (
+                            <Grid container spacing={3}>
+                                {news.map((item, index) => (
+                                    <Grid item xs={12} sm={6} md={4} key={index}>
+                                        <Card className="news-card" onClick={() => handleOpen(item)}>
+                                            <CardMedia
+                                                component="img"
+                                                height="200"
+                                                image={item.urlToImage}
+                                                alt={item.title}
+                                            />
+                                            <CardContent>
+                                                <Typography variant="h6" component="div" className="news-title">
+                                                    {item.title}
+                                                </Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="text.secondary"
+                                                    className="news-meta"
+                                                >
+                                                    {new Date(item.publishedAt).toLocaleDateString()}
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
                         ) : (
-                            <p>No news available.</p>
+                            <Typography variant="body1" paragraph>
+                                No news available.
+                            </Typography>
                         )}
-                    </div>
-                </div>
-            </div>
+                    </Grid>
+                </Grid>
+            </Box>
 
             <Footer />
 
@@ -154,20 +175,30 @@ function News() {
             <Dialog fullScreen open={open} onClose={handleClose}>
                 <DialogTitle>{selectedNews?.title}</DialogTitle>
                 <DialogContent>
-                    <img src={selectedNews?.urlToImage} alt={selectedNews?.title} className="news-popup-image" />
-                    <Typography variant="body1" className="news-popup-content">
+                    <img
+                        src={selectedNews?.urlToImage}
+                        alt={selectedNews?.title}
+                        style={{ width: '100%', height: 'auto', marginBottom: '16px' }}
+                    />
+                    <Typography variant="body1" paragraph>
                         {selectedNews?.description}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" className="news-popup-meta">
-                        Published on{' '}
-                        {selectedNews?.publishedAt !== 'Unknown'
-                            ? new Date(selectedNews?.publishedAt).toLocaleDateString()
-                            : 'Unknown'}
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                        Published on {new Date(selectedNews?.publishedAt).toLocaleDateString()}
                     </Typography>
-                    <Button variant="contained" color="primary" href={selectedNews?.link} target="_blank">
+                    <Typography variant="body1" paragraph>
+                        {selectedNews?.content}
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        href={selectedNews?.link}
+                        target="_blank"
+                        sx={{ mr: 2 }}
+                    >
                         Read More
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={handleClose} className="news-popup-close">
+                    <Button variant="contained" color="secondary" onClick={handleClose}>
                         Close
                     </Button>
                 </DialogContent>
