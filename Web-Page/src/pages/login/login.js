@@ -39,11 +39,13 @@ function Login() {
         };
 
         try {
+            console.log(formData);
             const res = await instance.post(REGISTER, formData);
             dispatchState(logged(formData));
             navigate('/survey');
         } catch (err) {
             setErrorMessage(err.response?.data?.message || 'Registration failed!');
+            console.log(err);
         }
     };
 
@@ -67,6 +69,7 @@ function Login() {
             }
         } catch (err) {
             setErrorMessage(err.response?.data?.message || 'Login failed!');
+            console.log(err);
         }
     };
 

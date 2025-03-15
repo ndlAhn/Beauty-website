@@ -20,7 +20,8 @@ function Header() {
         const navPath = e.target.innerText.toLowerCase();
         if (navPath === 'home') {
             navigate('/');
-        } else navigate(`/${navPath}`);
+        } else if (navPath === 'about us') navigate('/about-us');
+        else navigate(`/${navPath}`);
     };
     return (
         <div>
@@ -79,9 +80,7 @@ function Header() {
                             <li onClick={handleNavigate} className="nav-bar-header">
                                 Recommendations
                             </li>
-                            <li onClick={handleNavigate} className="nav-bar-header">
-                                Comparison
-                            </li>
+
                             <li onClick={handleNavigate} className="nav-bar-header">
                                 Ingredients
                             </li>

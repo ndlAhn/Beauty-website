@@ -12,9 +12,7 @@ exports.create = async (req, res) => {
     try {
         console.log(req.body);
         const newUserId = uuidv4();
-
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
         const newUser = {
             user_id: newUserId,
             name: req.body.name,

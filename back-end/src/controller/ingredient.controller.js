@@ -7,6 +7,7 @@ module.exports = (app) => {
     router.get('/get-ingredient/:ingredientId', IngredientsService.getById);
     router.put('/update-ingredient/:ingredientId', IngredientsService.updateIngredientById);
     router.delete('/delete-ingredient/:ingredientId', IngredientsService.deleteIngredientById);
+    router.get('/search-ingredients/:name', IngredientsService.getIngredientByName);
 
     app.use('/', router);
 };

@@ -91,3 +91,30 @@ exports.deleteIngredientById = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+exports.getIngredientByName = async (req, res) => {
+    try {
+        const { name } = req.params; // Lấy giá trị từ query parameters
+
+        if (!name) {
+            return res.status(400).json({ message: 'Name parameter is required' });
+        }
+
+        const ingredient = await Ingredients.findAll({
+            where: {
+                name: {
+                    [Op.like]: `%${name.toLowerCase()}%`, // Chuyển đổi về chữ thường
+                },
+            },
+        });
+
+        if (!ingredient) {
+            return res.status(404).json({ message: 'Ingredient not found' });
+        }
+
+        res.status(200).json(ingredient);
+    } catch (error) {
+        console.error('Error finding ingredient by name:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
