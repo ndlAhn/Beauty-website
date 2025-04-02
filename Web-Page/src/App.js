@@ -40,9 +40,9 @@ function App() {
         //             console.log(err);
         //         });
         // }
-        // if (state.login === false) {
-        //     navigate('/log-in');
-        // }
+        if (state.login === false) {
+            navigate('/log-in');
+        }
         console.log(localStorage.getItem('token'));
         console.log(localStorage.getItem('userId'));
         console.log(state);

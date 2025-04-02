@@ -6,29 +6,43 @@ import { BsReply } from 'react-icons/bs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import instance from '../../axios/instance';
+import {
+    Box,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Paper,
+    Typography,
+    Divider,
+    Collapse,
+    IconButton,
+} from '@mui/material';
+import { ExpandLess, ExpandMore, Circle, LabelImportant } from '@mui/icons-material';
 
 function ReviewDetails() {
     const [reviewData, setReviewData] = useState(null);
     const { reviewId } = useParams();
     const cloudName = 'dppaihihm';
+    const [openToc, setOpenToc] = useState(true); // Mở/đóng mục lục
 
-    // Danh sách các mục trong mục lục với cấu hình có thể tùy chỉnh
+    // Danh sách mục lục có thể tùy chỉnh
     const TABLE_OF_CONTENTS = [
-        { id: 'packaging', label: 'Packaging', visible: true },
-        { id: 'ingredients', label: 'Ingredients', visible: true },
-        { id: 'uses', label: 'Uses', visible: true },
-        { id: 'target-user', label: 'Target user', visible: true },
-        { id: 'review', label: 'Review', visible: true },
-        { id: 'pros-cons', label: 'Pros & Cons', visible: true },
-        { id: 'guide', label: 'User Guidelines', visible: true },
-        { id: 'conclusion', label: 'Conclusion', visible: true },
+        { id: 'packaging', label: 'Packaging', icon: <Circle fontSize="small" /> },
+        { id: 'ingredients', label: 'Ingredients', icon: <Circle fontSize="small" /> },
+        { id: 'uses', label: 'Uses', icon: <Circle fontSize="small" /> },
+        { id: 'target-user', label: 'Target User', icon: <Circle fontSize="small" /> },
+        { id: 'review', label: 'Review', icon: <LabelImportant fontSize="small" color="primary" /> },
+        { id: 'pros-cons', label: 'Pros & Cons', icon: <LabelImportant fontSize="small" color="primary" /> },
+        { id: 'guide', label: 'User Guidelines', icon: <Circle fontSize="small" /> },
+        { id: 'conclusion', label: 'Conclusion', icon: <LabelImportant fontSize="small" color="secondary" /> },
     ];
 
     useEffect(() => {
         const fetchReviewDetails = async () => {
             try {
                 const response = await instance.get(`/get-review/${reviewId}`);
-                console.log(response.data);
                 setReviewData(response.data);
             } catch (error) {
                 console.error('Error fetching review details:', error);
@@ -49,11 +63,10 @@ function ReviewDetails() {
         return date.toLocaleDateString('en-GB');
     };
 
-    // Hàm xử lý click vào mục lục
     const handleTocClick = (id) => {
         const element = document.getElementById(id);
         if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 
@@ -71,29 +84,45 @@ function ReviewDetails() {
                         <p>{reviewData.introduction}</p>
                     </div>
 
-                    {/* Phần mục lục được cải tiến */}
-                    <div className="table-content-block">
-                        <div className="content-title-block">
-                            <h6 className="content-title">Table of Content</h6>
-                        </div>
-                        {TABLE_OF_CONTENTS.map(
-                            (item) =>
-                                item.visible && (
-                                    <a
+                    {/* Mục lục được thiết kế lại với MUI */}
+                    <Paper elevation={3} sx={{ mb: 3, borderRadius: 2 }}>
+                        <ListItemButton onClick={() => setOpenToc(!openToc)}>
+                            <ListItemText
+                                primary={
+                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                        Table of Contents
+                                    </Typography>
+                                }
+                            />
+                            {openToc ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+                        <Divider />
+
+                        <Collapse in={openToc} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                {TABLE_OF_CONTENTS.map((item) => (
+                                    <ListItem
                                         key={item.id}
-                                        href={`#${item.id}`}
-                                        className="triangle-before"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handleTocClick(item.id);
+                                        disablePadding
+                                        sx={{
+                                            '&:hover': {
+                                                backgroundColor: 'action.hover',
+                                            },
                                         }}
                                     >
-                                        {item.label}
-                                    </a>
-                                ),
-                        )}
-                    </div>
+                                        <ListItemButton onClick={() => handleTocClick(item.id)} sx={{ pl: 4 }}>
+                                            <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                                            <ListItemText
+                                                primary={<Typography variant="body1">{item.label}</Typography>}
+                                            />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Collapse>
+                    </Paper>
 
+                    {/* Giữ nguyên các phần nội dung hiện có */}
                     {reviewData.img_path && (
                         <img
                             src={`https://res.cloudinary.com/${cloudName}/image/upload/${reviewData.img_path}.jpg`}
@@ -102,21 +131,12 @@ function ReviewDetails() {
                         />
                     )}
 
-                    {/* Giữ nguyên các phần nội dung hiện có */}
                     <div id="packaging" className="element-review-details">
                         <h5>1. Packaging:</h5>
                         <div className="review-script">
                             <p>{reviewData.packaging}</p>
                         </div>
                     </div>
-
-                    <div id="ingredients" className="element-review-details">
-                        <h5>2. Ingredients:</h5>
-                        <div className="review-script">
-                            <p>{reviewData.ingredients}</p>
-                        </div>
-                    </div>
-
                     <div id="uses" className="element-review-details">
                         <h5>3. Uses:</h5>
                         <div className="review-script">
