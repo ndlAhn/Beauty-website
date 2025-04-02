@@ -40,9 +40,9 @@ function App() {
         //             console.log(err);
         //         });
         // }
-        if (state.login === false) {
-            navigate('/log-in');
-        }
+        // if (state.login === false) {
+        //     navigate('/log-in');
+        // }
         console.log(localStorage.getItem('token'));
         console.log(localStorage.getItem('userId'));
         console.log(state);
@@ -67,7 +67,7 @@ function App() {
             <Route path="/liked-products" element={<LikedProduct />} />
             <Route path="/create-incredient" element={<AddIncredient />} />
             <Route path="/product-details" element={<ProductDetails />} />
-            <Route path="/review-details" element={<ReviewDetails />} />
+            <Route path="/review-detail/:reviewId" element={<ReviewDetails />} />
             <Route path="/news-detail" element={<NewsDetails />} />
         </Routes>
     );

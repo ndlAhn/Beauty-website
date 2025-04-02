@@ -6,5 +6,7 @@ module.exports = (app) => {
     router.post('/get-review-by-user-id', ReviewsService.getReviewByUserId);
     router.delete('/delete-review/:reviewId', ReviewsService.deleteReviewById);
     router.put('/update-review/:reviewId', ReviewsService.updateReviewById);
+    router.get('/get-review/:reviewId', ReviewsService.getReviewById);
+
     app.use('/', router);
 };

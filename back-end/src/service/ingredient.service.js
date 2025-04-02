@@ -28,7 +28,7 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
     try {
         const ingredients = await Ingredients.findAll({
-            attributes: ['ingredient_id', 'name', 'function'],
+            attributes: ['ingredient_id', 'name', 'function', 'safety'],
         });
 
         res.status(200).json(ingredients);

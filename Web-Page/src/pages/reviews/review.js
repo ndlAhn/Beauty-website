@@ -4,6 +4,7 @@ import Footer from '../../components/footer/footer.js';
 import { FiFilter } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import instance from '../../axios/instance.js';
+import { useNavigate } from 'react-router-dom';
 
 function formatDate(isoString) {
     const date = new Date(isoString);
@@ -15,7 +16,7 @@ function formatDate(isoString) {
 function Review() {
     const [reviews, setReviews] = useState([]);
     const cloudName = 'dppaihihm';
-
+    const navigate = useNavigate();
     useEffect(() => {
         instance
             .get('/get-all-reviews')
@@ -46,7 +47,11 @@ function Review() {
                             products to achieve your healthiest, most radiant skin.
                         </p>
                         {reviews?.map((item, index) => (
-                            <div className="home-news" key={index}>
+                            <div
+                                className="home-news"
+                                key={index}
+                                onClick={() => navigate(`/review-detail/${item.review_id}`)}
+                            >
                                 <div className="home-new-picture">
                                     <img
                                         className="review-poster"

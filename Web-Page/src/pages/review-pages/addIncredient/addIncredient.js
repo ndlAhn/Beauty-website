@@ -41,6 +41,7 @@ function AddIngredient() {
     const fetchIngredients = async () => {
         try {
             const response = await instance.get('/get-all-ingredients');
+            console.log(response.data);
             setIngredients(response.data);
         } catch (error) {
             console.error('Error fetching ingredients:', error);

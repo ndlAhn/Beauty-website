@@ -26,7 +26,13 @@ const CloudinaryUploadWidget = ({ uwConfig, setPublicId }) => {
     }, [uwConfig, setPublicId]);
 
     return (
-        <button onClick={handleUploadClick} ref={uploadButtonRef} id="upload_widget" className="cloudinary-button">
+        <button
+            type="button"
+            onClick={handleUploadClick}
+            ref={uploadButtonRef}
+            id="upload_widget"
+            className="cloudinary-button"
+        >
             Upload
         </button>
     );

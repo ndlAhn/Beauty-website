@@ -27,7 +27,7 @@ exports.create = async (req, res) => {
         };
 
         await Reviews.create(newReview);
-        res.status(201).json({ message: 'Review created successfully', review_id: reviewId });
+        res.status(200).json({ message: 'Review created successfully', review_id: reviewId });
     } catch (error) {
         console.error('Error creating review:', error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -64,25 +64,47 @@ exports.getAllReviews = async (req, res) => {
     }
 };
 
-// 📖 Lấy review theo ID
 exports.getReviewById = async (req, res) => {
     try {
+        const { reviewId } = req.params;
+        if (!reviewId) {
+            return res.status(400).json({ message: 'Review ID is required' });
+        }
+
         const review = await Reviews.findOne({
-            where: { review_id: req.params.reviewId },
-            attributes: { exclude: ['user_id'] }, // Loại bỏ user_id, chỉ lấy thông tin cần thiết
-            include: [{ model: Users, attributes: ['name'] }],
+            where: { review_id: reviewId },
+            include: [
+                {
+                    model: Users,
+                    attributes: ['name'],
+                    required: false,
+                },
+            ],
         });
 
-        if (!review) return res.status(404).json({ message: 'Review not found' });
+        if (!review) {
+            return res.status(404).json({ message: 'Review not found' });
+        }
 
-        res.status(200).json(review);
+        const responseData = {
+            ...review.dataValues,
+        };
+
+        delete responseData.User;
+
+        res.status(200).json(responseData);
     } catch (error) {
         console.error('Error retrieving review:', error);
+
+        // Phân loại lỗi cụ thể hơn
+        if (error.name === 'SequelizeDatabaseError') {
+            return res.status(500).json({ message: 'Database error' });
+        }
+
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
-// 🧑‍💻 Lấy review theo user_id
 exports.getReviewByUserId = async (req, res) => {
     try {
         const reviews = await Reviews.findAll({
