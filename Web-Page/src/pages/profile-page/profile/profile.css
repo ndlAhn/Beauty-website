@@ -1,15 +1,15 @@
-.profile-wrap{
-    display:flex;
+.profile-wrap {
+    display: flex;
 }
 .profile-content-wrap {
     width: 100%;
     padding: 30px 60px;
-    background-color: #f8f8f8 ;
+    background-color: #f8f8f8;
 }
 .profile-content {
     padding: 20px 30px;
     color: var(--text-color-blue);
-    background-color: white ;
+    background-color: white;
     width: 100%;
 }
 .profile-img {
@@ -22,7 +22,7 @@
 }
 .profile-name {
     padding-left: 40px;
-    display:flex;
+    display: flex;
     flex-direction: column;
 }
 
@@ -54,18 +54,19 @@
     font-size: 20px;
 }
 
-.story-text-box{
+.story-text-box {
     padding-top: 10px;
     padding-left: 50px;
     height: 50px;
     width: 100%;
 }
-.story-text{
+.story-text {
     font-size: 20px;
     width: 80%;
 }
 
-.pro5-post, .pro5-like {
+.pro5-post,
+.pro5-like {
     padding: 10px;
 }
 .first-post {
@@ -77,3 +78,10 @@
     align-items: center;
 }
 
+.pro5-post {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}

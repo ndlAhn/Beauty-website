@@ -1,27 +1,36 @@
 import './profile.css';
 import SubHeader from '../../../components/subHeader/subHeader';
 import ProfileSidebar from '../../../components/sidebar/profile-sidebar/profileSidebar';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import StateContext from '../../../context/context.context';
 import instance from '../../../axios/instance';
 import { BiEditAlt } from 'react-icons/bi';
+import { useNavigate } from 'react-router-dom';
+
+function formatDate(isoString) {
+    const date = new Date(isoString);
+
+    const options = { year: 'numeric', month: 'short', day: '2-digit' };
+    return date.toLocaleDateString('en-US', options).replace(',', '');
+}
 
 function Profile() {
     const test = {};
     const [state, dispatchState] = useContext(StateContext);
-    // useEffect(() => {
-    //     if (state.login === true) {
-    //         console.log(state);
-    //         instance
-    //             .post('/get-user-product-review', state.userData.userId)
-    //             .then((res) => {
-    //                 console.log(res.data);
-    //             })
-    //             .catch((err) => {
-    //                 console.log(err);
-    //             });
-    //     }
-    // }, [state]);
+
+    const [reviews, setReviews] = useState([]);
+    const cloudName = 'dppaihihm';
+    const navigate = useNavigate();
+    useEffect(() => {
+        console.log(state);
+        instance
+            .post('/get-review-by-user-id', { user_id: state.userData.userId })
+            .then((res) => {
+                console.log(res.data);
+                setReviews(res.data);
+            })
+            .catch((err) => console.log(err));
+    }, []);
     return (
         <div>
             <SubHeader />
@@ -69,8 +78,23 @@ function Profile() {
                         <hr style={{ color: 'var(--text-color-blue)' }} />
                         <h4>Recent Posts</h4>
                         <div className="pro5-post">
-                            <div className="first-post"></div>
-                            {/* <p>Post title</p> */}
+                            {reviews?.map((item, index) => (
+                                <div
+                                    className="home-news"
+                                    key={index}
+                                    onClick={() => navigate(`/review-detail/${item.review_id}`)}
+                                >
+                                    <div className="home-new-picture">
+                                        <img
+                                            className="review-poster"
+                                            src={`https://res.cloudinary.com/${cloudName}/image/upload/${item.img_path}.jpg`}
+                                        />
+                                    </div>
+                                    <p className="home-new-title">{item.title}</p>
+                                    <p className="home-review-title">Reviewer: {item.name} </p>
+                                    <p className="home-review-title">Post date: {formatDate(item.createdAt)} </p>
+                                </div>
+                            ))}
                         </div>
                         <h4>Liked</h4>
                         <div className="pro5-like">

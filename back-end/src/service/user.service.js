@@ -20,6 +20,7 @@ exports.create = async (req, res) => {
             password: hashedPassword,
             dob: req.body.dob,
             gender: req.body.gender,
+            role: 'admin',
         };
 
         await Users.create(newUser);
