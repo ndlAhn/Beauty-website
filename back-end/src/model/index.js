@@ -15,16 +15,8 @@ db.Product_reviews = require('./product_reviews.model')(sequelize, Sequelize);
 db.Comments = require('./comments.model')(sequelize, Sequelize);
 db.Articles = require('./articles.model')(sequelize, Sequelize);
 db.Reviews = require('./review.model')(sequelize, Sequelize);
-
+db.TableOfIngredient = require('./tableOfIngredient.model')(sequelize, Sequelize);
 //table relationship
-//Products
-db.Products.belongsTo(db.Ingredients, {
-    foreignKey: 'ingredient_id',
-});
-db.Ingredients.hasMany(db.Products, {
-    foreignKey: 'ingredient_id',
-});
-
 //Product_reviews
 
 db.Products.hasMany(db.Product_reviews, {
@@ -61,6 +53,22 @@ db.Reviews.belongsTo(db.Users, {
 });
 db.Users.hasMany(db.Reviews, {
     foreignKey: 'user_id',
+});
+// Ingredient
+db.Products.hasMany(db.TableOfIngredient, {
+    foreignKey: 'product_id',
+});
+
+db.TableOfIngredient.belongsTo(db.Products, {
+    foreignKey: 'product_id',
+});
+
+db.Ingredients.hasMany(db.TableOfIngredient, {
+    foreignKey: 'ingredient_id',
+});
+
+db.TableOfIngredient.belongsTo(db.Ingredients, {
+    foreignKey: 'ingredient_id',
 });
 
 module.exports = db;

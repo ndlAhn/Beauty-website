@@ -23,6 +23,8 @@ import {
     FormControl,
     InputLabel,
     TextareaAutosize,
+    Chip,
+    Box,
 } from '@mui/material';
 
 function CreateProduct() {
@@ -33,8 +35,9 @@ function CreateProduct() {
 
     const [publicId, setPublicId] = useState('');
     const [state] = useContext(StateContext);
-    const [products, setProducts] = useState([]); // Danh sách sản phẩm
-    const [ingredients, setIngredients] = useState([]); // Danh sách ingredient từ database
+    const [products, setProducts] = useState([]);
+    const [ingredients, setIngredients] = useState([]);
+    const [selectedIngredients, setSelectedIngredients] = useState([]);
     const [formData, setFormData] = useState({
         product_name: '',
         product_details: '',
@@ -44,7 +47,6 @@ function CreateProduct() {
         capacity: '',
         skin_type: '',
         skin_problem: '',
-        ingredient: '', // ID ingredient được chọn
         product_description: '',
         price_range: '',
         warning: '',
@@ -79,7 +81,6 @@ function CreateProduct() {
     const fetchIngredients = async () => {
         try {
             const res = await instance.get('/get-all-ingredients');
-            console.log(res.data);
             setIngredients(res.data);
         } catch (error) {
             console.error('Error fetching ingredients:', error);
@@ -96,18 +97,50 @@ function CreateProduct() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const toggleIngredient = (ingredient) => {
+        setSelectedIngredients((prev) => {
+            const isSelected = prev.some((item) => item.ingredient_id === ingredient.ingredient_id);
+            if (isSelected) {
+                return prev.filter((item) => item.ingredient_id !== ingredient.ingredient_id);
+            } else {
+                return [...prev, ingredient];
+            }
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validate required fields
+        if (!formData.product_name || !publicId) {
+            alert('Product name and image are required');
+            return;
+        }
+
         try {
-            const response = await instance.post('/create-product', {
+            // 1. Create product first
+            const productResponse = await instance.post('/create-product', {
                 ...formData,
                 picture: publicId,
                 user_id: state.userData.userId,
             });
 
-            if (response.status === 200) {
+            if (productResponse.status === 200) {
+                const productId = productResponse.data.product_id;
+
+                // 2. Add to junction table if ingredients selected
+                if (selectedIngredients.length > 0) {
+                    await instance.post('/product-ingredients', {
+                        product_id: productId,
+                        ingredients: selectedIngredients.map((ing) => ({
+                            ingredient_id: ing.ingredient_id,
+                        })),
+                    });
+                }
+
                 alert('Product created successfully!');
                 fetchProducts();
+                // Reset form
                 setFormData({
                     product_name: '',
                     product_details: '',
@@ -117,27 +150,29 @@ function CreateProduct() {
                     capacity: '',
                     skin_type: '',
                     skin_problem: '',
-                    ingredient: '',
                     product_description: '',
                     price_range: '',
                     warning: '',
                 });
                 setPublicId('');
-            } else {
-                alert('Failed to create product');
+                setSelectedIngredients([]);
             }
         } catch (error) {
             console.error('Error submitting product:', error);
+            alert(`Error: ${error.response?.data?.message || 'Something went wrong'}`);
         }
     };
 
     const handleDelete = async (productId) => {
+        if (!window.confirm('Are you sure you want to delete this product?')) return;
+
         try {
             await instance.delete(`/delete-product/${productId}`);
             alert('Product deleted successfully!');
             fetchProducts();
         } catch (error) {
             console.error('Error deleting product:', error);
+            alert('Failed to delete product');
         }
     };
 
@@ -172,6 +207,7 @@ function CreateProduct() {
                                     sx={{ my: 1 }}
                                 />
                             ))}
+
                             {/* Dropdowns */}
                             {[
                                 {
@@ -207,26 +243,55 @@ function CreateProduct() {
                                     </Select>
                                 </FormControl>
                             ))}
-                            <FormControl sx={{ marginBottom: '10px' }} fullWidth className="review-input-area">
-                                <Select
-                                    fullWidth
-                                    value={formData.ingredient}
-                                    onChange={handleChange}
-                                    name="ingredient"
-                                    displayEmpty
-                                >
-                                    <MenuItem value="" disabled>
-                                        Select an ingredient
-                                    </MenuItem>
+
+                            {/* Ingredients Selection */}
+                            <Box sx={{ my: 2 }}>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    Ingredients
+                                </Typography>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                     {ingredients.map((ingredient) => (
-                                        <MenuItem key={ingredient.ingredient_id} value={ingredient.ingredient_id}>
-                                            {ingredient.name}
-                                        </MenuItem>
+                                        <Chip
+                                            key={ingredient.ingredient_id}
+                                            label={ingredient.name}
+                                            clickable
+                                            variant={
+                                                selectedIngredients.some(
+                                                    (item) => item.ingredient_id === ingredient.ingredient_id,
+                                                )
+                                                    ? 'filled'
+                                                    : 'outlined'
+                                            }
+                                            color={
+                                                selectedIngredients.some(
+                                                    (item) => item.ingredient_id === ingredient.ingredient_id,
+                                                )
+                                                    ? 'primary'
+                                                    : 'default'
+                                            }
+                                            onClick={() => toggleIngredient(ingredient)}
+                                            sx={{
+                                                fontWeight: 500,
+                                                '&:hover': {
+                                                    backgroundColor: 'action.hover',
+                                                },
+                                            }}
+                                        />
                                     ))}
-                                </Select>
-                            </FormControl>
-                            <textarea onChange={handleChange} name="description" placeholder="Description"></textarea>
-                            {/* Upload Image */}
+                                </Box>
+                                <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+                                    Selected: {selectedIngredients.map((ing) => ing.name).join(', ')}
+                                </Typography>
+                            </Box>
+
+                            <textarea
+                                onChange={handleChange}
+                                name="description"
+                                placeholder="Description"
+                                value={formData.description}
+                            ></textarea>
+
+                            {/* Image Upload */}
                             <div className="review-input-area">
                                 <span className="asterisk">
                                     <h5>Picture</h5>
@@ -264,8 +329,8 @@ function CreateProduct() {
                             </div>
                         </form>
 
-                        {/* Table hiển thị danh sách sản phẩm */}
-                        <TableContainer component={Paper}>
+                        {/* Products Table */}
+                        <TableContainer component={Paper} sx={{ mt: 4 }}>
                             <Table>
                                 <TableHead>
                                     <TableRow>
@@ -291,7 +356,7 @@ function CreateProduct() {
                                             <TableCell>{product.skin_type}</TableCell>
                                             <TableCell>
                                                 <Button
-                                                    color="secondary"
+                                                    color="error"
                                                     startIcon={<MdDelete />}
                                                     onClick={() => handleDelete(product.product_id)}
                                                 >
