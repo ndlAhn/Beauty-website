@@ -20,7 +20,6 @@ exports.create = async (req, res) => {
             password: hashedPassword,
             dob: req.body.dob,
             gender: req.body.gender,
-            role: 'admin',
         };
 
         await Users.create(newUser);
@@ -86,22 +85,44 @@ exports.getAll = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        Users.update(
-            {
-                skin_type: req.body.skinType,
-                skin_prob: req.body.skinProb,
+        // Kiểm tra dữ liệu đầu vào
+        if (!req.body.username || !req.body.skinType || !req.body.skinProb) {
+            return res.status(400).send('Thiếu thông tin bắt buộc');
+        }
+
+        // Chuẩn bị dữ liệu cập nhật
+        const updateData = {
+            skin_type: req.body.skinType,
+            acne: req.body.skinProb.acne || false,
+            aging: req.body.skinProb.aging || false,
+            dried: req.body.skinProb.dried || false,
+            oily: req.body.skinProb.oily || false,
+            // Thêm các trường skin problem khác nếu cần
+        };
+
+        // Thực hiện cập nhật
+        const [affectedRows] = await Users.update(updateData, {
+            where: {
+                username: req.body.username,
             },
-            {
-                where: {
-                    username: req.body.username,
-                },
-            },
-        ).then((result) => {
-            res.status(200).send('Cập nhật thành công');
+        });
+
+        if (affectedRows === 0) {
+            return res.status(404).send('Không tìm thấy người dùng để cập nhật');
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Cập nhật thành công',
+            data: updateData,
         });
     } catch (err) {
-        console.log(err);
-        res.status(500).send('Error due to ', err);
+        console.error('Lỗi khi cập nhật thông tin người dùng:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server khi cập nhật thông tin',
+            error: err.message,
+        });
     }
 };
 
