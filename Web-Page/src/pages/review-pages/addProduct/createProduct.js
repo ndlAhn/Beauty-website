@@ -26,6 +26,17 @@ import {
     Chip,
     Box,
 } from '@mui/material';
+// Thêm các import cần thiết cho Dialog
+import {
+    // ... các import hiện có
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    IconButton,
+    InputAdornment
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 function CreateProduct() {
     const cloudName = 'dppaihihm';
@@ -51,6 +62,9 @@ function CreateProduct() {
         price_range: '',
         warning: '',
     });
+    const [openDialog, setOpenDialog] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [openIngredientDialog, setOpenIngredientDialog] = useState(false);
 
     useEffect(() => {
         if (window.cloudinary && uploadButtonRef.current) {
@@ -174,7 +188,29 @@ function CreateProduct() {
             console.error('Error deleting product:', error);
             alert('Failed to delete product');
         }
+        
     };
+    // Thêm hàm xử lý mở/đóng dialog
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    };
+    
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setSearchTerm('');
+    };
+    const handleOpenIngredientDialog = () => {
+        setOpenIngredientDialog(true);
+      };
+      
+      const handleCloseIngredientDialog = () => {
+        setOpenIngredientDialog(false);
+      };
+    
+    // Hàm lọc ingredients theo search term
+    const filteredIngredients = ingredients.filter(ingredient =>
+        ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
 
     return (
         <div>
@@ -245,7 +281,51 @@ function CreateProduct() {
                             ))}
 
                             {/* Ingredients Selection */}
-                            <Box sx={{ my: 2 }}>
+                            <div className='review-input-area'>
+                                <h5>Ingredient:</h5>
+                                <button className='add-ingredient-create-product' 
+                                onClick={handleOpenIngredientDialog}  
+                                >Add</button>
+                            </div>
+                            {/* Thêm Dialog component */}
+                            {/* Ingredient Dialog */}
+<Dialog open={openIngredientDialog} onClose={handleCloseIngredientDialog}>
+  <DialogTitle>Add Ingredients</DialogTitle>
+  <DialogContent>
+    <TextField
+      autoFocus
+      margin="dense"
+      label="Search Ingredients"
+      fullWidth
+      variant="outlined"
+      sx={{ mb: 2 }}
+    />
+    
+    {/* Danh sách ingredients sẽ thêm vào đây */}
+    <Box sx={{ maxHeight: 400,width: 300, overflow: 'auto' }}>
+      {ingredients.map(ingredient => (
+        <Box 
+          key={ingredient.ingredient_id}
+          sx={{ 
+            p: 2,
+            borderBottom: '1px solid #eee',
+            '&:hover': {
+              backgroundColor: '#f5f5f5',
+              cursor: 'pointer'
+            }
+          }}
+        >
+          {ingredient.name}
+        </Box>
+      ))}
+    </Box>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleCloseIngredientDialog}>Cancel</Button>
+    <Button onClick={handleCloseIngredientDialog} variant="contained">Add</Button>
+  </DialogActions>
+</Dialog>
+                            {/* <Box sx={{ my: 2 }}>
                                 <Typography variant="subtitle1" gutterBottom>
                                     Ingredients
                                 </Typography>
@@ -282,7 +362,7 @@ function CreateProduct() {
                                 <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
                                     Selected: {selectedIngredients.map((ing) => ing.name).join(', ')}
                                 </Typography>
-                            </Box>
+                            </Box> */}
 
                             <textarea
                                 onChange={handleChange}

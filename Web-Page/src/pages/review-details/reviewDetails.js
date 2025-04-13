@@ -7,19 +7,20 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import instance from '../../axios/instance';
 import {
-    Box,
+    Box, // Giữ lại import Box ở đây
     List,
     ListItem,
     ListItemButton,
-    ListItemIcon,
     ListItemText,
     Paper,
     Typography,
     Divider,
     Collapse,
     IconButton,
+    // Bỏ các import trùng lặp ở dưới
 } from '@mui/material';
-import { ExpandLess, ExpandMore, Circle, LabelImportant } from '@mui/icons-material';
+import { Menu as MenuIcon, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Circle, LabelImportant } from '@mui/icons-material';
 
 function ReviewDetails() {
     const [reviewData, setReviewData] = useState(null);
@@ -29,14 +30,14 @@ function ReviewDetails() {
 
     // Danh sách mục lục có thể tùy chỉnh
     const TABLE_OF_CONTENTS = [
-        { id: 'packaging', label: 'Packaging', icon: <Circle fontSize="small" /> },
-        { id: 'ingredients', label: 'Ingredients', icon: <Circle fontSize="small" /> },
-        { id: 'uses', label: 'Uses', icon: <Circle fontSize="small" /> },
-        { id: 'target-user', label: 'Target User', icon: <Circle fontSize="small" /> },
-        { id: 'review', label: 'Review', icon: <LabelImportant fontSize="small" color="primary" /> },
-        { id: 'pros-cons', label: 'Pros & Cons', icon: <LabelImportant fontSize="small" color="primary" /> },
-        { id: 'guide', label: 'User Guidelines', icon: <Circle fontSize="small" /> },
-        { id: 'conclusion', label: 'Conclusion', icon: <LabelImportant fontSize="small" color="secondary" /> },
+        { id: 'packaging', label: 'Packaging' },
+        { id: 'ingredients', label: 'Ingredients' },
+        { id: 'uses', label: 'Uses' },
+        { id: 'target-user', label: 'Target User' },
+        { id: 'review', label: 'Review' },
+        { id: 'pros-cons', label: 'Pros & Cons' },
+        { id: 'guide', label: 'User Guidelines' },
+        { id: 'conclusion', label: 'Conclusion' },
     ];
 
     useEffect(() => {
@@ -85,42 +86,74 @@ function ReviewDetails() {
                     </div>
 
                     {/* Mục lục được thiết kế lại với MUI */}
-                    <Paper elevation={3} sx={{ mb: 3, borderRadius: 2 }}>
-                        <ListItemButton onClick={() => setOpenToc(!openToc)}>
-                            <ListItemText
-                                primary={
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                        Table of Contents
-                                    </Typography>
-                                }
-                            />
-                            {openToc ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                        <Divider />
+                    <Box sx={{ 
+                        position: 'relative',
+                        mb: 4,
+                        backgroundColor: 'rgb(223,181,182)',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        maxWidth: '400px'
 
-                        <Collapse in={openToc} timeout="auto" unmountOnExit>
-                            <List component="div" disablePadding>
+                    }}>
+                        <IconButton
+                            onClick={() => setOpenToc(!openToc)}
+                            sx={{
+                                width: '100%',
+                                justifyContent: 'flex-start',
+                                py: 2,
+                                px: 3,
+                                color: 'rgb(60,75,87)',
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255,255,255,0.2)'
+                                }
+                            }}
+                        >
+                            <MenuIcon sx={{ mr: 1,  }} />
+                            <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
+                                Table of Contents
+                            </Typography>
+                            {openToc ? (
+                                <ExpandLess sx={{ ml: 'auto' }} />
+                            ) : (
+                                <ExpandMore sx={{ ml: 'auto' }} />
+                            )}
+                        </IconButton>
+
+                        <Collapse in={openToc}>
+                            <List sx={{ 
+                                py: 0,
+                                '& .MuiListItem-root': {
+                                    px: 0
+                                }
+                            }}>
                                 {TABLE_OF_CONTENTS.map((item) => (
-                                    <ListItem
+                                    <ListItem 
                                         key={item.id}
                                         disablePadding
-                                        sx={{
-                                            '&:hover': {
-                                                backgroundColor: 'action.hover',
-                                            },
-                                        }}
                                     >
-                                        <ListItemButton onClick={() => handleTocClick(item.id)} sx={{ pl: 4 }}>
-                                            <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
-                                            <ListItemText
-                                                primary={<Typography variant="body1">{item.label}</Typography>}
+                                        <ListItemButton 
+                                            onClick={() => handleTocClick(item.id)}
+                                            sx={{
+                                                px: 4,
+                                                py: 1.5,
+                                                color: 'rgb(60,75,87)',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(255,255,255,0.2)'
+                                                }
+                                            }}
+                                        >
+                                            <ListItemText 
+                                                primary={item.label} 
+                                                primaryTypographyProps={{
+                                                    fontWeight: 'medium'
+                                                }}
                                             />
                                         </ListItemButton>
                                     </ListItem>
                                 ))}
                             </List>
                         </Collapse>
-                    </Paper>
+                    </Box>
 
                     {/* Giữ nguyên các phần nội dung hiện có */}
                     {reviewData.img_path && (

@@ -142,7 +142,7 @@ function CreateReview() {
                                 </div>
                             ))}
 
-                        <div className="review-input-area">
+                        {/* <div className="review-input-area">
                             <span className="asterisk">
                                 <h5>Select an ingredient</h5>
                                 <CgAsterisk style={{ color: 'red' }} />
@@ -166,7 +166,9 @@ function CreateReview() {
                                     ))}
                                 </Select>
                             </FormControl>
+                            
                         </div>
+                         */}
 
                         <div className="review-input-area">
                             <span className="asterisk">

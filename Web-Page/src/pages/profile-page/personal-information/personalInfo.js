@@ -85,14 +85,31 @@ function PersonalInfo() {
                                     <label htmlFor="skin-prob" className="personal-label">
                                         Skin problem:
                                     </label>
-                                    <select className="profile-input" name="skinprob" id="skin-prob">
-                                        <option value="none">None</option>
-                                        <option value="acne">Acne</option>
-                                        <option value="aging">Aging</option>
-                                        <option value="dried-skin">Dried skin</option>
-                                        <option value="oily-skin-p">Oily skin</option>
+                                    <select className="profile-input" name="skinprob" id="skin-prob">                                  
+                                        <option value="acne">Acne-prone</option>
+                                        <option value="dull-skin">Dull skin</option>
+                                        <option value="large-pores">Large pores</option>
+                                        <option value="uneven-skin-tone">Uneven skin tone</option>
+                                        <option value="dark-skin">Dark spots & hyperpigmentation</option>
+                                        <option value="Red-irritation">Redness & irritation</option>
+                                        <option value="aging">Wrinkles & fine lines</option>
+                                        <option value="dehydrated-skin">Dehydrated skin</option>
                                     </select>
                                 </div>
+                                <div className="info-field">
+                                    <label htmlFor="skin-prob" className="personal-label">
+                                        Skincare goal:
+                                    </label>
+                                    <select className="profile-input" name="skingoal" id="skin-goal">                                  
+                                        <option value="Moisturizing">Hydration & Moisturizing</option>
+                                        <option value="acne-control">Acne Control</option>
+                                        <option value="anti-aging">Anti-aging</option>
+                                        <option value="brightening">Brightening</option>
+                                        <option value="oil-control">Oil Control</option>
+                                        <option value="repair">Soothing & Repair</option>
+                                    </select>
+                                </div>
+
                                 <label htmlFor="price-segment" className="personal-label-price">
                                     Price segments (optional):
                                 </label>

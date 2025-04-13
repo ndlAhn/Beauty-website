@@ -108,6 +108,7 @@ function Products() {
                                 <MenuItem value="Cleanser">Cleanser</MenuItem>
                                 <MenuItem value="Toner">Toner</MenuItem>
                                 <MenuItem value="Serum">Serum</MenuItem>
+
                             </Select>
                         </FormControl>
                     </Grid>
@@ -115,10 +116,12 @@ function Products() {
                         <FormControl fullWidth>
                             <InputLabel>Skin Type</InputLabel>
                             <Select value={skinType} onChange={(e) => setSkinType(e.target.value)}>
-                                <MenuItem value="">All</MenuItem>
-                                <MenuItem value="Oily">Oily</MenuItem>
-                                <MenuItem value="Dry">Dry</MenuItem>
-                                <MenuItem value="Combination">Combination</MenuItem>
+                                <MenuItem value="All skin type">All</MenuItem>
+                                <MenuItem value="Oily skin ">Oily</MenuItem>
+                                <MenuItem value="Dry skin">Dry</MenuItem>
+                                <MenuItem value="Combination skin">Combination</MenuItem>
+                                <MenuItem value="Normal skin">Normal skin</MenuItem>
+                                <MenuItem value="Sensitive skin">Sensitive skin</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>

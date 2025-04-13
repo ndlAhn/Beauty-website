@@ -78,3 +78,11 @@
     font-weight: bold;
     border: none; 
 }
+.add-ingredient-create-product{
+    background-color: var(--heavy-pink);
+    color: white;
+    height: 40px;
+    width: 80px;
+    font-weight: bold;
+}
+

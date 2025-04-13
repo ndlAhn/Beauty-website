@@ -42,7 +42,7 @@ function ReviewSidebar() {
                         </li>
                     )}
 
-                    {state.userData.role === 'admin' && (
+                    {state.userData?.role === 'admin' && (
                         <li>
                             <GrAddCircle className="sidebar-icon" />
                             <Link to="/create-incredient" className="sidebar-link">
