@@ -32,6 +32,10 @@ import {
   } from '@mui/material';
 
 import {TextField } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import PersonIcon from '@mui/icons-material/Person';
+
 
 function formatDate(isoString) {
     
@@ -42,18 +46,34 @@ function formatDate(isoString) {
 }
 
 function Profile() {
+    // Following, follower
+    const [open, setOpen] = useState(false);
+    const [tabIndex, setTabIndex] = useState(0); // 0: Follower, 1: Following
+
+    const handleOpen = (index) => {
+        setTabIndex(index);
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+  
+
+    //--
   //Edit pro5
-  const [avatarUrl, setAvatarUrl] = useState('https://via.placeholder.com/120'); // ảnh mặc định
+    const [avatarUrl, setAvatarUrl] = useState('https://via.placeholder.com/120'); // ảnh mặc định
 
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-const [bio, setBio] = useState('Share story or quote...');
-const [displayName, setDisplayName] = useState('');
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [bio, setBio] = useState('Share story or quote...');
+    const [displayName, setDisplayName] = useState('');
 
 
 
-  const handleOpenEditDialog = () => setOpenEditDialog(true);
-  const handleCloseEditDialog = () => setOpenEditDialog(false);
-  const handleSaveProfile = () => {
+    const handleOpenEditDialog = () => setOpenEditDialog(true);
+    const handleCloseEditDialog = () => setOpenEditDialog(false);
+    const handleSaveProfile = () => {
     // Add your save logic here
     handleCloseEditDialog();
   };
@@ -108,6 +128,7 @@ const [displayName, setDisplayName] = useState('');
                                 <label className="profile-username">{state.userData?.username}</label>
                             </div>
                         </div>
+                        {/* Design dialog for fler&flwing */}
                         {/* <div className="post-fler-flwing">
                             <div className="count">
                                 <label>0</label>
@@ -122,6 +143,55 @@ const [displayName, setDisplayName] = useState('');
                                 <label>Following</label>
                             </div>
                         </div> */}
+                                    <Box>
+      {/* Cụm count */}
+      <Box className="post-fler-flwing" display="flex" gap={4}>
+        <div className="count">
+          <label>0</label>
+          <label>Posts</label>
+        </div>
+        <div className="count" onClick={() => handleOpen(0)} style={{ cursor: 'pointer' }}>
+          <label>0</label>
+          <label>Followers</label>
+        </div>
+        <div className="count" onClick={() => handleOpen(1)} style={{ cursor: 'pointer' }}>
+          <label>0</label>
+          <label>Following</label>
+        </div>
+      </Box>
+
+      {/* Dialog với Tabs */}
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        {/* Tabs header */}
+        <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ backgroundColor: '#d7bcbc' }}>
+          <Tabs value={tabIndex} onChange={(e, val) => setTabIndex(val)}>
+            <Tab label="Follower" />
+            <Tab label="Following" />
+          </Tabs>
+          <IconButton onClick={handleClose} sx={{ mr: 1 }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <DialogContent>
+          {tabIndex === 0 && (
+            <Box display="flex" alignItems="center" gap={2}>
+              <PersonIcon color="disabled" />
+              <Typography>Follower’s name</Typography>
+              <Button variant="outlined" size="small">Unfollow</Button>
+            </Box>
+          )}
+
+          {tabIndex === 1 && (
+            <Box display="flex" alignItems="center" gap={2}>
+              <PersonIcon color="disabled" />
+              <Typography>Following’s name</Typography>
+              <Button variant="outlined" size="small" color="error">Delete</Button>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
+    </Box>
                         
                         {/* Design UI for Edit screen: avatar, name, bio*/}
                         <div className="story">
