@@ -7,28 +7,26 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import instance from '../../axios/instance';
 import {
-    Box, // Giữ lại import Box ở đây
+    Box,
     List,
     ListItem,
     ListItemButton,
     ListItemText,
     Paper,
     Typography,
-    Divider,
     Collapse,
     IconButton,
-    // Bỏ các import trùng lặp ở dưới
 } from '@mui/material';
 import { Menu as MenuIcon, ExpandLess, ExpandMore } from '@mui/icons-material';
-import { Circle, LabelImportant } from '@mui/icons-material';
 
 function ReviewDetails() {
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
     const [reviewData, setReviewData] = useState(null);
     const { reviewId } = useParams();
     const cloudName = 'dppaihihm';
-    const [openToc, setOpenToc] = useState(true); // Mở/đóng mục lục
+    const [openToc, setOpenToc] = useState(true);
 
-    // Danh sách mục lục có thể tùy chỉnh
     const TABLE_OF_CONTENTS = [
         { id: 'packaging', label: 'Packaging' },
         { id: 'ingredients', label: 'Ingredients' },
@@ -55,9 +53,34 @@ function ReviewDetails() {
         }
     }, [reviewId]);
 
-    if (!reviewData) {
-        return <div>Loading...</div>;
-    }
+    const handleAddComment = () => {
+        if (newComment.trim()) {
+            setComments([
+                ...comments,
+                { id: Date.now(), text: newComment, parentId: null, replies: [], likes: 0, dislikes: 0 },
+            ]);
+            setNewComment('');
+        }
+    };
+
+    const handleReply = (parentId, text) => {
+        const addReply = (comments) =>
+            comments.map((c) => {
+                if (c.id === parentId) {
+                    return {
+                        ...c,
+                        replies: [
+                            ...(c.replies || []),
+                            { id: Date.now(), text, parentId, replies: [], likes: 0, dislikes: 0 },
+                        ],
+                    };
+                } else if (c.replies) {
+                    return { ...c, replies: addReply(c.replies) };
+                }
+                return c;
+            });
+        setComments(addReply(comments));
+    };
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -70,6 +93,60 @@ function ReviewDetails() {
             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
+
+    const CommentItem = ({ comment }) => {
+        const [showReplyBox, setShowReplyBox] = useState(false);
+        const [replyText, setReplyText] = useState('');
+
+        const handleReplySubmit = () => {
+            if (replyText.trim()) {
+                handleReply(comment.id, replyText);
+                setReplyText('');
+                setShowReplyBox(false);
+            }
+        };
+
+        return (
+            <div className="review-details-user-comment" style={{ marginLeft: comment.parentId ? '20px' : '0' }}>
+                <div className="comment-header">
+                    <p className="user-comment">User's name</p>
+                    <div className="comment-history-section">
+                        <div className="comment-history">
+                            <FaRegClock className="clock-icon" />
+                        </div>
+                        <p>{new Date(comment.id).toLocaleDateString('en-GB')}</p>
+                    </div>
+                </div>
+                <div className="user-comment-script">
+                    <p>{comment.text}</p>
+                </div>
+                <div className="reply-comment-section" onClick={() => setShowReplyBox(!showReplyBox)}>
+                    <div className="comment-history">
+                        <BsReply className="reply-icon" />
+                    </div>
+                    <p>Reply</p>
+                </div>
+                {showReplyBox && (
+                    <div className="reply-box">
+                        <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Write a reply..."
+                        />
+                        <button onClick={handleReplySubmit}>Post Reply</button>
+                    </div>
+                )}
+                {/* Hiển thị các reply nếu có */}
+                {comment.replies && comment.replies.map((reply) => (
+                    <CommentItem key={reply.id} comment={reply} />
+                ))}
+            </div>
+        );
+    };
+
+    if (!reviewData) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
@@ -85,7 +162,7 @@ function ReviewDetails() {
                         <p>{reviewData.introduction}</p>
                     </div>
 
-                    {/* Mục lục được thiết kế lại với MUI */}
+                    {/* Table of Contents */}
                     <Box sx={{ 
                         position: 'relative',
                         mb: 4,
@@ -93,7 +170,6 @@ function ReviewDetails() {
                         borderRadius: '8px',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                         maxWidth: '400px'
-
                     }}>
                         <IconButton
                             onClick={() => setOpenToc(!openToc)}
@@ -103,51 +179,22 @@ function ReviewDetails() {
                                 py: 2,
                                 px: 3,
                                 color: 'rgb(60,75,87)',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(255,255,255,0.2)'
-                                }
+                                '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' }
                             }}
                         >
-                            <MenuIcon sx={{ mr: 1,  }} />
+                            <MenuIcon sx={{ mr: 1 }} />
                             <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
                                 Table of Contents
                             </Typography>
-                            {openToc ? (
-                                <ExpandLess sx={{ ml: 'auto' }} />
-                            ) : (
-                                <ExpandMore sx={{ ml: 'auto' }} />
-                            )}
+                            {openToc ? <ExpandLess sx={{ ml: 'auto' }} /> : <ExpandMore sx={{ ml: 'auto' }} />}
                         </IconButton>
 
                         <Collapse in={openToc}>
-                            <List sx={{ 
-                                py: 0,
-                                '& .MuiListItem-root': {
-                                    px: 0
-                                }
-                            }}>
+                            <List sx={{ py: 0 }}>
                                 {TABLE_OF_CONTENTS.map((item) => (
-                                    <ListItem 
-                                        key={item.id}
-                                        disablePadding
-                                    >
-                                        <ListItemButton 
-                                            onClick={() => handleTocClick(item.id)}
-                                            sx={{
-                                                px: 4,
-                                                py: 1.5,
-                                                color: 'rgb(60,75,87)',
-                                                '&:hover': {
-                                                    backgroundColor: 'rgba(255,255,255,0.2)'
-                                                }
-                                            }}
-                                        >
-                                            <ListItemText 
-                                                primary={item.label} 
-                                                primaryTypographyProps={{
-                                                    fontWeight: 'medium'
-                                                }}
-                                            />
+                                    <ListItem key={item.id} disablePadding>
+                                        <ListItemButton onClick={() => handleTocClick(item.id)} sx={{ px: 4, py: 1.5 }}>
+                                            <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 'medium' }} />
                                         </ListItemButton>
                                     </ListItem>
                                 ))}
@@ -155,7 +202,7 @@ function ReviewDetails() {
                         </Collapse>
                     </Box>
 
-                    {/* Giữ nguyên các phần nội dung hiện có */}
+                    {/* Main content */}
                     {reviewData.img_path && (
                         <img
                             src={`https://res.cloudinary.com/${cloudName}/image/upload/${reviewData.img_path}.jpg`}
@@ -163,13 +210,15 @@ function ReviewDetails() {
                             className="review-product-image"
                         />
                     )}
-
+                    
+                    {/* Các phần nội dung khác (packaging, uses, target user...) */}
                     <div id="packaging" className="element-review-details">
                         <h5>1. Packaging:</h5>
                         <div className="review-script">
                             <p>{reviewData.packaging}</p>
                         </div>
                     </div>
+
                     <div id="uses" className="element-review-details">
                         <h5>3. Uses:</h5>
                         <div className="review-script">
@@ -195,17 +244,13 @@ function ReviewDetails() {
                         <h5>6. Pros & Cons:</h5>
                         <div className="review-details-pros-cons-wrap">
                             <div className="review-details-pros">
-                                <div className="review-details-title">
-                                    <p>Pros</p>
-                                </div>
+                                <p>Pros</p>
                                 <div className="review-script">
                                     <div className="pros-script">{reviewData.pros}</div>
                                 </div>
                             </div>
                             <div className="review-details-cons">
-                                <div className="review-details-title">
-                                    <p>Cons</p>
-                                </div>
+                                <p>Cons</p>
                                 <div className="review-script">
                                     <div className="cons-script">{reviewData.cons}</div>
                                 </div>
@@ -227,50 +272,25 @@ function ReviewDetails() {
                         </div>
                     </div>
 
-                    <div className="custom-line"></div>
-
-                    <div className="review-detais-reviewer">
-                        <h6>REVIEW BY:</h6>
-                        <h6 className="review-detais-reviewer-name">{reviewData.user?.name || 'Unknown'}</h6>
-                        <h6>UPDATED:</h6>
-                        <h6>{formatDate(reviewData.updatedAt)}</h6>
-                    </div>
-
+                    {/* Comment Section */}
                     <div className="review-details-comment">
                         <h5>Comments</h5>
                         <div className="review-details-comment-area">
                             <textarea
-                                type="text"
                                 className="comment"
-                                id="comment"
-                                name="comment"
                                 placeholder="Add your comment..."
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
                             />
                         </div>
                         <div className="review-details-comment-upload-btn">
-                            <button className="upload-comment-btn">Post comment</button>
+                            <button className="upload-comment-btn" onClick={handleAddComment}>Post comment</button>
                         </div>
 
-                        <div className="review-details-user-comment">
-                            <div className="comment-header">
-                                <p className="user-comment">User's name</p>
-                                <div className="comment-history-section">
-                                    <div className="comment-history">
-                                        <FaRegClock className="clock-icon" />
-                                    </div>
-                                    <p>22/5/2002</p>
-                                </div>
-                            </div>
-                            <div className="user-comment-script">
-                                <p>User's comment</p>
-                            </div>
-                            <div className="reply-comment-section">
-                                <div className="comment-history">
-                                    <BsReply className="reply-icon" />
-                                </div>
-                                <p>Reply</p>
-                            </div>
-                        </div>
+                        {/* Hiển thị comment */}
+                        {comments.map((comment) => (
+                            <CommentItem key={comment.id} comment={comment} />
+                        ))}
                     </div>
 
                     <div className="admin-delete-post">

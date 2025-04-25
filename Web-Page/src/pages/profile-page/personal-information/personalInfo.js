@@ -12,6 +12,7 @@ import {
   } from '@mui/material';
 
 function PersonalInfo() {
+    
     const [selectedGoals, setSelectedGoals] = useState([]);
 
   const skincareGoals = [
