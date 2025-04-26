@@ -151,7 +151,6 @@ function AddIngredient() {
         }
     };
 
-    // Tạo chuỗi safety information từ các properties được chọn
     const generateSafetyInfo = () => {
         const selectedProperties = SAFETY_PROPERTIES.filter((prop) => formData.safety_properties[prop.value]).map(
             (prop) => prop.label,
