@@ -72,6 +72,14 @@ module.exports = (sequelize, Sequelize) => {
                 allowNull: false,
                 defaultValue: false,
             },
+            bio: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            avt_path: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
         },
         {
             timestamp: false,

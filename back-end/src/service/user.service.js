@@ -52,14 +52,7 @@ exports.authenticate = async (req, res) => {
         res.status(200).json({
             message: 'Authentication successful',
             token,
-            userData: {
-                userId: user.user_id,
-                name: user.name,
-                username: user.username,
-                gender: user.gender,
-                dob: user.dob,
-                role: user.role,
-            },
+            userData: user,
         });
     } catch (error) {
         console.error('Error during authentication:', error);
@@ -139,6 +132,24 @@ exports.getUserById = async (req, res) => {
             .catch((err) => {
                 res.status(500).send(err);
             });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
+exports.updateInfo = async (req, res) => {
+    try {
+        console.log(req.body);
+        const updateUser = await Users.findOne({
+            where: {
+                user_id: req.body.user_id,
+            },
+        });
+        await updateUser.update({ name: req.body.name, bio: req.body.bio, avt_path: req.body.avt_path });
+        res.status(200).json({
+            success: true,
+            message: 'User updated successfully',
+        });
     } catch (err) {
         res.status(500).send(err);
     }

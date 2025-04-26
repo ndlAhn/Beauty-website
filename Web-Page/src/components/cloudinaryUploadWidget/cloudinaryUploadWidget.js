@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import { useEffect, useRef } from 'react';
 
 const CloudinaryUploadWidget = ({ uwConfig, setPublicId }) => {
@@ -26,15 +27,16 @@ const CloudinaryUploadWidget = ({ uwConfig, setPublicId }) => {
     }, [uwConfig, setPublicId]);
 
     return (
-        <button
+        <Button
             type="button"
+            contained
+            color="primary"
             onClick={handleUploadClick}
             ref={uploadButtonRef}
             id="upload_widget"
-            className="cloudinary-button"
         >
             Upload
-        </button>
+        </Button>
     );
 };
 

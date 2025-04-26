@@ -5,5 +5,6 @@ module.exports = (app) => {
     router.post('/register', UsersService.create);
     router.post('/survey', UsersService.update);
     router.post('/get-user-data-by-id', UsersService.getUserById);
+    router.post('/update-info', UsersService.updateInfo);
     app.use('/', router);
 };

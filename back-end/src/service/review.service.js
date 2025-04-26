@@ -107,6 +107,7 @@ exports.getReviewById = async (req, res) => {
 
 exports.getReviewByUserId = async (req, res) => {
     try {
+        console.log('Get Review ', req.body);
         const reviews = await Reviews.findAll({
             where: { user_id: req.body.user_id },
         });
