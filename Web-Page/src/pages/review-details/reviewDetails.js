@@ -6,6 +6,8 @@ import { BsReply } from 'react-icons/bs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import instance from '../../axios/instance';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import {
     Box,
     List,
@@ -20,12 +22,18 @@ import {
 import { Menu as MenuIcon, ExpandLess, ExpandMore } from '@mui/icons-material';
 
 function ReviewDetails() {
+
+    const [isFavorite, setIsFavorite] = useState(false);
+
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [reviewData, setReviewData] = useState(null);
     const { reviewId } = useParams();
     const cloudName = 'dppaihihm';
     const [openToc, setOpenToc] = useState(true);
+    const handleFavoriteClick = () => {
+    setIsFavorite(!isFavorite);
+  };
 
     const TABLE_OF_CONTENTS = [
         { id: 'packaging', label: 'Packaging' },
@@ -153,9 +161,39 @@ function ReviewDetails() {
             <Header />
             <div className="review-details-wrap">
                 <div className="review-details-content-wrap">
-                    <div className="review-details-title">
+                    {/* <div className="review-details-title">
                         <h3>{reviewData.title}</h3>
-                    </div>
+                    </div> */}
+                                    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      position: 'relative',
+      width: '100%'
+    }}>
+      <div className="review-details-title" style={{ textAlign: 'center' }}>
+        <h3 style={{ margin: 0 }}>{reviewData.title}</h3>
+      </div>
+      
+      <IconButton 
+        aria-label="add to favorites"
+        onClick={handleFavoriteClick}
+        size="medium"
+        sx={{ 
+          position: 'absolute',
+          right: 0,
+          '&:hover': {
+            backgroundColor: 'transparent'
+          }
+        }}
+      >
+        {isFavorite ? (
+          <FavoriteIcon color="error" fontSize="large" />
+        ) : (
+          <FavoriteBorderIcon fontSize="large" />
+        )}
+      </IconButton>
+    </div>
 
                     <h5>Introduction</h5>
                     <div className="review-script">
@@ -194,7 +232,7 @@ function ReviewDetails() {
                                 {TABLE_OF_CONTENTS.map((item) => (
                                     <ListItem key={item.id} disablePadding>
                                         <ListItemButton onClick={() => handleTocClick(item.id)} sx={{ px: 4, py: 1.5 }}>
-                                            <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 'medium' }} />
+                                            <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 'large' }} />
                                         </ListItemButton>
                                     </ListItem>
                                 ))}

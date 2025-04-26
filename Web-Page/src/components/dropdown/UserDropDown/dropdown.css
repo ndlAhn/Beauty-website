@@ -1,65 +1,58 @@
 .user-drop-list {
-    position: absolute;
-    top: 5.2rem;
-    right: 7.55rem;
-    width: 140px;
-    height: 120px;
-    padding-top: 15px;
-    border-radius: 15px;
-    background-color: var(--back-drop-list);
-    border: 1px solid gray;
-  }
-  .user-drop-list::before {
-      content: '';
-      position: absolute;
-      top: -0.8rem;
-      right: 3.4rem;
-      width: 25px;
-      height: 25px;
-      background-color: var(--back-drop-list);
-      border-left: 1px solid gray;
-      border-top: 1px solid gray;
-      transform: rotate(44deg);
-  }
-  .user-profile-list {
-    display: flex;
-    flex-direction: column;
-    justify-content: left;
-    background-color: rgba(255, 255, 255, 0);
-    list-style: none;
-    gap: 5px;
-  }
-  .user-profile-list-span {
-    display: flex;
-    gap: 10px;
-    
-    
-  }
-  .drop-list-list {
-    font-size: 16px;
-    color: var(--text-color-blue);
-  }
-  .user-drop-list-icon {
-    width: 25px;
-    height: 25px;
-    color: var(--text-color-blue)
-  }
-  
-  .user-profile-list-span {
-    cursor: pointer;
-  } 
-  .user-profile-list-span{
-    padding: 5px;
-  }
-  
-  /* .user-profile-list-span {
-    transition: transform 0.5s;
-  }
-  
-  .user-profile-list:hover .user-profile-list-span {
-    transform: translate(5px);
-  }
-  */
-  /* .user-profile-list:hover .drop-list-list {
-    font-weight: 600; 
-  } */
+  position: absolute;
+  top: 5.2rem;
+  right: 7.55rem;
+  width: 140px;
+  height: 120px;
+  padding-top: 15px;
+  border-radius: 15px;
+  background-color: var(--back-drop-list);
+  border: 1px solid gray;
+  z-index: 1000; /* Add this to ensure it appears above other elements */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for better visibility */
+}
+
+.user-drop-list::before {
+  content: '';
+  position: absolute;
+  top: -0.8rem;
+  right: 3.4rem;
+  width: 25px;
+  height: 25px;
+  background-color: var(--back-drop-list);
+  border-left: 1px solid gray;
+  border-top: 1px solid gray;
+  transform: rotate(44deg);
+  z-index: 1001; /* Ensure the arrow appears above the dropdown */
+}
+
+/* Rest of your existing CSS remains the same */
+.user-profile-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  background-color: rgba(255, 255, 255, 0);
+  list-style: none;
+  gap: 5px;
+}
+
+.user-profile-list-span {
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+}
+
+.drop-list-list {
+  font-size: 16px;
+  color: var(--text-color-blue);
+}
+
+.user-drop-list-icon {
+  width: 25px;
+  height: 25px;
+  color: var(--text-color-blue)
+}
+
+.user-profile-list-span {
+  cursor: pointer;
+}
