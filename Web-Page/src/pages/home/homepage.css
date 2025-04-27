@@ -75,3 +75,19 @@
     font-size: 18px;
     
 }
+/* Chatbox fixed position */
+.chatbox-wrapper {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000; /* Đảm bảo nổi lên trên footer */
+    transition: all 0.3s ease;
+  }
+  
+  /* Responsive cho mobile */
+  @media (max-width: 768px) {
+    .chatbox-wrapper {
+      bottom: 15px;
+      right: 15px;
+    }
+  }

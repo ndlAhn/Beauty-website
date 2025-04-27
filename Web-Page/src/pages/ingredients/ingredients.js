@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './ingredients.css';
 import Header from '../../components/header/header.js';
 import Footer from '../../components/footer/footer.js';
+import ChatBox from '../../components/chatBox/chatBox.js';
 import { FiFilter, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import {
     Table,

@@ -3,6 +3,7 @@ import Header from '../../components/header/header.js';
 import Footer from '../../components/footer/footer.js';
 import Slogan from '../../pages/home/slogan.png';
 import { FaRegHeart } from 'react-icons/fa';
+import ChatBox from '../../components/chatBox/chatBox.js';
 
 function Homepage() {
     return (
@@ -114,6 +115,9 @@ function Homepage() {
                 </div>
             </div>
             <Footer />
+            <div className="chatbox-wrapper">
+        <ChatBox />
+      </div>
         </div>
     );
 }
