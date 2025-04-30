@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, Typography, IconButton, TextField, Paper, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import axios from "axios";
 
 function ChatBox() {
     const [open, setOpen] = useState(false);
@@ -10,17 +11,44 @@ function ChatBox() {
     { sender: "bot", text: "Hi there!\nHow can I help you today?" },
     ]);
     const [input, setInput] = useState("");
-
-    const handleSend = () => {
-    if (input.trim() === "") return;
-    setMessages((prev) => [...prev, { sender: "user", text: input }]);
-    setInput("");
-
-    // Simulate bot response
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { sender: "bot", text: "Thanks for your message! (AI will reply here)" }]);
-    }, 1000);
+    const messagesEndRef = useRef(null);
+    const handleSend = async () => {
+      if (input.trim() === "") return;
+    
+      // Hiện tin nhắn của user
+      setMessages((prev) => [...prev, { sender: "user", text: input }]);
+      const currentInput = input;
+      setInput("");
+    
+      try {
+        // Gọi API tới FastAPI
+        const response = await axios.post("http://127.0.0.1:8000/chat", {
+          message: currentInput,
+        });
+    
+        const botReply = response.data.reply;
+    
+        setMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
+      } catch (error) {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "bot", text: "Sorry, something went wrong!" },
+        ]);
+      }
     };
+    const handleKeyPress = (e) => {
+      if (e.key === 'Enter') {
+        handleSend();
+      }
+    };
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+    
+    useEffect(() => {
+      scrollToBottom();
+    }, [messages]);
+    
     return(
         <>
       {open ? (
@@ -29,8 +57,8 @@ function ChatBox() {
             position: "fixed",
             bottom: 100,
             right: 30,
-            width: 300,
-            height: 400,
+            width: 350,
+            height: 450,
             bgcolor: "#fff",
             borderRadius: 2,
             boxShadow: 4,
@@ -67,6 +95,7 @@ function ChatBox() {
                 </Paper>
               </Box>
             ))}
+            <div ref={messagesEndRef} /> 
           </Box>
 
           {/* Input */}
@@ -76,6 +105,7 @@ function ChatBox() {
               placeholder="Ask something..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
               fullWidth
               InputProps={{ disableUnderline: true }}
             />

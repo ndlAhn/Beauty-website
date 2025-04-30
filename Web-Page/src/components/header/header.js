@@ -85,6 +85,12 @@ function Header() {
                                 Ingredients
                             </li>
                             <li onClick={handleNavigate} className="nav-bar-header">
+                                Community
+                            </li>
+                            <li onClick={handleNavigate} className="nav-bar-header">
+                                Beauty Finder
+                            </li>
+                            <li onClick={handleNavigate} className="nav-bar-header">
                                 About us
                             </li>
                         </ul>

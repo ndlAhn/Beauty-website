@@ -25,6 +25,8 @@ import ReviewDetails from './pages/review-details/reviewDetails';
 import NewsDetails from './pages/news-details/newsDetail';
 import instance from './axios/instance';
 import ProfileView from './pages/profile-view/profileView';
+import Community from './pages/community/community';
+import BeautyFinder from './pages/beautyFinder/beautyFinder';
 function App() {
     const [state, dispatchState] = useContext(StateContext);
     const navigate = useNavigate();
@@ -71,6 +73,8 @@ function App() {
             <Route path="/review-detail/:reviewId" element={<ReviewDetails />} />
             <Route path="/news-detail" element={<NewsDetails />} />
             <Route path="/profile-view" element={<ProfileView />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/beauty-finder" element={<BeautyFinder />} />
         </Routes>
     );
 }
