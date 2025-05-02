@@ -9,6 +9,21 @@ import { FormControl, InputLabel, MenuItem, Select, Checkbox, ListItemText, Butt
 function PersonalInfo() {
     const [state, dispatchState] = useContext(StateContext);
     const [loading, setLoading] = useState(true);
+    const [selectedAllergies, setSelectedAllergies] = useState([]);
+
+// Add this to your existing options
+const allergyOptions = [
+  { value: 'fragrance', label: 'Fragrance' },
+  { value: 'alcohol', label: 'Alcohol' },
+  { value: 'silicones', label: 'Silicones' },
+  { value: 'parabens', label: 'Parabens' },
+  { value: 'essential_oils', label: 'Essential Oils' },
+  // Add more from your SAFETY_PROPERTIES as needed
+];
+
+const handleAllergyChange = (event) => {
+  setSelectedAllergies(event.target.value);
+};
 
     // Form states
     const [name, setName] = useState('');
@@ -168,6 +183,13 @@ function PersonalInfo() {
                             <div className="form-title">
                                 <h2>Personal Information</h2>
                             </div>
+                            <h5>Tailor your experience for better recommendations</h5>
+                            <p>This is your hub to manage and update your skin’s unique details. By keeping your profile accurate, you’ll receive personalized product matches that align with your skin type, concerns, and goals.</p>
+                            <p>What You Can Do Here:</p>
+                            <p>✧ Edit your skin profile: Update your skin type, concerns, and goals as they change.</p>
+                            <p>✧ Track allergies: Flag ingredients to avoid, so we filter out unsuitable products.</p>
+                            <p>✧ Optimize recommendations: The more precise your profile, the better your matches!</p>
+
                             <div className="personal-survey-field">
                                 {/* Name Field */}
                                 <div className="info-field">
@@ -368,9 +390,57 @@ function PersonalInfo() {
                                         </Select>
                                     </FormControl>
                                 </div>
+                                {/* Ingredient Allergy Field */}
+<div 
+  className="info-field" 
+  style={{ display: 'flex', alignItems: 'center', gap: '16px' }}
+>
+  <label
+    htmlFor="ingredient-allergy"
+    className="personal-label"
+    style={{ marginBottom: 0, minWidth: '120px' }}
+  >
+    Ingredient allergy:
+  </label>
+  <FormControl fullWidth style={{ flex: 1 }}>
+    <Select
+      id="ingredient-allergy"
+      name="ingredientAllergy"
+      multiple
+      value={selectedAllergies}
+      onChange={handleAllergyChange}
+      displayEmpty
+      renderValue={(selected) => {
+        if (selected.length === 0) {
+          return 'Select ingredient allergies';
+        }
+        return selected
+          .map((value) => {
+            const allergy = allergyOptions.find((a) => a.value === value);
+            return allergy ? allergy.label : value;
+          })
+          .join(', ');
+      }}
+      sx={{
+        backgroundColor: '#ffffff',
+        minHeight: '40px',
+        '& .MuiSelect-select': {
+          padding: '8px 32px 8px 12px',
+        },
+      }}
+    >
+      {allergyOptions.map((allergy) => (
+        <MenuItem key={allergy.value} value={allergy.value}>
+          <Checkbox checked={selectedAllergies.indexOf(allergy.value) > -1} />
+          <ListItemText primary={allergy.label} />
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</div>
 
                                 {/* Price Segments Field */}
-                                <label htmlFor="price-segment" className="personal-label-price">
+                                {/* <label htmlFor="price-segment" className="personal-label-price">
                                     Price segments (optional):
                                 </label>
                                 <div className="price-segments">
@@ -391,7 +461,7 @@ function PersonalInfo() {
                                             </label>
                                         </div>
                                     ))}
-                                </div>
+                                </div> */}
                             </div>
                             <div className="save">
                                 <button type="submit" className="save-btn">

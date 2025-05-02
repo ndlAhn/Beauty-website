@@ -21,6 +21,7 @@ function Header() {
         if (navPath === 'home') {
             navigate('/');
         } else if (navPath === 'about us') navigate('/about-us');
+        else if (navPath === 'beauty finder') navigate('/beauty-finder');
         else navigate(`/${navPath}`);
     };
     return (

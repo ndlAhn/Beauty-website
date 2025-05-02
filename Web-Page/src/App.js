@@ -14,7 +14,7 @@ import LikedPost from './pages/profile-page/liked-posts/likePost';
 import LikedProduct from './pages/profile-page/liked-product/likedProduct';
 import Posts from './pages/review-pages/posts/posts';
 import CreateProduct from './pages/review-pages/addProduct/createProduct';
-import Ingredients from './pages/ingredients/ingredients';
+
 import Products from './pages/products/products';
 import Recommendations from './pages/profile-page/recommendations/recommendations';
 import { useContext, useEffect } from 'react';
@@ -25,8 +25,12 @@ import ReviewDetails from './pages/review-details/reviewDetails';
 import NewsDetails from './pages/news-details/newsDetail';
 import instance from './axios/instance';
 import ProfileView from './pages/profile-view/profileView';
+
+import Ingredients from './pages/ingredients/ingredients';
 import Community from './pages/community/community';
+
 import BeautyFinder from './pages/beautyFinder/beautyFinder';
+
 function App() {
     const [state, dispatchState] = useContext(StateContext);
     const navigate = useNavigate();
@@ -54,7 +58,11 @@ function App() {
         <Routes>
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/products" element={<Products />} />
+            {/* ingredient */}
             <Route path="/ingredients" element={<Ingredients />} />
+            {/* community */}
+            <Route path="/community" element={<Community />} />
+
             <Route path="/create-product" element={<CreateProduct />} />
             <Route path="/create-review" element={<CreateReview />} />
             <Route path="/posts" element={<Posts />} />
@@ -73,7 +81,7 @@ function App() {
             <Route path="/review-detail/:reviewId" element={<ReviewDetails />} />
             <Route path="/news-detail" element={<NewsDetails />} />
             <Route path="/profile-view" element={<ProfileView />} />
-            <Route path="/community" element={<Community />} />
+            <Route path="/product-detail/:id" element={<ProductDetails />} />
             <Route path="/beauty-finder" element={<BeautyFinder />} />
         </Routes>
     );

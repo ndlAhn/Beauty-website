@@ -22,10 +22,10 @@ function ProfileSidebar() {
                             Profile
                         </Link>
                     </li>
-                    {/* <li>
+                    <li>
                     <MdOutlineSettings className="pi-icon"/>
                     <Link to="/personal-information" className="sidebar-link">Personal information</Link>
-                </li> */}
+                </li>
                     <li>
                         <FaRegHeart className="post-icon" />
                         <Link to="/liked-posts" className="sidebar-link">
