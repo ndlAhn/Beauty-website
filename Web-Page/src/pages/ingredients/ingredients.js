@@ -1,404 +1,217 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
+import './ingredients.css';
 import {
-  Box,
-  Typography,
-  Grid,
-  TextField,
-  InputAdornment,
-  Avatar,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  Button,
-  Stack,
-  Paper,
-  Menu,
-  MenuItem,
-  IconButton
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import CreateIcon from "@mui/icons-material/Create";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import ReplyIcon from "@mui/icons-material/Reply";
+    Box,
+    Typography,
+    Grid,
+    TextField,
+    InputAdornment,
+    Avatar,
+    Card,
+    CardContent,
+    CardHeader,
+    Divider,
+    Button,
+    Stack,
+    Paper,
+    Menu,
+    MenuItem,
+    IconButton,
+    Input,
+    CircularProgress,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from '@mui/material';
+import { FiFilter, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import Header from '../../components/header/header.js';
 import Footer from '../../components/footer/footer.js';
+import instance from '../../axios/instance.js';
 
-function Community() {
-  // State quản lý filter
-  const [activeFilter, setActiveFilter] = useState("latest");
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
+function Ingredients() {
+    const [allIngredients, setAllIngredients] = useState([]);
+    const [searchResults, setSearchResults] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [sortBy, setSortBy] = useState('name');
+    const [sortOrder, setSortOrder] = useState('asc');
 
-  // Data mẫu
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      user: "BeautyExpert",
-      title: "Best skincare routine for summer",
-      content: "Here are my top recommendations...",
-      comments: [
-        { 
-          id: 1,
-          user: "User1", 
-          text: "Great tips!", 
-          replies: [
-            { id: 1, user: "BeautyExpert", text: "Thanks!" }
-          ] 
-        },
-        { 
-          id: 2,
-          user: "User2", 
-          text: "What about for oily skin?",
-          replies: [] 
+    const fetchIngredients = async () => {
+        setIsLoading(true);
+        try {
+            const response = await instance.get('/get-all-ingredients');
+            const data = await response.data;
+            setAllIngredients(data);
+            setError(null);
+        } catch (error) {
+            console.error('Error fetching ingredients:', error);
+            setError('Failed to fetch ingredients. Please try again later.');
+        } finally {
+            setIsLoading(false);
         }
-      ],
-      likes: 24,
-      isLiked: false,
-      date: "2025-04-28",
-      isPopular: true
-    },
-    {
-      id: 2,
-      user: "MakeupLover",
-      title: "New foundation review",
-      content: "Just tried this new product...",
-      comments: [
-        { 
-          id: 3,
-          user: "User3", 
-          text: "How's the coverage?",
-          replies: [] 
+    };
+
+    const searchIngredients = async () => {
+        if (!searchQuery.trim()) {
+            setSearchResults([]);
+            return;
         }
-      ],
-      likes: 15,
-      isLiked: false,
-      date: "2025-04-30",
-      isNew: true
-    }
-  ]);
 
-  const topCreators = [
-    { id: 1, name: "BeautyGuru", posts: 42, avatar: "B" },
-    { id: 2, name: "SkinCareExpert", posts: 38, avatar: "S" },
-    { id: 3, name: "MakeupArtist", posts: 29, avatar: "M" }
-  ];
+        setIsLoading(true);
+        try {
+            const response = await instance.get(`/search-ingredients/${searchQuery}`);
+            const data = await response.data;
+            setSearchResults(data);
+            setError(null);
+        } catch (error) {
+            console.error('Error searching ingredients:', error);
+            setError('Failed to search ingredients. Please try again later.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-  // Xử lý mở/đóng menu filter
-  const handleFilterClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+    const sortIngredients = (data) => {
+        return data.sort((a, b) => {
+            if (sortBy === 'name') {
+                return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+            } else if (sortBy === 'function') {
+                return sortOrder === 'asc'
+                    ? a.function.localeCompare(b.function)
+                    : b.function.localeCompare(a.function);
+            }
+            return 0;
+        });
+    };
 
-  const handleFilterClose = () => {
-    setAnchorEl(null);
-  };
+    const handleSort = (column) => {
+        if (sortBy === column) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(column);
+            setSortOrder('asc');
+        }
+    };
 
-  // Xử lý chọn filter
-  const handleFilterSelect = (filter) => {
-    setActiveFilter(filter);
-    handleFilterClose();
-  };
+    useEffect(() => {
+        fetchIngredients();
+    }, []);
 
-  // Xử lý like bài viết
-  const handleLikePost = (postId) => {
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        return {
-          ...post,
-          likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-          isLiked: !post.isLiked
-        };
-      }
-      return post;
-    }));
-  };
+    const handleSearch = () => {
+        searchIngredients();
+    };
 
-  // Lọc bài đăng theo các tiêu chí
-  const filteredPosts = posts.filter(post => {
-    // Lọc theo search query
-    if (searchQuery && !post.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    
-    // Lọc theo loại
-    switch (activeFilter) {
-      case "newest":
-        return post.isNew;
-      case "popular":
-        return post.isPopular;
-      default:
-        return true;
-    }
-  });
+    const displayedIngredients = searchQuery.trim() ? searchResults : allIngredients;
+    const sortedIngredients = sortIngredients([...displayedIngredients]);
 
-  // Lấy label cho filter hiện tại
-  const getFilterLabel = () => {
-    switch (activeFilter) {
-      case "latest":
-        return "Latest";
-      case "newest":
-        return "Newest";
-      case "popular":
-        return "Popular";
-      default:
-        return "Filter";
-    }
-  };
-
-  return (
-    <Box sx={{ color: '#3C4B57' }}>
-      <Header />
-      
-      <Box sx={{ p: 4 }}>
-        <Grid container spacing={4}>
-          {/* Cột trái - Tạo bài đăng và Top Creators */}
-          <Grid item xs={12} md={3}>
-            <Paper elevation={3} sx={{ p: 3, mb: 4, position: 'sticky', top: 20 }}>
-              <Button
-                fullWidth
-                variant="contained"
-                size="medium"
-                startIcon={<CreateIcon />}
-                sx={{ 
-                  mb: 3,
-                  backgroundColor: '#DFB5B5',
-                  color: '#3C4B57',
-                  '&:hover': {
-                    backgroundColor: '#d8a5a5',
-                  }
-                }}
-              >
-                Create New Post
-              </Button>
-              
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Top Creators
-              </Typography>
-              
-              <Stack spacing={2}>
-                {topCreators.map(creator => (
-                  <Card key={creator.id} variant="outlined">
-                    <CardHeader
-                      avatar={
-                        <Avatar sx={{ bgcolor: 'primary.main' }}>
-                          {creator.avatar}
-                        </Avatar>
-                      }
-                      title={creator.name}
-                      subheader={`${creator.posts} posts`}
-                    />
-                  </Card>
-                ))}
-              </Stack>
-            </Paper>
-          </Grid>
-
-          {/* Cột phải - Nội dung chính */}
-          <Grid item xs={12} md={9}>
-            <Paper elevation={3} sx={{ p: 3 }}>
-              {/* Header */}
-              <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Beauty Community
-              </Typography>
-              
-              <Typography variant="body1" sx={{ mb: 3 }}>
-              Welcome to beauty community! Ask our experts anything about beauty, lifestyle, or daily life. We’re here to help—drop your questions below! 
-              </Typography>
-              
-              {/* Thanh tìm kiếm */}
-              <TextField
-                fullWidth
-                placeholder="Search posts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{ mb: 3 }}
-              />
-              
-              {/* Phần Filter - Phiên bản dropdown */}
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 2, 
-                mb: 3
-              }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<FilterAltIcon />}
-                  endIcon={<ArrowDropDownIcon />}
-                  onClick={handleFilterClick}
-                  sx={{ 
-                    textTransform: 'none',
-                    color: '#3C4B57',
-                    borderColor: '#3C4B57',
-                    '&:hover': {
-                      borderColor: '#3C4B57',
-                      backgroundColor: 'rgba(60, 75, 87, 0.04)'
-                    }
-                  }}
-                >
-                  {getFilterLabel()}
-                </Button>
-                
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleFilterClose}
-                >
-                  <MenuItem onClick={() => handleFilterSelect("latest")}>Latest</MenuItem>
-                  <MenuItem onClick={() => handleFilterSelect("newest")}>Newest</MenuItem>
-                  <MenuItem onClick={() => handleFilterSelect("popular")}>Popular</MenuItem>
-                </Menu>
-              </Box>
-              
-              <Divider sx={{ my: 2 }} />
-              
-              {/* Danh sách bài đăng */}
-              <Stack spacing={3}>
-                {filteredPosts.length > 0 ? (
-                  filteredPosts.map(post => (
-                    <Card key={post.id} elevation={2}>
-                      <CardHeader
-                        avatar={
-                          <Avatar sx={{ bgcolor: 'secondary.main' }}>
-                            {post.user.charAt(0)}
-                          </Avatar>
-                        }
-                        title={post.user}
-                        subheader={post.title}
-                      />
-                      
-                      <CardContent>
-                        <Typography variant="body1" paragraph>
-                          {post.content}
+    return (
+        <div>
+            <Header />
+            <Box sx={{ flexGrow: 1, p: 3 }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        <Typography variant="h4" gutterBottom>
+                            Look up and cosmetic ingredients analysis
                         </Typography>
-                        
-                        <Box sx={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: 2,
-                          mt: 2
-                        }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <IconButton onClick={() => handleLikePost(post.id)}>
-                              {post.isLiked ? (
-                                <FavoriteIcon color="error" />
-                              ) : (
-                                <FavoriteBorderIcon />
-                              )}
-                            </IconButton>
-                            <Typography variant="body2">
-                              {post.likes}
+                        <Typography variant="body1" paragraph>
+                            Curious about what's in your cosmetics? With <strong>Beauty Insight</strong>, you can easily
+                            look up and analyze cosmetic ingredients. Discover the benefits, potential risks, and
+                            overall effectiveness of each component in your beauty products. Stay informed and make
+                            smarter choices for your skincare and makeup routine. Empower yourself with the knowledge to
+                            choose the best for your skin!
+                        </Typography>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <div style={{ display: 'flex', flexDirection: 'row' }}>
+                            <Typography variant="h6" gutterBottom>
+                                Enter the names of the ingredients:
                             </Typography>
-                          </Box>
-                          
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <ChatBubbleOutlineIcon fontSize="small" />
-                            <Typography variant="body2">
-                              {post.comments.length}
+                            <Input
+                                placeholder="Enter ingredients"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                variant="outlined"
+                                sx={{ mb: 2, marginLeft: '10px' }}
+                            />
+                        </div>
+
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSearch}
+                            sx={{ mb: 4 }}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? <CircularProgress size={24} /> : 'Look up'}
+                        </Button>
+                        <Typography variant="body2" color="textSecondary" paragraph>
+                            Note: When entering multiple ingredients, the ingredients must be separated by commas ( , )!
+                        </Typography>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <FiFilter style={{ marginRight: 8 }} />
+                            <Typography variant="h6">
+                                {searchQuery.trim() ? 'Search Results' : 'All Ingredients'}
                             </Typography>
-                          </Box>
-                          
-                          <Typography 
-                            variant="caption" 
-                            color="text.secondary"
-                            sx={{ ml: 'auto' }}
-                          >
-                            {post.date}
-                          </Typography>
                         </Box>
-                      </CardContent>
-                      
-                      {/* Phần bình luận */}
-                      {post.comments.length > 0 && (
-                        <Box sx={{ 
-                          bgcolor: 'action.hover', 
-                          p: 2,
-                          borderTop: '1px solid',
-                          borderColor: 'divider'
-                        }}>
-                          <Typography variant="subtitle2" gutterBottom>
-                            Comments ({post.comments.length})
-                          </Typography>
-                          
-                          <Stack spacing={2}>
-                            {post.comments.map((comment) => (
-                              <Box key={comment.id}>
-                                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                                  <Avatar sx={{ 
-                                    width: 24, 
-                                    height: 24, 
-                                    fontSize: 12,
-                                    bgcolor: 'primary.light'
-                                  }}>
-                                    {comment.user.charAt(0)}
-                                  </Avatar>
-                                  <Typography variant="body2">
-                                    <strong>{comment.user}:</strong> {comment.text}
-                                  </Typography>
-                                </Box>
-                                
-                                {/* Reply button */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', ml: 5 }}>
-                                  <IconButton size="small" sx={{ mr: 1 }}>
-                                    <ReplyIcon fontSize="small" />
-                                  </IconButton>
-                                  <Typography variant="caption" color="text.secondary">
-                                    Reply
-                                  </Typography>
-                                </Box>
-                                
-                                {/* Replies */}
-                                {comment.replies.length > 0 && (
-                                  <Box sx={{ ml: 5, mt: 1 }}>
-                                    {comment.replies.map(reply => (
-                                      <Box key={reply.id} sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                                        <Avatar sx={{ 
-                                          width: 24, 
-                                          height: 24, 
-                                          fontSize: 12,
-                                          bgcolor: 'secondary.light'
-                                        }}>
-                                          {reply.user.charAt(0)}
-                                        </Avatar>
-                                        <Typography variant="body2">
-                                          <strong>{reply.user}:</strong> {reply.text}
-                                        </Typography>
-                                      </Box>
-                                    ))}
-                                  </Box>
-                                )}
-                              </Box>
-                            ))}
-                          </Stack>
-                        </Box>
-                      )}
-                    </Card>
-                  ))
-                ) : (
-                  <Typography variant="body1" color="text.secondary" textAlign="center" py={4}>
-                    No posts found matching your criteria
-                  </Typography>
-                )}
-              </Stack>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Box>
-      
-      <Footer />
-    </Box>
-  );
+                        {error ? (
+                            <Typography color="error" paragraph>
+                                {error}
+                            </Typography>
+                        ) : isLoading ? (
+                            <Box display="flex" justifyContent="center">
+                                <CircularProgress />
+                            </Box>
+                        ) : (
+                            <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
+                                <Table>
+                                    <TableHead sx={{ bgcolor: 'primary.main' }}>
+                                        <TableRow>
+                                            <TableCell
+                                                sx={{ color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                                                onClick={() => handleSort('name')}
+                                            >
+                                                Name{' '}
+                                                {sortBy === 'name' &&
+                                                    (sortOrder === 'asc' ? <FiArrowUp /> : <FiArrowDown />)}
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{ color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                                                onClick={() => handleSort('function')}
+                                            >
+                                                Function{' '}
+                                                {sortBy === 'function' &&
+                                                    (sortOrder === 'asc' ? <FiArrowUp /> : <FiArrowDown />)}
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {sortedIngredients.map((ingredient) => (
+                                            <TableRow
+                                                key={ingredient.ingredient_id}
+                                                sx={{ '&:hover': { bgcolor: 'action.hover' } }}
+                                            >
+                                                <TableCell>{ingredient.name}</TableCell>
+                                                <TableCell>{ingredient.function}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        )}
+                    </Grid>
+                </Grid>
+            </Box>
+            <Footer />
+        </div>
+    );
 }
 
-export default Community;
+export default Ingredients;
