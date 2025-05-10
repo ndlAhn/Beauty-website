@@ -118,10 +118,10 @@ function Products() {
                 <Grid container spacing={3}>
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map((product) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={product.product_id}>
+                            <Grid item xs={12} sm={6} md={4} lg={3} key={product.review_id}>
                                 <Card
                                     sx={{ maxWidth: 300, mx: 'auto', boxShadow: 3, cursor: 'pointer' }}
-                                    onClick={() => navigate(`/product-detail/${product.product_id}`)}
+                                    onClick={() => navigate(`/product-detail/${product.review_id}`)}
                                 >
                                     <CardMedia
                                         component="img"

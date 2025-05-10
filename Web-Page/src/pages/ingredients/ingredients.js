@@ -30,6 +30,17 @@ import { FiFilter, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import Header from '../../components/header/header.js';
 import Footer from '../../components/footer/footer.js';
 import instance from '../../axios/instance.js';
+const SAFETY_PROPERTIES = [
+    { value: 'non_comedogenic', label: 'Non-comedogenic' },
+    { value: 'hypoallergenic', label: 'Hypoallergenic' },
+    { value: 'fragrance_free', label: 'Fragrance-free' },
+    { value: 'dermatologically_tested', label: 'Dermatologically tested' },
+    { value: 'alcohol_free', label: 'Alcohol-free' },
+    { value: 'sulphate_free', label: 'Sulphate-free' },
+    { value: 'cruelty_free', label: 'Cruelty-free' },
+    { value: 'vegan', label: 'Vegan' },
+    { value: 'safe_for_pregnancy', label: 'Safe for pregnancy' },
+];
 
 function Ingredients() {
     const [allIngredients, setAllIngredients] = useState([]);
@@ -39,6 +50,8 @@ function Ingredients() {
     const [error, setError] = useState(null);
     const [sortBy, setSortBy] = useState('name');
     const [sortOrder, setSortOrder] = useState('asc');
+
+    
 
     const fetchIngredients = async () => {
         setIsLoading(true);
@@ -190,6 +203,11 @@ function Ingredients() {
                                                 {sortBy === 'function' &&
                                                     (sortOrder === 'asc' ? <FiArrowUp /> : <FiArrowDown />)}
                                             </TableCell>
+                                            <TableCell
+                                                    sx={{ color: 'white', fontWeight: 'bold' }}
+                                            >
+                                                Safety Information
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -198,8 +216,10 @@ function Ingredients() {
                                                 key={ingredient.ingredient_id}
                                                 sx={{ '&:hover': { bgcolor: 'action.hover' } }}
                                             >
-                                                <TableCell>{ingredient.name}</TableCell>
-                                                <TableCell>{ingredient.function}</TableCell>
+                                                <TableCell >{ingredient.name}</TableCell>
+                                                <TableCell sx={{ minWidth: 600, whiteSpace: 'normal', wordWrap: 'break-word' }}>{ingredient.function}</TableCell>
+                                                <TableCell>{generateSafetyInfoFromIngredient(ingredient)}</TableCell>
+
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -213,5 +233,11 @@ function Ingredients() {
         </div>
     );
 }
+const generateSafetyInfoFromIngredient = (ingredient) => {
+    return SAFETY_PROPERTIES.filter((prop) => ingredient[prop.value])
+        .map((prop) => prop.label)
+        .join(', ');
+};
+
 
 export default Ingredients;

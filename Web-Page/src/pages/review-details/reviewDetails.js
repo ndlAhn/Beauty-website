@@ -246,6 +246,9 @@ function ReviewDetails() {
                             src={`https://res.cloudinary.com/${cloudName}/image/upload/${reviewData.img_path}.jpg`}
                             alt="Product"
                             className="review-product-image"
+                            
+                            height="500"
+                            style={{ maxWidth: '100%', height: 'auto' }}
                         />
                     )}
                     
