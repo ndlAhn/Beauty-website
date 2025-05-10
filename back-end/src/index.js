@@ -28,6 +28,7 @@ require('./controller/comment.controller')(app);
 require('./controller/productReview.controller')(app);
 require('./controller/reviews.controller')(app);
 require('./controller/ingredient.controller')(app);
+require('./controller/follower.controller')(app);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
