@@ -25,16 +25,18 @@ import {
     TextareaAutosize,
     Chip,
     Box,
-} from '@mui/material';
-// Thêm các import cần thiết cho Dialog
-import {
-    // ... các import hiện có
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
     IconButton,
-    InputAdornment
+    InputAdornment,
+    Checkbox,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemButton,
+    CircularProgress,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -62,9 +64,10 @@ function CreateProduct() {
         price_range: '',
         warning: '',
     });
-    const [openDialog, setOpenDialog] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
     const [openIngredientDialog, setOpenIngredientDialog] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         if (window.cloudinary && uploadButtonRef.current) {
@@ -95,9 +98,28 @@ function CreateProduct() {
     const fetchIngredients = async () => {
         try {
             const res = await instance.get('/get-all-ingredients');
+            console.log(ingredients);
             setIngredients(res.data);
         } catch (error) {
-            console.error('Error fetching ingredients:', error);
+            console.error('Error fetching products:', error);
+        }
+    };
+
+    const searchIngredients = async (query) => {
+        if (!query.trim()) {
+            setSearchResults([]);
+            return;
+        }
+
+        setIsSearching(true);
+        try {
+            const res = await instance.get(`/search-ingredients/${query}`);
+            setSearchResults(res.data);
+        } catch (error) {
+            console.error('Error searching ingredients:', error);
+            setSearchResults([]);
+        } finally {
+            setIsSearching(false);
         }
     };
 
@@ -111,6 +133,12 @@ function CreateProduct() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        searchIngredients(value);
+    };
+
     const toggleIngredient = (ingredient) => {
         setSelectedIngredients((prev) => {
             const isSelected = prev.some((item) => item.ingredient_id === ingredient.ingredient_id);
@@ -122,17 +150,21 @@ function CreateProduct() {
         });
     };
 
+    const handleAddIngredients = () => {
+        setOpenIngredientDialog(false);
+        setSearchTerm('');
+        setSearchResults([]);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate required fields
         if (!formData.product_name || !publicId) {
             alert('Product name and image are required');
             return;
         }
 
         try {
-            // 1. Create product first
             const productResponse = await instance.post('/create-product', {
                 ...formData,
                 picture: publicId,
@@ -142,7 +174,6 @@ function CreateProduct() {
             if (productResponse.status === 200) {
                 const productId = productResponse.data.product_id;
 
-                // 2. Add to junction table if ingredients selected
                 if (selectedIngredients.length > 0) {
                     await instance.post('/product-ingredients', {
                         product_id: productId,
@@ -154,7 +185,6 @@ function CreateProduct() {
 
                 alert('Product created successfully!');
                 fetchProducts();
-                // Reset form
                 setFormData({
                     product_name: '',
                     product_details: '',
@@ -188,29 +218,7 @@ function CreateProduct() {
             console.error('Error deleting product:', error);
             alert('Failed to delete product');
         }
-        
     };
-    // Thêm hàm xử lý mở/đóng dialog
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
-    };
-    
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-        setSearchTerm('');
-    };
-    const handleOpenIngredientDialog = () => {
-        setOpenIngredientDialog(true);
-      };
-      
-      const handleCloseIngredientDialog = () => {
-        setOpenIngredientDialog(false);
-      };
-    
-    // Hàm lọc ingredients theo search term
-    const filteredIngredients = ingredients.filter(ingredient =>
-        ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
 
     return (
         <div>
@@ -281,88 +289,138 @@ function CreateProduct() {
                             ))}
 
                             {/* Ingredients Selection */}
-                            <div className='review-input-area'>
-                                <h5>Ingredient:</h5>
-                                <button className='add-ingredient-create-product' 
-                                onClick={handleOpenIngredientDialog}  
-                                >Add</button>
+                            <div className="review-input-area">
+                                <h5>Ingredients:</h5>
+                                <Button variant="outlined" onClick={() => setOpenIngredientDialog(true)} sx={{ ml: 2 }}>
+                                    Add Ingredients
+                                </Button>
                             </div>
-                            {/* Thêm Dialog component */}
-                            {/* Ingredient Dialog */}
-<Dialog open={openIngredientDialog} onClose={handleCloseIngredientDialog}>
-  <DialogTitle>Add Ingredients</DialogTitle>
-  <DialogContent>
-    <TextField
-      autoFocus
-      margin="dense"
-      label="Search Ingredients"
-      fullWidth
-      variant="outlined"
-      sx={{ mb: 2 }}
-    />
-    
-    {/* Danh sách ingredients sẽ thêm vào đây */}
-    <Box sx={{ maxHeight: 400,width: 300, overflow: 'auto' }}>
-      {ingredients.map(ingredient => (
-        <Box 
-          key={ingredient.ingredient_id}
-          sx={{ 
-            p: 2,
-            borderBottom: '1px solid #eee',
-            '&:hover': {
-              backgroundColor: '#f5f5f5',
-              cursor: 'pointer'
-            }
-          }}
-        >
-          {ingredient.name}
-        </Box>
-      ))}
-    </Box>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleCloseIngredientDialog}>Cancel</Button>
-    <Button onClick={handleCloseIngredientDialog} variant="contained">Add</Button>
-  </DialogActions>
-</Dialog>
-                            {/* <Box sx={{ my: 2 }}>
-                                <Typography variant="subtitle1" gutterBottom>
-                                    Ingredients
-                                </Typography>
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                    {ingredients.map((ingredient) => (
-                                        <Chip
-                                            key={ingredient.ingredient_id}
-                                            label={ingredient.name}
-                                            clickable
-                                            variant={
-                                                selectedIngredients.some(
-                                                    (item) => item.ingredient_id === ingredient.ingredient_id,
-                                                )
-                                                    ? 'filled'
-                                                    : 'outlined'
-                                            }
-                                            color={
-                                                selectedIngredients.some(
-                                                    (item) => item.ingredient_id === ingredient.ingredient_id,
-                                                )
-                                                    ? 'primary'
-                                                    : 'default'
-                                            }
-                                            onClick={() => toggleIngredient(ingredient)}
-                                            sx={{
-                                                fontWeight: 500,
+
+                            {/* Selected Ingredients Chips */}
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, my: 2 }}>
+                                {selectedIngredients.map((ingredient) => (
+                                    <Chip
+                                        key={ingredient.ingredient_id}
+                                        label={ingredient.name}
+                                        onDelete={() => toggleIngredient(ingredient)}
+                                        sx={{
+                                            backgroundColor: '#e3f2fd',
+                                            '& .MuiChip-deleteIcon': {
+                                                color: '#1976d2',
                                                 '&:hover': {
-                                                    backgroundColor: 'action.hover',
+                                                    color: '#0d47a1',
                                                 },
+                                            },
+                                        }}
+                                    />
+                                ))}
+                            </Box>
+
+                            {/* Ingredient Search Dialog */}
+                            <Dialog
+                                open={openIngredientDialog}
+                                onClose={() => {
+                                    setOpenIngredientDialog(false);
+                                    setSearchTerm('');
+                                    setSearchResults([]);
+                                }}
+                                fullWidth
+                                maxWidth="sm"
+                            >
+                                <DialogTitle>Add Ingredients</DialogTitle>
+                                <DialogContent>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        label="Search Ingredients"
+                                        fullWidth
+                                        variant="outlined"
+                                        value={searchTerm}
+                                        onChange={handleSearchChange}
+                                        sx={{ mb: 2 }}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <SearchIcon />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+
+                                    {isSearching ? (
+                                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                                            <CircularProgress />
+                                        </Box>
+                                    ) : (
+                                        <List
+                                            sx={{
+                                                maxHeight: 400,
+                                                overflow: 'auto',
+                                                border: '1px solid #eee',
+                                                borderRadius: 1,
                                             }}
-                                        />
-                                    ))}
-                                </Box>
-                                <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                                    Selected: {selectedIngredients.map((ing) => ing.name).join(', ')}
-                                </Typography>
-                            </Box> */}
+                                        >
+                                            {searchResults.length > 0
+                                                ? searchResults.map((ingredient) => (
+                                                      <ListItem
+                                                          key={ingredient.ingredient_id}
+                                                          disablePadding
+                                                          secondaryAction={
+                                                              <Checkbox
+                                                                  edge="end"
+                                                                  checked={selectedIngredients.some(
+                                                                      (item) =>
+                                                                          item.ingredient_id ===
+                                                                          ingredient.ingredient_id,
+                                                                  )}
+                                                                  onChange={() => toggleIngredient(ingredient)}
+                                                              />
+                                                          }
+                                                      >
+                                                          <ListItemButton onClick={() => toggleIngredient(ingredient)}>
+                                                              <ListItemText primary={ingredient.name} />
+                                                          </ListItemButton>
+                                                      </ListItem>
+                                                  ))
+                                                : ingredients.map((ingredient, index) => (
+                                                      <ListItem
+                                                          key={ingredient.ingredient_id}
+                                                          disablePadding
+                                                          secondaryAction={
+                                                              <Checkbox
+                                                                  edge="end"
+                                                                  checked={selectedIngredients.some(
+                                                                      (item) =>
+                                                                          item.ingredient_id ===
+                                                                          ingredient.ingredient_id,
+                                                                  )}
+                                                                  onChange={() => toggleIngredient(ingredient)}
+                                                              />
+                                                          }
+                                                      >
+                                                          <ListItemButton onClick={() => toggleIngredient(ingredient)}>
+                                                              <ListItemText primary={ingredient.name} />
+                                                          </ListItemButton>
+                                                      </ListItem>
+                                                  ))}
+                                        </List>
+                                    )}
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button
+                                        onClick={() => {
+                                            setOpenIngredientDialog(false);
+                                            setSearchTerm('');
+                                            setSearchResults([]);
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={handleAddIngredients} variant="contained">
+                                        Add Selected
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
 
                             <textarea
                                 onChange={handleChange}
