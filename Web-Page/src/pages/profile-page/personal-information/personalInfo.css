@@ -1,15 +1,17 @@
-.personal-wrap{
-    display:flex;
+.personal-wrap {
+    display: flex;
 }
 .personal-content-wrap {
     width: 100%;
     padding: 30px 60px;
-    background-color: #f8f8f8 ;
+    background-color: #f8f8f8;
+    flex-direction: row;
+    flex-wrap: nowrap;
 }
 .personal-content {
     padding: 30px 50px;
     color: var(--text-color-blue);
-    background-color: white ;
+    background-color: white;
     width: 100%;
 }
 .info-field {
@@ -19,8 +21,6 @@
 }
 .personal-label {
     font-size: 25px;
-    
-
 }
 .profile-input {
     height: 40px;
@@ -29,7 +29,7 @@
     padding-left: 5px;
     border-radius: 5px;
     font-size: 20px;
-    color: var(--text-color-blue)
+    color: var(--text-color-blue);
 }
 .personal-gender {
     padding-right: 20px;
@@ -48,7 +48,7 @@
     padding-left: 15px;
 }
 .price-segments {
-    padding-left: 20px ;
+    padding-left: 20px;
 }
 .personal-price {
     padding-bottom: 10px;
@@ -56,7 +56,6 @@
 .personal-segment-input {
     width: 15px;
     height: 15px;
-
 }
 .personal-label-price {
     font-size: 25px;
@@ -79,5 +78,5 @@
     border: none;
 }
 .gender-group {
-    display:flex;
+    display: flex;
 }

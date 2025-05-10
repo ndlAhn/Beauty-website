@@ -168,7 +168,7 @@ function CreateProduct() {
             const productResponse = await instance.post('/create-product', {
                 ...formData,
                 picture: publicId,
-                user_id: state.userData.userId,
+                user_id: state.userData.user_id,
             });
 
             if (productResponse.status === 200) {

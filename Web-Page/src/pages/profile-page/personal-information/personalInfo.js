@@ -1,476 +1,397 @@
-import './personalInfo.css';
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    FormLabel,
+    MenuItem,
+    Select,
+    Typography,
+    TextField,
+    Avatar,
+    Paper,
+    Divider,
+} from '@mui/material';
+import instance from '../../../axios/instance';
+import StateContext from '../../../context/context.context';
 import SubHeader from '../../../components/subHeader/subHeader';
 import ProfileSidebar from '../../../components/sidebar/profile-sidebar/profileSidebar';
-import { useContext, useEffect, useState } from 'react';
-import StateContext from '../../../context/context.context';
-import instance from '../../../axios/instance';
-import { FormControl, InputLabel, MenuItem, Select, Checkbox, ListItemText, Button } from '@mui/material';
+import './personalInfo.css';
+const SKIN_TYPES = [
+    { value: 'oily', label: 'Oily skin' },
+    { value: 'dry', label: 'Dry skin' },
+    { value: 'normal', label: 'Normal skin' },
+    { value: 'combination', label: 'Combination skin' },
+    { value: 'sensitive', label: 'Sensitive skin' },
+    { value: 'acne_prone', label: 'Acne-prone skin' },
+];
+
+const SKIN_PROBLEMS = [
+    { value: 'acne', label: 'Acne' },
+    { value: 'aging', label: 'Aging' },
+    { value: 'dried', label: 'Dried skin' },
+    { value: 'oily', label: 'Oily skin' },
+    { value: 'enlarged_pores', label: 'Enlarged pores' },
+    { value: 'scarring', label: 'Scarring' },
+    { value: 'skin_recovery', label: 'Skin recovery' },
+];
+
+const ALLERGY_OPTIONS = [
+    { value: 'fragrance', label: 'Fragrance' },
+    { value: 'alcohol', label: 'Alcohol' },
+    { value: 'silicones', label: 'Silicones' },
+    { value: 'parabens', label: 'Parabens' },
+    { value: 'essential_oil', label: 'Essential Oils' },
+];
 
 function PersonalInfo() {
     const [state, dispatchState] = useContext(StateContext);
-    const [loading, setLoading] = useState(true);
-    const [selectedAllergies, setSelectedAllergies] = useState([]);
-
-// Add this to your existing options
-const allergyOptions = [
-  { value: 'fragrance', label: 'Fragrance' },
-  { value: 'alcohol', label: 'Alcohol' },
-  { value: 'silicones', label: 'Silicones' },
-  { value: 'parabens', label: 'Parabens' },
-  { value: 'essential_oils', label: 'Essential Oils' },
-  // Add more from your SAFETY_PROPERTIES as needed
-];
-
-const handleAllergyChange = (event) => {
-  setSelectedAllergies(event.target.value);
-};
-
-    // Form states
-    const [name, setName] = useState('');
-    const [dob, setDob] = useState('');
-    const [gender, setGender] = useState('');
-    const [skinType, setSkinType] = useState('');
-    const [selectedProblems, setSelectedProblems] = useState([]);
-    const [selectedGoals, setSelectedGoals] = useState([]);
-    const [priceSegments, setPriceSegments] = useState({
-        drug_store: false,
-        mid_end: false,
-        high_end: false,
+    const navigate = useNavigate();
+    const [userData, setUserData] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        bio: '',
+        avt_path: '',
+        skin_type: '',
+        acne: false,
+        aging: false,
+        dried: false,
+        oily: false,
+        enlarged_pores: false,
+        scarring: false,
+        skin_recovery: false,
+        fragrance: false,
+        alcohol: false,
+        silicones: false,
+        parabens: false,
+        essential_oil: false,
     });
-    const [avatarPath, setAvatarPath] = useState('');
 
-    // Options data
-    const skincareGoals = [
-        { value: 'Moisturizing', label: 'Hydration & Moisturizing' },
-        { value: 'acne-control', label: 'Acne Control' },
-        { value: 'anti-aging', label: 'Anti-aging' },
-        { value: 'brightening', label: 'Brightening' },
-        { value: 'oil-control', label: 'Oil Control' },
-        { value: 'repair', label: 'Soothing & Repair' },
-    ];
-
-    const skinProblems = [
-        { value: 'acne', label: 'Acne-prone' },
-        { value: 'dull-skin', label: 'Dull skin' },
-        { value: 'large-pores', label: 'Large pores' },
-        { value: 'uneven-skin-tone', label: 'Uneven skin tone' },
-        { value: 'dark-skin', label: 'Dark spots & hyperpigmentation' },
-        { value: 'Red-irritation', label: 'Redness & irritation' },
-        { value: 'aging', label: 'Wrinkles & fine lines' },
-        { value: 'dehydrated-skin', label: 'Dehydrated skin' },
-    ];
-
-    // Fetch user data
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await instance.post('/get-user-data-by-id', {
-                    user_id: state.userData?.userId,
-                });
-
-                if (response.data.success) {
-                    const userData = response.data.data;
-
-                    // Map data to form fields
-                    setName(userData.name || '');
-                    setDob(userData.dob ? new Date(userData.dob).toISOString().split('T')[0] : '');
-                    setGender(userData.gender || '');
-                    setSkinType(userData.skin_type || '');
-                    setAvatarPath(userData.avt_path || '');
-
-                    // Map skin problems (convert boolean fields to array)
-                    const problems = [];
-                    if (userData.acne) problems.push('acne');
-                    if (userData.aging) problems.push('aging');
-                    if (userData.dried) problems.push('dehydrated-skin');
-                    if (userData.oily) problems.push('oil-control');
-                    if (userData.elarged_pores) problems.push('large-pores');
-                    if (userData.scarring) problems.push('dark-skin');
-                    setSelectedProblems(problems);
-
-                    // Map skincare goals
-                    if (userData.skincare_goals) {
-                        setSelectedGoals(userData.skincare_goals);
-                    }
-
-                    // Map price segments
-                    if (userData.price_segments) {
-                        setPriceSegments({
-                            drug_store: userData.price_segments.drug_store || false,
-                            mid_end: userData.price_segments.mid_end || false,
-                            high_end: userData.price_segments.high_end || false,
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchUserData();
-    }, [state.userData?.userId]);
+    }, []);
 
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-
-        if (name === 'skingoal') {
-            setSelectedGoals(value);
-        } else if (name === 'skinprob') {
-            setSelectedProblems(value);
-        } else if (name === 'skintype') {
-            setSkinType(value);
+    const fetchUserData = async () => {
+        try {
+            const response = await instance.post('/get-user-data-by-id', {
+                user_id: state.userData?.user_id,
+            });
+            console.log(response.data);
+            setUserData(response.data);
+            setFormData({
+                skin_type: response.data.skin_type,
+                name: response.data.name || '',
+                bio: response.data.bio || '',
+                avt_path: response.data.avt_path || '',
+                skin_type: response.data.skin_type || '',
+                acne: response.data.acne || false,
+                aging: response.data.aging || false,
+                dried: response.data.dried || false,
+                oily: response.data.oily || false,
+                enlarged_pores: response.data.enlarged_pores || false,
+                scarring: response.data.scarring || false,
+                skin_recovery: response.data.skin_recovery || false,
+                fragrance: response.data.fragrance || false,
+                alcohol: response.data.alcohol || false,
+                silicones: response.data.silicones || false,
+                parabens: response.data.parabens || false,
+                essential_oil: response.data.essential_oil || false,
+            });
+        } catch (error) {
+            console.error('Error fetching user data:', error);
         }
     };
 
-    const handleGenderChange = (event) => {
-        setGender(event.target.value);
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
     };
 
-    const handlePriceSegmentChange = (segment) => {
-        setPriceSegments((prev) => ({
+    const handleSkinProblemChange = (problem) => {
+        setFormData((prev) => ({
             ...prev,
-            [segment]: !prev[segment],
+            [problem]: !prev[problem],
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
-            const formData = {
-                user_id: state.userData.userId,
-                name: e.target.Uname.value,
-                dob: e.target.dob.value,
-                gender,
-                skin_type: skinType,
-                // Map skin problems to boolean fields
-                acne: selectedProblems.includes('acne'),
-                aging: selectedProblems.includes('aging'),
-                dried: selectedProblems.includes('dehydrated-skin'),
-                oily: selectedProblems.includes('oil-control'),
-                elarged_pores: selectedProblems.includes('large-pores'),
-                scarring: selectedProblems.includes('dark-skin'),
-                skincare_goals: selectedGoals,
-                price_segments: priceSegments,
-                avt_path: avatarPath,
-            };
+            // Update basic info
+            await instance.post('/update-info', {
+                user_id: state.userData?.user_id,
+                name: formData.name,
+                bio: formData.bio,
+                avt_path: formData.avt_path,
+            });
 
-            const response = await instance.post('/update-info', formData);
+            // Update skin and allergy info
+            await instance.post('/survey', {
+                user_id: state.userData?.user_id,
+                skinType: formData.skin_type,
+                skinProb: {
+                    acne: formData.acne,
+                    aging: formData.aging,
+                    dried: formData.dried,
+                    oily: formData.oily,
+                    enlarged_pores: formData.enlarged_pores,
+                    scarring: formData.scarring,
+                    skin_recovery: formData.skin_recovery,
+                },
+                allergies: [
+                    formData.fragrance ? 'fragrance' : null,
+                    formData.alcohol ? 'alcohol' : null,
+                    formData.silicones ? 'silicones' : null,
+                    formData.parabens ? 'parabens' : null,
+                    formData.essential_oil ? 'essential_oil' : null,
+                ].filter(Boolean),
+            });
 
-            if (response.data.success) {
-                // Update context or show success message
-                console.log('Profile updated successfully');
-            }
+            setEditMode(false);
+            fetchUserData(); // Refresh data
         } catch (error) {
-            console.error('Error updating profile:', error);
+            console.error('Error updating user data:', error);
         }
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
+    const textColor = 'rgb(169, 80, 80)';
+    const buttonColor = 'rgb(169, 80, 80)';
+
+    if (!userData) {
+        return <Typography>Loading...</Typography>;
     }
 
     return (
         <div>
             <SubHeader />
+
             <div className="personal-wrap">
                 <ProfileSidebar />
-                <div className="personal-content-wrap">
-                    <div className="personal-content">
-                        <form className="survey-form" onSubmit={handleSubmit}>
-                            <div className="form-title">
-                                <h2>Personal Information</h2>
-                            </div>
-                            <h5>Tailor your experience for better recommendations</h5>
-                            <p>This is your hub to manage and update your skin’s unique details. By keeping your profile accurate, you’ll receive personalized product matches that align with your skin type, concerns, and goals.</p>
-                            <p>What You Can Do Here:</p>
-                            <p>✧ Edit your skin profile: Update your skin type, concerns, and goals as they change.</p>
-                            <p>✧ Track allergies: Flag ingredients to avoid, so we filter out unsuitable products.</p>
-                            <p>✧ Optimize recommendations: The more precise your profile, the better your matches!</p>
 
-                            <div className="personal-survey-field">
-                                {/* Name Field */}
-                                <div className="info-field">
-                                    <label className="personal-label" htmlFor="Uname">
-                                        Name:
-                                    </label>
-                                    <input
-                                        className="profile-input"
-                                        type="text"
-                                        id="Uname"
-                                        name="Uname"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: '#f5f5f5',
+                        flex: 1,
+                        padding: '0 30px ',
+                        backgroundColor: 'white',
+                        paddingBottom: '30px',
+                    }}
+                >
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            width: '100%',
+                            maxWidth: 800,
+                            p: 4,
+                            borderRadius: 2,
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                            <Typography variant="h4" sx={{ color: textColor, fontWeight: 'bold' }}>
+                                User Profile
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                onClick={() => setEditMode(!editMode)}
+                                sx={{
+                                    backgroundColor: buttonColor,
+                                    '&:hover': { backgroundColor: 'rgb(140, 60, 60)' },
+                                }}
+                            >
+                                {editMode ? 'Cancel' : 'Edit Profile'}
+                            </Button>
+                        </Box>
 
-                                {/* Date of Birth Field */}
-                                <div className="info-field">
-                                    <label htmlFor="dob" className="personal-label">
-                                        Date of birth:
-                                    </label>
-                                    <input
-                                        className="profile-input"
-                                        type="date"
-                                        id="dob"
-                                        value={dob}
-                                        onChange={(e) => setDob(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                        {editMode ? (
+                            <form onSubmit={handleSubmit}>
+                                <Box sx={{ display: 'flex', gap: 4, mb: 4 }}>
+                                    <Box sx={{ flex: 1 }}>
+                                        <FormControl fullWidth sx={{ mb: 3 }}>
+                                            <FormLabel sx={{ color: textColor, mb: 1, fontWeight: 'bold' }}>
+                                                Skin type:
+                                            </FormLabel>
+                                            <Select
+                                                name="skin_type"
+                                                value={formData.skin_type}
+                                                onChange={handleInputChange}
+                                            >
+                                                {SKIN_TYPES.map((type) => (
+                                                    <MenuItem key={type.value} value={type.value}>
+                                                        {type.label}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
 
-                                {/* Gender Field */}
-                                <div className="info-field">
-                                    <label htmlFor="gender" className="personal-label">
-                                        Gender:
-                                    </label>
-                                    <div className="gender-group">
-                                        <div className="personal-gender">
-                                            <input
-                                                type="radio"
-                                                id="male"
-                                                name="gender"
-                                                value="male"
-                                                checked={gender === 'male'}
-                                                onChange={handleGenderChange}
-                                                className="personal-gender-input"
-                                            />
-                                            <label htmlFor="male" className="personal-gender-label">
-                                                Male
-                                            </label>
-                                        </div>
-                                        <div className="personal-gender">
-                                            <input
-                                                type="radio"
-                                                id="female"
-                                                name="gender"
-                                                value="female"
-                                                checked={gender === 'female'}
-                                                onChange={handleGenderChange}
-                                                className="personal-gender-input"
-                                            />
-                                            <label htmlFor="female" className="personal-gender-label">
-                                                Female
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
+                                        <FormControl fullWidth sx={{ mb: 3 }}>
+                                            <FormLabel sx={{ color: textColor, mb: 1, fontWeight: 'bold' }}>
+                                                Skin problems:
+                                            </FormLabel>
+                                            <FormGroup>
+                                                {SKIN_PROBLEMS.map((problem) => (
+                                                    <FormControlLabel
+                                                        key={problem.value}
+                                                        control={
+                                                            <Checkbox
+                                                                checked={formData[problem.value]}
+                                                                onChange={() => handleSkinProblemChange(problem.value)}
+                                                                name={problem.value}
+                                                            />
+                                                        }
+                                                        label={problem.label}
+                                                    />
+                                                ))}
+                                            </FormGroup>
+                                        </FormControl>
 
-                                {/* Skin Type Field */}
-                                <div
-                                    className="info-field"
-                                    style={{ display: 'flex', alignItems: 'center', gap: '16px' }}
-                                >
-                                    <label htmlFor="skin-type" className="personal-label" style={{ marginBottom: 0 }}>
-                                        Skin type:
-                                    </label>
-                                    <FormControl fullWidth style={{ flex: 1 }}>
-                                        <Select
-                                            id="skin-type"
-                                            name="skintype"
-                                            value={skinType}
-                                            onChange={(e) => setSkinType(e.target.value)}
-                                            className="profile-input"
-                                            displayEmpty
-                                            sx={{
-                                                backgroundColor: '#ffffff',
-                                                height: '40px',
-                                                minWidth: '200px',
-                                            }}
-                                        >
-                                            <MenuItem value="" disabled>
-                                                Select skin type
-                                            </MenuItem>
-                                            <MenuItem value="oily">Oily skin</MenuItem>
-                                            <MenuItem value="dry">Dry skin</MenuItem>
-                                            <MenuItem value="normal">Normal skin</MenuItem>
-                                            <MenuItem value="combination">Combination skin</MenuItem>
-                                            <MenuItem value="sensitive">Sensitive skin</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </div>
+                                        <FormControl fullWidth sx={{ mb: 3 }}>
+                                            <FormLabel sx={{ color: textColor, mb: 1, fontWeight: 'bold' }}>
+                                                Ingredient Allergies:
+                                            </FormLabel>
+                                            <FormGroup>
+                                                {ALLERGY_OPTIONS.map((allergy) => (
+                                                    <FormControlLabel
+                                                        key={allergy.value}
+                                                        control={
+                                                            <Checkbox
+                                                                checked={formData[allergy.value]}
+                                                                onChange={() => handleSkinProblemChange(allergy.value)}
+                                                                name={allergy.value}
+                                                            />
+                                                        }
+                                                        label={allergy.label}
+                                                    />
+                                                ))}
+                                            </FormGroup>
+                                        </FormControl>
+                                    </Box>
+                                </Box>
 
-                                {/* Skin Problems Field */}
-                                <div
-                                    className="info-field"
-                                    style={{ display: 'flex', alignItems: 'center', gap: '16px' }}
-                                >
-                                    <label
-                                        htmlFor="skin-prob"
-                                        className="personal-label"
-                                        style={{ marginBottom: 0, minWidth: '120px' }}
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: buttonColor,
+                                            color: 'white',
+                                            px: 4,
+                                            py: 1.5,
+                                            '&:hover': {
+                                                backgroundColor: 'rgb(140, 60, 60)',
+                                            },
+                                        }}
                                     >
-                                        Skin problem:
-                                    </label>
-                                    <FormControl fullWidth style={{ flex: 1 }}>
-                                        <Select
-                                            id="skin-prob"
-                                            name="skinprob"
-                                            multiple
-                                            value={selectedProblems}
-                                            onChange={handleChange}
-                                            displayEmpty
-                                            renderValue={(selected) => {
-                                                if (selected.length === 0) {
-                                                    return 'Select skin problems';
-                                                }
-                                                return selected
-                                                    .map((value) => {
-                                                        const problem = skinProblems.find((p) => p.value === value);
-                                                        return problem ? problem.label : value;
-                                                    })
-                                                    .join(', ');
-                                            }}
-                                            sx={{
-                                                backgroundColor: '#ffffff',
-                                                minHeight: '40px',
-                                                '& .MuiSelect-select': {
-                                                    padding: '8px 32px 8px 12px',
-                                                },
-                                            }}
-                                        >
-                                            {skinProblems.map((problem) => (
-                                                <MenuItem key={problem.value} value={problem.value}>
-                                                    <Checkbox checked={selectedProblems.indexOf(problem.value) > -1} />
-                                                    <ListItemText primary={problem.label} />
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </div>
+                                        Save Changes
+                                    </Button>
+                                </Box>
+                            </form>
+                        ) : (
+                            <Box sx={{ display: 'flex', gap: 4 }}>
+                                <Box sx={{ flex: 1 }}>
+                                    <Avatar
+                                        src={`https://res.cloudinary.com/dppaihihm/image/upload/${formData.avt_path}.jpg`}
+                                        sx={{ width: 150, height: 150, mb: 3 }}
+                                    />
+                                    <Typography variant="h5" sx={{ mb: 1, fontWeight: 'bold' }}>
+                                        {userData.name}
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ mb: 3 }}>
+                                        {userData.bio || 'No bio provided'}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Username: {userData.username}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Gender: {userData.gender}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Date of Birth: {new Date(userData.dob).toLocaleDateString()}
+                                    </Typography>
+                                </Box>
 
-                                {/* Skincare Goals Field */}
-                                <div
-                                    className="info-field"
-                                    style={{ display: 'flex', alignItems: 'center', gap: '16px' }}
-                                >
-                                    <label
-                                        htmlFor="skin-goal"
-                                        className="personal-label"
-                                        style={{ marginBottom: 0, minWidth: '120px' }}
-                                    >
-                                        Skincare goal:
-                                    </label>
-                                    <FormControl fullWidth style={{ flex: 1 }}>
-                                        <Select
-                                            id="skin-goal"
-                                            name="skingoal"
-                                            multiple
-                                            value={selectedGoals}
-                                            onChange={handleChange}
-                                            displayEmpty
-                                            renderValue={(selected) => {
-                                                if (selected.length === 0) {
-                                                    return 'Select skincare goals';
-                                                }
-                                                return selected
-                                                    .map((value) => {
-                                                        const goal = skincareGoals.find((g) => g.value === value);
-                                                        return goal ? goal.label : value;
-                                                    })
-                                                    .join(', ');
-                                            }}
-                                            sx={{
-                                                backgroundColor: '#ffffff',
-                                                minHeight: '40px',
-                                                '& .MuiSelect-select': {
-                                                    padding: '8px 32px 8px 12px',
-                                                },
-                                            }}
-                                        >
-                                            {skincareGoals.map((goal) => (
-                                                <MenuItem key={goal.value} value={goal.value}>
-                                                    <Checkbox checked={selectedGoals.indexOf(goal.value) > -1} />
-                                                    <ListItemText primary={goal.label} />
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </div>
-                                {/* Ingredient Allergy Field */}
-<div 
-  className="info-field" 
-  style={{ display: 'flex', alignItems: 'center', gap: '16px' }}
->
-  <label
-    htmlFor="ingredient-allergy"
-    className="personal-label"
-    style={{ marginBottom: 0, minWidth: '120px' }}
-  >
-    Ingredient allergy:
-  </label>
-  <FormControl fullWidth style={{ flex: 1 }}>
-    <Select
-      id="ingredient-allergy"
-      name="ingredientAllergy"
-      multiple
-      value={selectedAllergies}
-      onChange={handleAllergyChange}
-      displayEmpty
-      renderValue={(selected) => {
-        if (selected.length === 0) {
-          return 'Select ingredient allergies';
-        }
-        return selected
-          .map((value) => {
-            const allergy = allergyOptions.find((a) => a.value === value);
-            return allergy ? allergy.label : value;
-          })
-          .join(', ');
-      }}
-      sx={{
-        backgroundColor: '#ffffff',
-        minHeight: '40px',
-        '& .MuiSelect-select': {
-          padding: '8px 32px 8px 12px',
-        },
-      }}
-    >
-      {allergyOptions.map((allergy) => (
-        <MenuItem key={allergy.value} value={allergy.value}>
-          <Checkbox checked={selectedAllergies.indexOf(allergy.value) > -1} />
-          <ListItemText primary={allergy.label} />
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-</div>
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+                                        Skin Information
+                                    </Typography>
+                                    <Divider sx={{ mb: 2 }} />
 
-                                {/* Price Segments Field */}
-                                {/* <label htmlFor="price-segment" className="personal-label-price">
-                                    Price segments (optional):
-                                </label>
-                                <div className="price-segments">
-                                    {Object.entries(priceSegments).map(([key, value]) => (
-                                        <div key={key} className="personal-price">
-                                            <input
-                                                className="personal-segment-input"
-                                                type="checkbox"
-                                                id={key}
-                                                checked={value}
-                                                onChange={() => handlePriceSegmentChange(key)}
-                                            />
-                                            <label className="personal-segment-label" htmlFor={key}>
-                                                {key
-                                                    .split('_')
-                                                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                                                    .join('-')}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div> */}
-                            </div>
-                            <div className="save">
-                                <button type="submit" className="save-btn">
-                                    Save
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                                    <Typography variant="body1" sx={{ mb: 1 }}>
+                                        <strong>Skin Type:</strong> {userData.skin_type || 'Not specified'}
+                                    </Typography>
+
+                                    <Typography variant="body1" sx={{ mb: 1 }}>
+                                        <strong>Skin Concerns:</strong>
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                                        {SKIN_PROBLEMS.map(
+                                            (problem) =>
+                                                userData[problem.value] && (
+                                                    <Typography
+                                                        key={problem.value}
+                                                        variant="body2"
+                                                        sx={{
+                                                            backgroundColor: '#f0f0f0',
+                                                            px: 1.5,
+                                                            py: 0.5,
+                                                            borderRadius: 1,
+                                                        }}
+                                                    >
+                                                        {problem.label}
+                                                    </Typography>
+                                                ),
+                                        )}
+                                        {!SKIN_PROBLEMS.some((problem) => userData[problem.value]) && (
+                                            <Typography variant="body2" color="text.secondary">
+                                                No skin concerns specified
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ mb: 1 }}>
+                                        <strong>Allergies to Avoid:</strong>
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                        {ALLERGY_OPTIONS.map(
+                                            (allergy) =>
+                                                userData[allergy.value] && (
+                                                    <Typography
+                                                        key={allergy.value}
+                                                        variant="body2"
+                                                        sx={{
+                                                            backgroundColor: '#f0f0f0',
+                                                            px: 1.5,
+                                                            py: 0.5,
+                                                            borderRadius: 1,
+                                                        }}
+                                                    >
+                                                        {allergy.label}
+                                                    </Typography>
+                                                ),
+                                        )}
+                                        {!ALLERGY_OPTIONS.some((allergy) => userData[allergy.value]) && (
+                                            <Typography variant="body2" color="text.secondary">
+                                                No allergies specified
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Box>
+                            </Box>
+                        )}
+                    </Paper>
+                </Box>
             </div>
         </div>
     );

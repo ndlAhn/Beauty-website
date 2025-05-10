@@ -41,7 +41,8 @@ function Login() {
         try {
             console.log(formData);
             const res = await instance.post(REGISTER, formData);
-            dispatchState(logged(formData));
+            console.log(res.data);
+            dispatchState(logged(res.data));
             navigate('/survey');
         } catch (err) {
             setErrorMessage(err.response?.data?.message || 'Registration failed!');
