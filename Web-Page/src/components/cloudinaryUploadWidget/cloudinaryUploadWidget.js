@@ -1,41 +1,56 @@
 import { Button } from '@mui/material';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const CloudinaryUploadWidget = ({ uwConfig, setPublicId }) => {
     const uploadWidgetRef = useRef(null);
-    const uploadButtonRef = useRef(null);
-    const handleUploadClick = () => {
-        console.log(uploadWidgetRef);
-        if (uploadWidgetRef.current) {
-            uploadWidgetRef.current.open();
-        }
-    };
+    const [widgetReady, setWidgetReady] = useState(false);
+
+    // Khởi tạo widget ngay khi component mount
     useEffect(() => {
-        const initializeUploadWidget = () => {
-            if (window.cloudinary && uploadButtonRef.current) {
-                // Create upload widget
+        // Kiểm tra nếu Cloudinary script đã được load
+        const checkCloudinary = () => {
+            if (window.cloudinary) {
+                initializeWidget();
+                return;
+            }
+
+            // Nếu chưa, thử lại sau 100ms
+            setTimeout(checkCloudinary, 100);
+        };
+
+        const initializeWidget = () => {
+            if (!uploadWidgetRef.current) {
                 uploadWidgetRef.current = window.cloudinary.createUploadWidget(uwConfig, (error, result) => {
                     if (!error && result && result.event === 'success') {
-                        console.log('Upload successful:', result.info);
                         setPublicId(result.info.public_id);
                     }
                 });
+                setWidgetReady(true);
             }
         };
 
-        initializeUploadWidget();
+        checkCloudinary();
+
+        // Cleanup
+        return () => {
+            if (uploadWidgetRef.current) {
+                uploadWidgetRef.current.destroy();
+                uploadWidgetRef.current = null;
+            }
+        };
     }, [uwConfig, setPublicId]);
 
+    const handleUploadClick = () => {
+        if (uploadWidgetRef.current) {
+            uploadWidgetRef.current.open();
+        } else {
+            console.warn('Upload widget is not ready yet');
+        }
+    };
+
     return (
-        <Button
-            type="button"
-            contained
-            color="primary"
-            onClick={handleUploadClick}
-            ref={uploadButtonRef}
-            id="upload_widget"
-        >
-            Upload
+        <Button type="button" color="primary" onClick={handleUploadClick} disabled={!widgetReady}>
+            {widgetReady ? 'Upload' : 'Loading...'}
         </Button>
     );
 };

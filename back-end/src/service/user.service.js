@@ -22,8 +22,16 @@ exports.create = async (req, res) => {
             gender: req.body.gender,
         };
 
+        const temp = {
+            user_id: newUserId,
+
+            name: req.body.name,
+            username: req.body.username,
+            dob: req.body.dob,
+            gender: req.body.gender,
+        };
         await Users.create(newUser);
-        res.status(201).json({ message: 'User created successfully' });
+        res.status(201).send(temp);
     } catch (error) {
         console.error('Error creating user:', error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -45,7 +53,7 @@ exports.authenticate = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ userId: user.user_id, username: user.username, role: user.role }, SECRET_KEY, {
+        const token = jwt.sign({ user_id: user.user_id, username: user.username, role: user.role }, SECRET_KEY, {
             expiresIn: '10d',
         });
 
@@ -78,25 +86,35 @@ exports.getAll = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        // Kiểm tra dữ liệu đầu vào
-        if (!req.body.username || !req.body.skinType || !req.body.skinProb) {
-            return res.status(400).send('Thiếu thông tin bắt buộc');
-        }
-
-        // Chuẩn bị dữ liệu cập nhật
         const updateData = {
             skin_type: req.body.skinType,
-            acne: req.body.skinProb.acne || false,
-            aging: req.body.skinProb.aging || false,
-            dried: req.body.skinProb.dried || false,
-            oily: req.body.skinProb.oily || false,
-            // Thêm các trường skin problem khác nếu cần
+            acne: req.body.skinProb?.acne || false,
+            aging: req.body.skinProb?.aging || false,
+            dried: req.body.skinProb?.dried || false,
+            oily: req.body.skinProb?.oily || false,
+            enlarged_pores: req.body.skinProb?.enlarged_pores || false,
+            scarring: req.body.skinProb?.scarring || false,
+            skin_recovery: req.body.skinProb?.skin_recovery || false,
+
+            // Thành phần cần tránh (allergies)
+            fragrance: req.body.allergies?.includes('fragrance') || false,
+            alcohol: req.body.allergies?.includes('alcohol') || false,
+            silicones: req.body.allergies?.includes('silicones') || false,
+            parabens: req.body.allergies?.includes('parabens') || false,
+            essential_oil: req.body.allergies?.includes('essential_oils') || false,
         };
+
+        // Lọc bỏ các trường undefined (không được cung cấp trong request)
+        Object.keys(updateData).forEach((key) => {
+            if (updateData[key] === undefined) {
+                delete updateData[key];
+            }
+        });
 
         // Thực hiện cập nhật
         const [affectedRows] = await Users.update(updateData, {
             where: {
-                username: req.body.username,
+                user_id: req.body.user_id, // Sử dụng user_id thay vì username
             },
         });
 
@@ -106,7 +124,7 @@ exports.update = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Cập nhật thành công',
+            message: 'Cập nhật thông tin thành công',
             data: updateData,
         });
     } catch (err) {
@@ -123,7 +141,7 @@ exports.getUserById = async (req, res) => {
     try {
         Users.findOne({
             where: {
-                user_id: req.body.userId,
+                user_id: req.body.user_id,
             },
         })
             .then((result) => {

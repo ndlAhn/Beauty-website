@@ -13,41 +13,41 @@ db.Products = require('./products.model')(sequelize, Sequelize);
 db.Ingredients = require('./ingredients.model')(sequelize, Sequelize);
 db.Product_reviews = require('./product_reviews.model')(sequelize, Sequelize);
 db.Comments = require('./comments.model')(sequelize, Sequelize);
-db.Articles = require('./articles.model')(sequelize, Sequelize);
+// db.Articles = require('./articles.model')(sequelize, Sequelize);
 db.Reviews = require('./review.model')(sequelize, Sequelize);
 db.TableOfIngredient = require('./tableOfIngredient.model')(sequelize, Sequelize);
 db.Follower = require('./follower.model')(sequelize, Sequelize);
 //table relationship
 //Product_reviews
 
-db.Products.hasMany(db.Product_reviews, {
-    foreignKey: 'product_id',
-});
-db.Products.belongsTo(db.Product_reviews, {
-    foreignKey: 'product_id',
-});
+// db.Products.hasMany(db.Product_reviews, {
+//     foreignKey: 'product_id',
+// });
+// db.Products.belongsTo(db.Product_reviews, {
+//     foreignKey: 'product_id',
+// });
 
-db.Users.belongsTo(db.Product_reviews, {
-    foreignKey: 'user_id',
-});
-db.Users.hasMany(db.Product_reviews, {
-    foreignKey: 'user_id',
-});
+// db.Users.belongsTo(db.Product_reviews, {
+//     foreignKey: 'user_id',
+// });
+// db.Users.hasMany(db.Product_reviews, {
+//     foreignKey: 'user_id',
+// });
 
-db.Comments.belongsTo(db.Product_reviews, {
+db.Comments.belongsTo(db.Reviews, {
     foreignKey: 'review_id',
 });
-db.Product_reviews.hasMany(db.Comments, {
+db.Reviews.hasMany(db.Comments, {
     foreignKey: 'review_id',
 });
 
 //Article
-db.Users.belongsTo(db.Articles, {
-    foreignKey: 'user_id',
-});
-db.Users.hasMany(db.Articles, {
-    foreignKey: 'user_id',
-});
+// db.Users.belongsTo(db.Articles, {
+//     foreignKey: 'user_id',
+// });
+// db.Users.hasMany(db.Articles, {
+//     foreignKey: 'user_id',
+// });
 // Reviews
 db.Reviews.belongsTo(db.Users, {
     foreignKey: 'user_id',

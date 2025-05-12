@@ -32,11 +32,6 @@ module.exports = (sequelize, Sequelize) => {
                 defaultValue: 'user',
                 allowNull: false,
             },
-            skin_type: {
-                type: DataTypes.ENUM('oily', 'dry', 'normal', 'combination', 'sensitive'),
-                defaultValue: 'normal',
-                allowNull: false,
-            },
             acne: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
@@ -62,12 +57,42 @@ module.exports = (sequelize, Sequelize) => {
                 allowNull: false,
                 defaultValue: false,
             },
-            elarged_pores: {
+            skin_type: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                defaultValue: false,
+            },
+            enlarged_pores: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
             scarring: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            fragrance: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            alcohol: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            silicones: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            parabens: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            essential_oil: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,

@@ -57,6 +57,11 @@ module.exports = (sequelize, Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
+            type_review: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                defaultValue: 'post',
+            },
         },
         {
             timestamps: true,

@@ -64,7 +64,7 @@ function App() {
             <Route path="/community" element={<Community />} />
 
             <Route path="/create-product" element={<CreateProduct />} />
-            <Route path="/create-review" element={<CreateReview />} />
+            <Route path="/create-review" element={<CreateReview type="review" />} />
             <Route path="/posts" element={<Posts />} />
             <Route path="/" element={<Homepage />} />
             <Route path="/log-in" element={<Login />} />

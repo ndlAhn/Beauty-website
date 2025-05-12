@@ -9,7 +9,7 @@ import instance from '../../../axios/instance';
 import CloudinaryUploadWidget from '../../../components/cloudinaryUploadWidget/cloudinaryUploadWidget';
 import { FormControl, MenuItem, Select, Typography } from '@mui/material';
 
-function CreateReview() {
+function CreateReview(props) {
     const cloudName = 'dppaihihm';
     const uploadPreset = 'Beauty Web';
     const [publicId, setPublicId] = useState('');
@@ -41,7 +41,6 @@ function CreateReview() {
         'cons',
         'guide',
         'conclusion',
-        'ingredients',
     ];
 
     const fetchIngredients = async () => {
@@ -63,25 +62,14 @@ function CreateReview() {
         // Kiểm tra nếu đang trong quá trình submit thì không làm gì
         if (isSubmitting) return;
 
-        // Kiểm tra các trường bắt buộc
-        const isFormValid =
-            requiredFields.every((field) => {
-                if (field === 'ingredients') return !!formData[field];
-                return !!formData[field].trim();
-            }) && !!publicId;
-
-        if (!isFormValid) {
-            alert('Please fill in all required fields and upload an image');
-            return;
-        }
-
         setIsSubmitting(true);
 
         try {
             const response = await instance.post('/create-review', {
                 ...formData,
                 picture: publicId,
-                user_id: state.userData.userId,
+                user_id: state.userData.user_id,
+                type_review: props.type,
             });
 
             if (response.status === 200) {
@@ -91,7 +79,7 @@ function CreateReview() {
                     title: '',
                     introduction: '',
                     packaging: '',
-                    ingredients: '',
+
                     uses: '',
                     targetUser: '',
                     review: '',
@@ -114,16 +102,18 @@ function CreateReview() {
 
     useEffect(() => {
         fetchIngredients();
+        console.log(props.type);
     }, []);
 
     return (
         <div>
-            <SubHeader />
+            {props.type === 'reivew' ? <SubHeader /> : ''}
             <div className="create-review-wrap">
-                <ReviewSidebar />
+                {props.type === 'reivew' ? <ReviewSidebar /> : ''}
+
                 <form className="create-review-area" onSubmit={handleSubmit}>
                     <div className="create-review-content">
-                        <h3 className="write-review-title">WRITE REVIEW</h3>
+                        <h3 className="write-review-title">WRITE {props.type === 'post' ? 'POST' : 'REVIEW'} </h3>
                         {requiredFields
                             .filter((field) => field !== 'ingredients')
                             .map((field, index) => (
@@ -186,6 +176,7 @@ function CreateReview() {
                                         src={`https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.jpg`}
                                         alt="Uploaded"
                                         className="preview-img"
+                                        style={{ marginBottom: '30px' }}
                                     />
                                     <button
                                         type="button"

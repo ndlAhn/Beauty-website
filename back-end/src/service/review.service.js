@@ -15,7 +15,7 @@ exports.create = async (req, res) => {
             title: req.body.title,
             introduction: req.body.introduction,
             packaging: req.body.packaging,
-            ingredients: req.body.ingredients,
+            //ingredients: req.body.ingredients,
             uses: req.body.uses,
             target_user: req.body.targetUser,
             review: req.body.review,
@@ -24,6 +24,7 @@ exports.create = async (req, res) => {
             guide: req.body.guide,
             conclusion: req.body.conclusion,
             img_path: req.body.picture,
+            type_review: req.body.type_review ? req.body.type_review : 'post',
         };
 
         await Reviews.create(newReview);
@@ -127,7 +128,7 @@ exports.updateReviewById = async (req, res) => {
             title,
             introduction,
             packaging,
-            ingredients,
+            // ingredients,
             uses,
             target_user,
             review,
@@ -150,7 +151,7 @@ exports.updateReviewById = async (req, res) => {
                 title,
                 introduction,
                 packaging,
-                ingredients,
+                // ingredients,
                 uses,
                 target_user,
                 review,
