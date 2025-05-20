@@ -30,6 +30,8 @@ import Ingredients from './pages/ingredients/ingredients';
 import Community from './pages/community/community';
 
 import BeautyFinder from './pages/beautyFinder/beautyFinder';
+import ManageProduct from './pages/review-pages/manageProduct/manageProduct';
+import ManageReview from './pages/review-pages/manageReview/manageReview';
 
 function App() {
     const [state, dispatchState] = useContext(StateContext);
@@ -62,7 +64,8 @@ function App() {
             <Route path="/ingredients" element={<Ingredients />} />
             {/* community */}
             <Route path="/community" element={<Community />} />
-
+            <Route path="/manage-product" element={<ManageProduct />} />
+            <Route path="/manage-review" element={<ManageReview />} />  
             <Route path="/create-product" element={<CreateProduct />} />
             <Route path="/create-review" element={<CreateReview type="review" />} />
             <Route path="/posts" element={<Posts />} />

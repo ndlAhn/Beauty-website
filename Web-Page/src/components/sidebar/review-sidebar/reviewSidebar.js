@@ -27,12 +27,7 @@ function ReviewSidebar() {
                             Home
                         </Link>
                     </li>
-                    <li>
-                        <TbLayoutNavbar className="sidebar-icon" />
-                        <Link to="/posts" className="sidebar-link">
-                            Your Post
-                        </Link>
-                    </li>
+                    
                     {state.userData?.role === 'admin' && (
                         <li>
                             <GrAddCircle className="sidebar-icon" />
@@ -52,6 +47,26 @@ function ReviewSidebar() {
                             </Link>
                         </li>
                     )}
+                    <li>
+                        <TbLayoutNavbar className="sidebar-icon" />
+                        <Link to="/posts" className="sidebar-link">
+                            Your Post
+                        </Link>
+                    </li>
+                    {state.userData?.role === 'admin' && (
+                    <li>
+                        <TbLayoutNavbar className="sidebar-icon" />
+                        <Link to="/manage-product" className="sidebar-link">
+                            Your Product
+                        </Link>
+                    </li>
+                    )}
+                    <li>
+                        <TbLayoutNavbar className="sidebar-icon" />
+                        <Link to="/manage-review" className="sidebar-link">
+                            Your Review
+                        </Link>
+                    </li>
                 </ul>
             </nav>
         </div>

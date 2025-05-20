@@ -68,21 +68,7 @@ function Homepage() {
                         </a>
                     </div>
                 </div>
-                <div className="home-news-content">
-                    <h3>Hot products</h3>
-                    <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                        <p className="home-new-title">Product's name</p>
-                        <FaRegHeart />
-                    </div>
-                    <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">
-                            See all
-                        </a>
-                    </div>
-                </div>
+                
                 <div className="home-news-content">
                     <h3>New reviews</h3>
                     <div className="home-news">

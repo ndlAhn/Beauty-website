@@ -107,9 +107,9 @@ function CreateReview(props) {
 
     return (
         <div>
-            {props.type === 'reivew' ? <SubHeader /> : ''}
+            <SubHeader />
             <div className="create-review-wrap">
-                {props.type === 'reivew' ? <ReviewSidebar /> : ''}
+                <ReviewSidebar />
 
                 <form className="create-review-area" onSubmit={handleSubmit}>
                     <div className="create-review-content">
