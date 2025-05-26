@@ -227,7 +227,7 @@ function Community() {
                             <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
                                 Top Creators
                             </Typography>
-
+                            {/*  */}
                             <Stack spacing={2}>
                                 {topCreators.map((creator) => (
                                     <Card key={creator.id} variant="outlined">
