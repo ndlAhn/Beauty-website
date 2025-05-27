@@ -21,10 +21,6 @@ module.exports = (sequelize, Sequelize) => {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
-            ingredients: {
-                type: DataTypes.TEXT,
-                allowNull: false,
-            },
             uses: {
                 type: DataTypes.TEXT,
                 allowNull: false,

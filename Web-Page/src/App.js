@@ -65,7 +65,7 @@ function App() {
             {/* community */}
             <Route path="/community" element={<Community />} />
             <Route path="/manage-product" element={<ManageProduct />} />
-            <Route path="/manage-review" element={<ManageReview />} />  
+            <Route path="/manage-review" element={<ManageReview />} />
             <Route path="/create-product" element={<CreateProduct />} />
             <Route path="/create-review" element={<CreateReview type="review" />} />
             <Route path="/posts" element={<Posts />} />

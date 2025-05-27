@@ -6,9 +6,19 @@ import Footer from '../../components/footer/footer.js';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Container, Grid, Card, CardMedia, CardContent, Typography,
-    TextField, InputAdornment, Paper, Select, MenuItem,
-    FormControl, InputLabel
+    Container,
+    Grid,
+    Card,
+    CardMedia,
+    CardContent,
+    Typography,
+    TextField,
+    InputAdornment,
+    Paper,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
 } from '@mui/material';
 import { Search, FavoriteBorder } from '@mui/icons-material';
 import instance from '../../axios/instance.js';
@@ -24,22 +34,22 @@ function Products() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        instance.get('/get-all-products')
-            .then(res => {
+        instance
+            .get('/get-all-products')
+            .then((res) => {
                 setProducts(res.data);
                 setFilteredProducts(res.data);
+                console.log(res.data);
             })
-            .catch(err => console.log('Error fetching products:', err));
+            .catch((err) => console.log('Error fetching products:', err));
     }, []);
 
     useEffect(() => {
-        let filtered = products.filter(p =>
-            p.product_name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        if (productType) filtered = filtered.filter(p => p.product_type === productType);
-        if (skinType) filtered = filtered.filter(p => p.skin_type === skinType);
-        if (skinProblem) filtered = filtered.filter(p => p.skin_problem === skinProblem);
-        if (priceRange) filtered = filtered.filter(p => p.price_range === priceRange);
+        let filtered = products.filter((p) => p.product_name.toLowerCase().includes(searchTerm.toLowerCase()));
+        if (productType) filtered = filtered.filter((p) => p.product_type === productType);
+        if (skinType) filtered = filtered.filter((p) => p.skin_type === skinType);
+        if (skinProblem) filtered = filtered.filter((p) => p.skin_problem === skinProblem);
+        if (priceRange) filtered = filtered.filter((p) => p.price_range === priceRange);
         setFilteredProducts(filtered);
     }, [searchTerm, productType, skinType, skinProblem, priceRange, products]);
 
@@ -121,7 +131,7 @@ function Products() {
                             <Grid item xs={12} sm={6} md={4} lg={3} key={product.review_id}>
                                 <Card
                                     sx={{ maxWidth: 300, mx: 'auto', boxShadow: 3, cursor: 'pointer' }}
-                                    onClick={() => navigate(`/product-detail/${product.review_id}`)}
+                                    onClick={() => navigate(`/product-detail/${product.product_id}`)}
                                 >
                                     <CardMedia
                                         component="img"

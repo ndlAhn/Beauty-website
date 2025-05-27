@@ -5,7 +5,7 @@ module.exports = (app) => {
     router.post('/create-product', ProductService.create);
     router.get('/get-all-products', ProductService.getAll);
     router.post('/get-products-by-name', ProductService.getProductsByName);
-    router.get('/get-product/:productId', ProductService.getById);
+    router.get('/product-detail/:productId', ProductService.getById);
     router.put('/update-product/:productId', ProductService.update);
     router.delete('/delete-product/:productId', ProductService.delete);
 
