@@ -1,174 +1,401 @@
 require('dotenv').config();
 const db = require('../model');
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const Users = db.Users;
 const SECRET_KEY = process.env.JWT_SECRET || 'default_secret';
+const Alergic = db.Alergic;
+const Ingredient = db.Ingredient;
+
+// Helper function to handle errors
+const handleError = (res, error, message = 'Internal Server Error') => {
+    console.error(`${message}:`, error);
+    res.status(500).json({ success: false, message });
+};
 
 exports.create = async (req, res) => {
     try {
-        console.log(req.body);
+        const { name, username, password, dob, gender } = req.body;
+
+        if (!name || !username || !password || !dob || !gender) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required',
+            });
+        }
+
+        const existingUser = await Users.findOne({ where: { username } });
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message: 'Username already exists',
+            });
+        }
+
         const newUserId = uuidv4();
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const newUser = {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = await Users.create({
             user_id: newUserId,
-            name: req.body.name,
-            username: req.body.username,
+            name,
+            username,
             password: hashedPassword,
-            dob: req.body.dob,
-            gender: req.body.gender,
-        };
+            dob,
+            gender,
+        });
 
-        const temp = {
-            user_id: newUserId,
+        // Omit sensitive data from response
+        const { password: _, ...userData } = newUser.get({ plain: true });
 
-            name: req.body.name,
-            username: req.body.username,
-            dob: req.body.dob,
-            gender: req.body.gender,
-        };
-        await Users.create(newUser);
-        res.status(201).send(temp);
+        res.status(201).json({
+            success: true,
+            message: 'User created successfully',
+            data: userData,
+        });
     } catch (error) {
-        console.error('Error creating user:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        handleError(res, error, 'Error creating user');
     }
 };
 
 exports.authenticate = async (req, res) => {
     try {
-        const user = await Users.findOne({
-            where: { username: req.body.username },
-        });
+        const { username, password } = req.body;
 
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username and password are required',
+            });
+        }
+
+        const user = await Users.findOne({ where: { username } });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
         }
 
-        const isMatch = await bcrypt.compare(req.body.password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials',
+            });
         }
 
-        const token = jwt.sign({ user_id: user.user_id, username: user.username, role: user.role }, SECRET_KEY, {
-            expiresIn: '10d',
-        });
+        const token = jwt.sign(
+            {
+                user_id: user.user_id,
+                username: user.username,
+                role: user.role,
+            },
+            SECRET_KEY,
+            { expiresIn: '10d' },
+        );
+
+        // Omit sensitive data from response
+        const { password: _, ...userData } = user.get({ plain: true });
 
         res.status(200).json({
+            success: true,
             message: 'Authentication successful',
             token,
-            userData: user,
+            data: userData,
         });
     } catch (error) {
-        console.error('Error during authentication:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        handleError(res, error, 'Error during authentication');
     }
 };
 
 exports.getAll = async (req, res) => {
     try {
+        const { currentUsername } = req.body;
+
+        if (!currentUsername) {
+            return res.status(400).json({
+                success: false,
+                message: 'Current username is required',
+            });
+        }
+
         const users = await Users.findAll({
-            where: {
-                username: { [Op.not]: req.body.currentUsername },
-            },
-            attributes: ['user_id', 'name', 'username', 'gender', 'dob', 'role'], // Chỉ lấy các field cần thiết
+            where: { username: { [Op.not]: currentUsername } },
+            attributes: ['user_id', 'name', 'username', 'gender', 'dob', 'role', 'bio', 'avt_path'],
+            order: [['createdAt', 'DESC']],
         });
 
-        res.status(200).json(users);
+        res.status(200).json({
+            success: true,
+            data: users,
+        });
     } catch (error) {
-        console.error('Error retrieving users:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        handleError(res, error, 'Error retrieving users');
     }
 };
 
 exports.update = async (req, res) => {
+    const transaction = await db.sequelize.transaction();
     try {
-        const updateData = {
-            skin_type: req.body.skinType,
-            acne: req.body.skinProb?.acne || false,
-            aging: req.body.skinProb?.aging || false,
-            dried: req.body.skinProb?.dried || false,
-            oily: req.body.skinProb?.oily || false,
-            enlarged_pores: req.body.skinProb?.enlarged_pores || false,
-            scarring: req.body.skinProb?.scarring || false,
-            skin_recovery: req.body.skinProb?.skin_recovery || false,
+        const { user_id, skinType, skinProb, skinGoals, allergies } = req.body;
 
-            // Thành phần cần tránh (allergies)
-            fragrance: req.body.allergies?.includes('fragrance') || false,
-            alcohol: req.body.allergies?.includes('alcohol') || false,
-            silicones: req.body.allergies?.includes('silicones') || false,
-            parabens: req.body.allergies?.includes('parabens') || false,
-            essential_oil: req.body.allergies?.includes('essential_oils') || false,
+        if (!user_id) {
+            await transaction.rollback();
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required',
+            });
+        }
+
+        const user = await Users.findByPk(user_id, { transaction });
+        if (!user) {
+            await transaction.rollback();
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        // Prepare update data
+        const updateData = {
+            ...(skinType !== undefined && { skin_type: skinType }),
+            ...(skinProb && {
+                acne: skinProb.acne || false,
+                aging: skinProb.aging || false,
+                dried: skinProb.dried || false,
+                oily: skinProb.oily || false,
+                enlarged_pores: skinProb.enlarged_pores || false,
+                scarring: skinProb.scarring || false,
+                skin_recovery: skinProb.skin_recovery || false,
+            }),
+            ...(skinGoals && {
+                hydration: skinGoals.hydration || null,
+                acne_control: skinGoals.acne_control || false,
+                anti_aging: skinGoals.anti_aging || false,
+                brightening: skinGoals.brightening || false,
+                oil_control: skinGoals.oil_control || false,
+                smooth_and_repair: skinGoals.smooth_and_repair || false,
+            }),
         };
 
-        // Lọc bỏ các trường undefined (không được cung cấp trong request)
-        Object.keys(updateData).forEach((key) => {
-            if (updateData[key] === undefined) {
-                delete updateData[key];
+        await Users.update(updateData, {
+            where: { user_id },
+            transaction,
+        });
+
+        // Process allergies
+        if (Array.isArray(allergies)) {
+            await Alergic.destroy({
+                where: { user_id },
+                transaction,
+            });
+
+            if (allergies.length > 0) {
+                const allergiesToAdd = allergies.map((ingredient_id) => ({
+                    alergic_id: uuidv4(),
+                    user_id,
+                    ingredient_id,
+                }));
+                await Alergic.bulkCreate(allergiesToAdd, { transaction });
             }
-        });
-
-        // Thực hiện cập nhật
-        const [affectedRows] = await Users.update(updateData, {
-            where: {
-                user_id: req.body.user_id, // Sử dụng user_id thay vì username
-            },
-        });
-
-        if (affectedRows === 0) {
-            return res.status(404).send('Không tìm thấy người dùng để cập nhật');
         }
+
+        await transaction.commit();
+
+        const updatedUser = await Users.findByPk(user_id, {
+            include: [
+                {
+                    model: Ingredient,
+                    as: 'allergies',
+                    through: { attributes: [] },
+                    attributes: ['ingredient_id', 'name'],
+                },
+            ],
+        });
 
         res.status(200).json({
             success: true,
-            message: 'Cập nhật thông tin thành công',
-            data: updateData,
+            message: 'User updated successfully',
+            data: updatedUser,
         });
     } catch (err) {
-        console.error('Lỗi khi cập nhật thông tin người dùng:', err);
-        res.status(500).json({
-            success: false,
-            message: 'Lỗi server khi cập nhật thông tin',
-            error: err.message,
-        });
+        await transaction.rollback();
+        handleError(res, err, 'Error updating user information');
     }
 };
 
 exports.getUserById = async (req, res) => {
     try {
-        Users.findOne({
-            where: {
-                user_id: req.body.user_id,
-            },
-        })
-            .then((result) => {
-                res.status(200).send(result);
-            })
-            .catch((err) => {
-                res.status(500).send(err);
+        const user_id = req.params.user_id || req.body.user_id;
+
+        if (!user_id) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required',
             });
+        }
+
+        const user = await Users.findByPk(user_id, {
+            include: [
+                {
+                    model: Ingredient,
+                    as: 'allergies',
+                    through: { attributes: [] },
+                    attributes: ['ingredient_id', 'name'],
+                },
+            ],
+            attributes: { exclude: ['password'] },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: user,
+        });
     } catch (err) {
-        res.status(500).send(err);
+        handleError(res, err, 'Error getting user');
     }
 };
 
 exports.updateInfo = async (req, res) => {
+    const transaction = await db.sequelize.transaction();
     try {
-        console.log(req.body);
-        const updateUser = await Users.findOne({
-            where: {
-                user_id: req.body.user_id,
-            },
+        const { user_id, name, bio, avt_path, ...skinGoals } = req.body;
+
+        if (!user_id) {
+            await transaction.rollback();
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required',
+            });
+        }
+
+        const user = await Users.findByPk(user_id, { transaction });
+        if (!user) {
+            await transaction.rollback();
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        const updateData = {
+            ...(name !== undefined && { name }),
+            ...(bio !== undefined && { bio }),
+            ...(avt_path !== undefined && { avt_path }),
+            ...(skinGoals.hydration !== undefined && { hydration: skinGoals.hydration }),
+            ...(skinGoals.acne_control !== undefined && { acne_control: skinGoals.acne_control }),
+            ...(skinGoals.anti_aging !== undefined && { anti_aging: skinGoals.anti_aging }),
+            ...(skinGoals.brightening !== undefined && { brightening: skinGoals.brightening }),
+            ...(skinGoals.oil_control !== undefined && { oil_control: skinGoals.oil_control }),
+            ...(skinGoals.smooth_and_repair !== undefined && { smooth_and_repair: skinGoals.smooth_and_repair }),
+        };
+
+        await user.update(updateData, { transaction });
+        await transaction.commit();
+
+        const updatedUser = await Users.findByPk(user_id, {
+            attributes: { exclude: ['password'] },
         });
-        await updateUser.update({ name: req.body.name, bio: req.body.bio, avt_path: req.body.avt_path });
+
         res.status(200).json({
             success: true,
-            message: 'User updated successfully',
+            message: 'User info updated successfully',
+            data: updatedUser,
         });
     } catch (err) {
-        res.status(500).send(err);
+        await transaction.rollback();
+        handleError(res, err, 'Error updating user info');
+    }
+};
+
+exports.handleSurvey = async (req, res) => {
+    try {
+        const { user_id, skinType, skinProb, skinGoals, allergies } = req.body;
+
+        if (!user_id) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required',
+            });
+        }
+
+        const user = await Users.findByPk(user_id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        const updateData = {
+            skin_type: skinType || null,
+            ...(skinProb && {
+                acne: skinProb.acne || false,
+                aging: skinProb.aging || false,
+                dried: skinProb.dried || false,
+                oily: skinProb.oily || false,
+                enlarged_pores: skinProb.enlarged_pores || false,
+                scarring: skinProb.scarring || false,
+                skin_recovery: skinProb.skin_recovery || false,
+            }),
+            ...(skinGoals && {
+                hydration: skinGoals.hydration || null,
+                acne_control: skinGoals.acne_control || false,
+                anti_aging: skinGoals.anti_aging || false,
+                brightening: skinGoals.brightening || false,
+                oil_control: skinGoals.oil_control || false,
+                smooth_and_repair: skinGoals.smooth_and_repair || false,
+            }),
+        };
+
+        await Users.update(updateData, {
+            where: { user_id },
+        });
+
+        // Process allergies
+        if (Array.isArray(allergies)) {
+            await Alergic.destroy({
+                where: { user_id },
+            });
+
+            if (allergies.length > 0) {
+                const allergiesToAdd = allergies.map((ingredient_id) => ({
+                    alergic_id: uuidv4(),
+                    user_id,
+                    ingredient_id,
+                }));
+                await Alergic.bulkCreate(allergiesToAdd);
+            }
+        }
+
+        const updatedUser = await Users.findByPk(user_id, {
+            include: [
+                {
+                    model: Ingredient,
+                    as: 'allergies',
+                    through: { attributes: [] },
+                    attributes: ['ingredient_id', 'name'],
+                },
+            ],
+            attributes: { exclude: ['password'] },
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Survey data saved successfully',
+            data: updatedUser,
+        });
+    } catch (err) {
+        handleError(res, err, 'Error saving survey data');
     }
 };

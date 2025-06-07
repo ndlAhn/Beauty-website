@@ -17,6 +17,7 @@ db.Comments = require('./comments.model')(sequelize, Sequelize);
 db.Reviews = require('./review.model')(sequelize, Sequelize);
 db.TableOfIngredient = require('./tableOfIngredient.model')(sequelize, Sequelize);
 db.Follower = require('./follower.model')(sequelize, Sequelize);
+db.Alergic = require('./alergic.model')(sequelize, Sequelize);
 //table relationship
 //Product_reviews
 
@@ -41,13 +42,6 @@ db.Reviews.hasMany(db.Comments, {
     foreignKey: 'review_id',
 });
 
-//Article
-// db.Users.belongsTo(db.Articles, {
-//     foreignKey: 'user_id',
-// });
-// db.Users.hasMany(db.Articles, {
-//     foreignKey: 'user_id',
-// });
 // Reviews
 db.Reviews.belongsTo(db.Users, {
     foreignKey: 'user_id',
@@ -79,4 +73,20 @@ db.Follower.belongsTo(db.Users, {
 db.Users.hasMany(db.Follower, {
     foreignKey: 'user_id',
 });
+
+// Alergic
+db.Users.hasMany(db.Alergic, {
+    foreignKey: 'user_id',
+});
+db.Alergic.belongsTo(db.Users, {
+    foreignKey: 'user_id',
+});
+
+db.Ingredients.hasMany(db.Alergic, {
+    foreignKey: 'ingredient_id',
+});
+db.Alergic.belongsTo(db.Ingredients, {
+    foreignKey: 'ingredient_id',
+});
+
 module.exports = db;

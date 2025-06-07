@@ -1,28 +1,22 @@
 import { useContext, useState } from 'react';
 import instance from '../../axios/instance';
-import { SURVEY } from '../../constant/endPoint';
 import StateContext from '../../context/context.context';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Button,
-    Card,
-    CardContent,
     Checkbox,
     FormControl,
-    FormControlLabel,
-    FormGroup,
     FormLabel,
     MenuItem,
     Select,
     Typography,
-    Chip,
     Paper,
-    TextField,
     ListItemText,
-    InputLabel,
-    OutlinedInput,
+    CircularProgress,
+    Alert,
 } from '@mui/material';
+import { useEffect } from 'react';
 
 const SKIN_PROBLEMS = [
     { value: 'acne', label: 'Acne' },
@@ -43,24 +37,20 @@ const SKIN_TYPES = [
     { value: 'acne_prone', label: 'Acne-prone skin' },
 ];
 
-const PRICE_SEGMENTS = [
-    { value: 'drug_store', label: 'Drug-store' },
-    { value: 'mid_end', label: 'Mid-end' },
-    { value: 'high_end', label: 'High-end' },
-];
-
-const ALLERGY_OPTIONS = [
-    { value: 'fragrance', label: 'Fragrance' },
-    { value: 'alcohol', label: 'Alcohol' },
-    { value: 'silicones', label: 'Silicones' },
-    { value: 'parabens', label: 'Parabens' },
-    { value: 'essential_oils', label: 'Essential Oils' },
+const SKIN_GOALS = [
+    { value: 'hydration', label: 'Hydration & Moisturizing (Cấp nước & Dưỡng ẩm)' },
+    { value: 'acne_control', label: 'Acne Control (Trị mụn)' },
+    { value: 'anti_aging', label: 'Anti-aging (Chống lão hóa)' },
+    { value: 'brightening', label: 'Brightening (Làm sáng da)' },
+    { value: 'oil_control', label: 'Oil Control (Kiềm dầu)' },
+    { value: 'smooth_and_repair', label: 'Soothing & Repair (Làm dịu & Phục hồi da)' },
 ];
 
 function Survey() {
-    const [state, dispatchState] = useContext(StateContext);
+    const [state] = useContext(StateContext);
     const navigate = useNavigate();
     const [skinType, setSkinType] = useState('');
+    const [ingredients, setIngredients] = useState([]);
     const [selectedProblems, setSelectedProblems] = useState({
         acne: false,
         aging: false,
@@ -70,46 +60,66 @@ function Survey() {
         scarring: false,
         skin_recovery: false,
     });
-    const [priceSegments, setPriceSegments] = useState({
-        drug_store: false,
-        mid_end: false,
-        high_end: false,
+    const [selectedGoals, setSelectedGoals] = useState({
+        hydration: false,
+        acne_control: false,
+        anti_aging: false,
+        brightening: false,
+        oil_control: false,
+        smooth_and_repair: false,
     });
     const [selectedAllergies, setSelectedAllergies] = useState([]);
-    const [skincareGoals, setSkincareGoals] = useState([]);
-
-    const toggleSkinProblem = (problem) => {
-        setSelectedProblems((prev) => ({
-            ...prev,
-            [problem]: !prev[problem],
-        }));
-    };
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
 
     const handleAllergyChange = (event) => {
         setSelectedAllergies(event.target.value);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
+        setIsSubmitting(true);
 
-        instance
-            .post('/survey', {
-                skin_type: e.target.skinType.value,
+        try {
+            // Prepare allergies data - send only ingredient IDs
+            const allergiesToSend = selectedAllergies.map((allergy) =>
+                typeof allergy === 'object' ? allergy.ingredient_id : allergy,
+            );
+
+            await instance.post('/survey', {
+                skin_type: skinType,
                 skinProb: selectedProblems,
-                allergies: selectedAllergies,
+                skinGoals: selectedGoals,
+                allergies: allergiesToSend,
                 user_id: state.userData?.user_id,
-            })
-            .then((res) => {
-                console.log(res.data);
-                navigate('/');
-            })
-            .catch((err) => {
-                console.log(err);
             });
+
+            navigate('/');
+        } catch (err) {
+            console.error('Submission error:', err);
+            setError(err.response?.data?.message || 'Failed to submit survey. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const textColor = 'rgb(169, 80, 80)';
     const buttonColor = 'rgb(169, 80, 80)';
+
+    useEffect(() => {
+        const fetchIngredients = async () => {
+            try {
+                const response = await instance.get('/get-all-ingredients');
+                setIngredients(response.data);
+            } catch (err) {
+                console.error('Failed to fetch ingredients:', err);
+                setError('Failed to load ingredients. Please refresh the page.');
+            }
+        };
+
+        fetchIngredients();
+    }, []);
 
     return (
         <Box
@@ -121,6 +131,8 @@ function Survey() {
                 backgroundColor: '#f5f5f5',
                 p: 2,
                 backgroundImage: `url(/surveyBG.png)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
             }}
         >
             <Paper
@@ -130,6 +142,7 @@ function Survey() {
                     maxWidth: 600,
                     p: 4,
                     borderRadius: 2,
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 }}
             >
                 <Typography
@@ -146,8 +159,13 @@ function Survey() {
                     Personal Information
                 </Typography>
 
+                {error && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                        {error}
+                    </Alert>
+                )}
+
                 <form onSubmit={handleSubmit}>
-                    {/* Original Survey Fields */}
                     <FormControl fullWidth sx={{ mb: 3 }}>
                         <FormLabel sx={{ color: textColor, mb: 1, fontWeight: 'bold' }}>Skin type:</FormLabel>
                         <Select
@@ -162,6 +180,7 @@ function Survey() {
                                     borderColor: textColor,
                                 },
                             }}
+                            required
                         >
                             {SKIN_TYPES.map((type) => (
                                 <MenuItem key={type.value} value={type.value}>
@@ -196,10 +215,7 @@ function Survey() {
                             }}
                             renderValue={(selected) =>
                                 selected
-                                    .map((value) => {
-                                        const label = SKIN_PROBLEMS.find((p) => p.value === value)?.label || value;
-                                        return label;
-                                    })
+                                    .map((value) => SKIN_PROBLEMS.find((p) => p.value === value)?.label || value)
                                     .join(', ')
                             }
                         >
@@ -214,13 +230,58 @@ function Survey() {
                                             },
                                         }}
                                     />
-                                    <ListItemText primary={problem.label} sx={{ color: 'black' }} />
+                                    <ListItemText primary={problem.label} />
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
 
-                    {/* Added Allergies Field */}
+                    <FormControl fullWidth sx={{ mb: 3 }}>
+                        <FormLabel sx={{ color: textColor, mb: 1, fontWeight: 'bold' }}>Skin goals:</FormLabel>
+                        <Select
+                            name="skinGoals"
+                            multiple
+                            value={Object.keys(selectedGoals).filter((key) => selectedGoals[key])}
+                            onChange={(e) => {
+                                const selected = e.target.value;
+                                const newGoals = {};
+                                SKIN_GOALS.forEach((goal) => {
+                                    newGoals[goal.value] = selected.includes(goal.value);
+                                });
+                                setSelectedGoals(newGoals);
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: textColor,
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: textColor,
+                                },
+                                backgroundColor: 'white',
+                            }}
+                            renderValue={(selected) =>
+                                selected
+                                    .map((value) => SKIN_GOALS.find((g) => g.value === value)?.label || value)
+                                    .join(', ')
+                            }
+                        >
+                            {SKIN_GOALS.map((goal) => (
+                                <MenuItem key={goal.value} value={goal.value}>
+                                    <Checkbox
+                                        checked={selectedGoals[goal.value]}
+                                        sx={{
+                                            color: textColor,
+                                            '&.Mui-checked': {
+                                                color: buttonColor,
+                                            },
+                                        }}
+                                    />
+                                    <ListItemText primary={goal.label} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
                     <FormControl fullWidth sx={{ mb: 3 }}>
                         <FormLabel sx={{ color: textColor, mb: 1, fontWeight: 'bold' }}>
                             Ingredient Allergies:
@@ -229,17 +290,21 @@ function Survey() {
                             multiple
                             value={selectedAllergies}
                             onChange={handleAllergyChange}
-                            renderValue={(selected) => selected.join(', ')}
+                            renderValue={(selected) => selected.map((item) => item.name || item).join(', ')}
                             sx={{
                                 '& .MuiOutlinedInput-notchedOutline': {
                                     borderColor: textColor,
                                 },
                             }}
                         >
-                            {ALLERGY_OPTIONS.map((allergy) => (
-                                <MenuItem key={allergy.value} value={allergy.value}>
-                                    <Checkbox checked={selectedAllergies.indexOf(allergy.value) > -1} />
-                                    <ListItemText primary={allergy.label} />
+                            {ingredients.map((ingredient) => (
+                                <MenuItem key={ingredient.ingredient_id} value={ingredient}>
+                                    <Checkbox
+                                        checked={selectedAllergies.some(
+                                            (item) => (item.ingredient_id || item) === ingredient.ingredient_id,
+                                        )}
+                                    />
+                                    <ListItemText primary={ingredient.name} />
                                 </MenuItem>
                             ))}
                         </Select>
@@ -249,6 +314,7 @@ function Survey() {
                         <Button
                             type="submit"
                             variant="contained"
+                            disabled={isSubmitting}
                             sx={{
                                 backgroundColor: buttonColor,
                                 color: 'white',
@@ -257,9 +323,13 @@ function Survey() {
                                 '&:hover': {
                                     backgroundColor: 'rgb(140, 60, 60)',
                                 },
+                                '&:disabled': {
+                                    backgroundColor: 'rgba(169, 80, 80, 0.5)',
+                                },
                             }}
+                            startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
                         >
-                            Finish
+                            {isSubmitting ? 'Submitting...' : 'Finish'}
                         </Button>
                     </Box>
                 </form>
