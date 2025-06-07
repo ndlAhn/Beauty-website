@@ -379,14 +379,6 @@ exports.handleSurvey = async (req, res) => {
         }
 
         const updatedUser = await Users.findByPk(user_id, {
-            include: [
-                {
-                    model: Ingredient,
-                    as: 'allergies',
-                    through: { attributes: [] },
-                    attributes: ['ingredient_id', 'name'],
-                },
-            ],
             attributes: { exclude: ['password'] },
         });
 
