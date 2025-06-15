@@ -114,26 +114,26 @@ function Profile() {
 
     // Fetch dữ liệu ban đầu
     useEffect(() => {
-        if (!state.userData?.userId) return;
+        if (!state.userData?.user_id) return;
 
         // Fetch bài viết
         instance
-            .post('/get-review-by-user-id', { user_id: state.userData.userId })
+            .post('/get-review-by-user-id', { user_id: state.userData.user_id })
             .then((res) => setReviews(res.data))
             .catch(console.error);
 
         // Fetch followers
         instance
-            .post('/get-followers', { user_id: state.userData.userId })
+            .post('/get-followers', { user_id: state.userData.user_id })
             .then((res) => setFollowers(res.data))
             .catch(console.error);
 
         // Fetch following
         instance
-            .post('/get-following', { user_id: state.userData.userId })
+            .post('/get-following', { user_id: state.userData.user_id })
             .then((res) => setFollowing(res.data))
             .catch(console.error);
-    }, [state.userData?.userId]);
+    }, [state.userData?.user_id]);
 
     const handleUploadSuccess = (imageData) => {
         setNewImageData(imageData);
@@ -146,33 +146,33 @@ function Profile() {
         setOpenEditDialog(false);
     };
 
-    const handleFollowAction = async (targetUserId, action) => {
+    const handleFollowAction = async (targetuser_id, action) => {
         try {
             await instance.post('/follow-action', {
-                user_id: state.userData.userId,
-                target_user_id: targetUserId,
+                user_id: state.userData.user_id,
+                target_user_id: targetuser_id,
                 action: action,
             });
-    
+
             // Update UI immediately
             if (action === 'follow') {
                 setFollowers((prev) =>
-                    prev.map((user) => (user.user_id === targetUserId ? { ...user, is_following: true } : user)),
+                    prev.map((user) => (user.user_id === targetuser_id ? { ...user, is_following: true } : user)),
                 );
             } else {
-                setFollowing((prev) => prev.filter((user) => user.user_id !== targetUserId));
+                setFollowing((prev) => prev.filter((user) => user.user_id !== targetuser_id));
             }
-    
+
             setSnackbar({
                 open: true,
-                message: `Successfully ${action}ed`,  // Fixed template literal
+                message: `Successfully ${action}ed`, // Fixed template literal
                 severity: 'success',
             });
         } catch (error) {
             console.error('Follow action error:', error);
             setSnackbar({
                 open: true,
-                message: `Failed to ${action}`,  // Fixed template literal
+                message: `Failed to ${action}`, // Fixed template literal
                 severity: 'error',
             });
         }
@@ -189,7 +189,7 @@ function Profile() {
 
             const response = await instance.post('/update-info', {
                 ...updateData,
-                user_id: state.userData?.userId,
+                user_id: state.userData?.user_id,
             });
 
             if (response.data.success) {
@@ -228,22 +228,22 @@ function Profile() {
                 <div className="profile-content-wrap">
                     <div className="profile-content">
                         <div className="user-profile">
-                        <Avatar
-                            src={
-                                newImageId
-                                ? `https://res.cloudinary.com/dppaihihm/image/upload/${newImageId}.jpg`
-                                : avatarUrl
-                                ? `https://res.cloudinary.com/dppaihihm/image/upload/${avatarUrl}.jpg`
-                                : '/default-avatar.jpg'
-                            }
-                            alt="Profile Avatar"
-                            sx={{
-                                 width: 120,
-                                height: 120,
-                                cursor: 'pointer',
-                            }}
-                            onClick={handleOpenEditDialog}
-                        />
+                            <Avatar
+                                src={
+                                    newImageId
+                                        ? `https://res.cloudinary.com/dppaihihm/image/upload/${newImageId}.jpg`
+                                        : avatarUrl
+                                        ? `https://res.cloudinary.com/dppaihihm/image/upload/${avatarUrl}.jpg`
+                                        : '/default-avatar.jpg'
+                                }
+                                alt="Profile Avatar"
+                                sx={{
+                                    width: 120,
+                                    height: 120,
+                                    cursor: 'pointer',
+                                }}
+                                onClick={handleOpenEditDialog}
+                            />
                             <div className="profile-name">
                                 <Typography variant="h6" className="profile-username">
                                     {state.userData?.name}
@@ -315,23 +315,23 @@ function Profile() {
                                                 }}
                                             >
                                                 <Box
-                                                   display="flex"
-                                                   alignItems="center"
-                                                   gap={2}
-                                                   sx={{ cursor: 'pointer' }}
-                                                   onClick={() => {
-                                                       navigate(`/user/${follower.user_id}`);
-                                                       setOpen(false);
-                                                   }}
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    gap={2}
+                                                    sx={{ cursor: 'pointer' }}
+                                                    onClick={() => {
+                                                        navigate(`/user/${follower.user_id}`);
+                                                        setOpen(false);
+                                                    }}
                                                 >
                                                     <Avatar
-    src={
-        follower.avt_path
-            ? `https://res.cloudinary.com/dppaihihm/image/upload/${follower.avt_path}.jpg`
-            : '/default-avatar.jpg'
-    }
-    sx={{ width: 40, height: 40 }}
-/>
+                                                        src={
+                                                            follower.avt_path
+                                                                ? `https://res.cloudinary.com/dppaihihm/image/upload/${follower.avt_path}.jpg`
+                                                                : '/default-avatar.jpg'
+                                                        }
+                                                        sx={{ width: 40, height: 40 }}
+                                                    />
                                                     <Box>
                                                         <Typography fontWeight="bold">{follower.name}</Typography>
                                                         <Typography variant="body2" color="text.secondary">
@@ -394,13 +394,13 @@ function Profile() {
                                                 }}
                                             >
                                                 <Avatar
-    src={
-        followedUser.avt_path
-            ? `https://res.cloudinary.com/dppaihihm/image/upload/${followedUser.avt_path}.jpg`
-            : '/default-avatar.jpg'
-    }
-    sx={{ width: 40, height: 40 }}
-/>
+                                                    src={
+                                                        followedUser.avt_path
+                                                            ? `https://res.cloudinary.com/dppaihihm/image/upload/${followedUser.avt_path}.jpg`
+                                                            : '/default-avatar.jpg'
+                                                    }
+                                                    sx={{ width: 40, height: 40 }}
+                                                />
                                                 <Box>
                                                     <Typography fontWeight="bold">{followedUser.name}</Typography>
                                                     <Typography variant="body2" color="text.secondary">
@@ -478,8 +478,8 @@ function Profile() {
                                         src={
                                             newImageData.imageUrl ||
                                             (avatarUrl
-                                            ? `https://res.cloudinary.com/dppaihihm/image/upload/${avatarUrl}.jpg`
-                                            : '/default-avatar.jpg')
+                                                ? `https://res.cloudinary.com/dppaihihm/image/upload/${avatarUrl}.jpg`
+                                                : '/default-avatar.jpg')
                                         }
                                         alt="Profile Avatar"
                                         sx={{ width: 120, height: 120, marginBottom: '10px' }}
@@ -527,23 +527,23 @@ function Profile() {
                         <div className="pro5-post">
                             {reviews?.map((item) => (
                                 <div
-                                className="home-news"
-                                key={item.review_id}
-                                onClick={() => navigate(`/review-detail/${item.review_id}`)}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <div className="home-new-picture">
-                                    <img
-                                        className="review-poster"
-                                        src={`https://res.cloudinary.com/${cloudName}/image/upload/${item.img_path}.jpg`}
-                                        alt={item.title}
-                                    />
+                                    className="home-news"
+                                    key={item.review_id}
+                                    onClick={() => navigate(`/review-detail/${item.review_id}`)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <div className="home-new-picture">
+                                        <img
+                                            className="review-poster"
+                                            src={`https://res.cloudinary.com/${cloudName}/image/upload/${item.img_path}.jpg`}
+                                            alt={item.title}
+                                        />
+                                    </div>
+                                    <Typography className="home-new-title">{item.title}</Typography>
+                                    <Typography className="home-review-title">
+                                        Post date: {formatDate(item.createdAt)}
+                                    </Typography>
                                 </div>
-                                <Typography className="home-new-title">{item.title}</Typography>
-                                <Typography className="home-review-title">
-                                    Post date: {formatDate(item.createdAt)}
-                                </Typography>
-                            </div>
                             ))}
                         </div>
                     </div>
@@ -566,6 +566,5 @@ function Profile() {
         </div>
     );
 }
-
 
 export default Profile;

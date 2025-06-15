@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const Users = db.Users;
 const SECRET_KEY = process.env.JWT_SECRET || 'default_secret';
 const Alergic = db.Alergic;
-const Ingredient = db.Ingredient;
+const Ingredient = db.Ingredients;
 
 // Helper function to handle errors
 const handleError = (res, error, message = 'Internal Server Error') => {
@@ -241,10 +241,16 @@ exports.getUserById = async (req, res) => {
         const user = await Users.findByPk(user_id, {
             include: [
                 {
-                    model: Ingredient,
-                    as: 'allergies',
-                    through: { attributes: [] },
-                    attributes: ['ingredient_id', 'name'],
+                    model: Alergic,
+                    as: 'alergics',
+                    include: [
+                        {
+                            model: Ingredient,
+                            as: 'ingredient',
+                            attributes: ['ingredient_id', 'name'],
+                        },
+                    ],
+                    attributes: ['alergic_id'],
                 },
             ],
             attributes: { exclude: ['password'] },
@@ -257,9 +263,15 @@ exports.getUserById = async (req, res) => {
             });
         }
 
+        // Format the response to match the expected structure
+        const formattedUser = {
+            ...user.get({ plain: true }),
+            allergies: user.alergics?.map((allergy) => allergy.ingredient),
+        };
+
         res.status(200).json({
             success: true,
-            data: user,
+            data: formattedUser,
         });
     } catch (err) {
         handleError(res, err, 'Error getting user');

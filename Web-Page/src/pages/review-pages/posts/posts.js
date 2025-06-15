@@ -93,7 +93,7 @@ function Posts() {
     // Fetch posts and ingredients
     useEffect(() => {
         instance
-            .post('/get-review-by-user-id', { user_id: state.userData.userId })
+            .post('/get-review-by-user-id', { user_id: state.userData.user_id })
             .then((res) => setPosts(res.data))
             .catch((err) => console.error('Error fetching posts:', err));
 
@@ -101,7 +101,7 @@ function Posts() {
             .get('/get-all-ingredients')
             .then((res) => setIngredients(res.data))
             .catch((err) => console.error('Error fetching ingredients:', err));
-    }, [state.userData.userId]);
+    }, [state.userData.user_id]);
 
     const filteredPosts = posts.filter((post) => post.title.toLowerCase().includes(searchQuery.toLowerCase()));
 

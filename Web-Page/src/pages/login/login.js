@@ -42,7 +42,7 @@ function Login() {
             console.log(formData);
             const res = await instance.post(REGISTER, formData);
             console.log(res.data);
-            dispatchState(logged(res.data));
+            dispatchState(logged(res.data.data));
             navigate('/survey');
         } catch (err) {
             setErrorMessage(err.response?.data?.message || 'Registration failed!');
@@ -63,9 +63,10 @@ function Login() {
         try {
             const res = await instance.post(LOGGIN, formData);
             if (res.status === 200) {
-                localStorage.setItem('token', res.data.token);
-                localStorage.setItem('userId', res.data.userData.userId);
-                dispatchState(logged(res.data.userData));
+                console.log(res.data.data);
+                // localStorage.setItem('token', res.data.token);
+                // localStorage.setItem('userId', res.data.userData.userId);
+                dispatchState(logged(res.data.data));
                 navigate('/');
             }
         } catch (err) {
