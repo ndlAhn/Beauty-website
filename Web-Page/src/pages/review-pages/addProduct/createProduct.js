@@ -203,7 +203,6 @@ function CreateProduct() {
             }
         } catch (error) {
             console.error('Error submitting product:', error);
-            alert(`Error: ${error.response?.data?.message || 'Something went wrong'}`);
         }
     };
 

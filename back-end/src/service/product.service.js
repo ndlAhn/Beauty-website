@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 
 const Products = db.Products;
+const Ingredient = db.Ingredients;
 
 // 🛠 **Tạo sản phẩm mới**
 exports.create = async (req, res) => {
@@ -22,7 +23,6 @@ exports.create = async (req, res) => {
             capacity: req.body.capacity,
             uses: req.body.uses,
             warning: req.body.warning,
-            ingredient_id: req.body.ingredient,
             picture: req.body.picture,
         };
 

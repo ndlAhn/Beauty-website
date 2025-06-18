@@ -17,12 +17,16 @@ import {
     Avatar,
     Paper,
     Divider,
+    CircularProgress,
+    Alert,
+    Chip,
 } from '@mui/material';
 import instance from '../../../axios/instance';
 import StateContext from '../../../context/context.context';
 import SubHeader from '../../../components/subHeader/subHeader';
 import ProfileSidebar from '../../../components/sidebar/profile-sidebar/profileSidebar';
 import './personalInfo.css';
+
 const SKIN_TYPES = [
     { value: 'oily', label: 'Oily skin' },
     { value: 'dry', label: 'Dry skin' },
@@ -42,36 +46,30 @@ const SKIN_PROBLEMS = [
     { value: 'skin_recovery', label: 'Skin recovery' },
 ];
 
-const ALLERGY_OPTIONS = [
-    { value: 'fragrance', label: 'Fragrance' },
-    { value: 'alcohol', label: 'Alcohol' },
-    { value: 'silicones', label: 'Silicones' },
-    { value: 'parabens', label: 'Parabens' },
-    { value: 'essential_oil', label: 'Essential Oils' },
+const SKINCARE_GOALS = [
+    { value: 'hydration', label: 'Hydration' },
+    { value: 'acne_control', label: 'Acne Control' },
+    { value: 'anti_aging', label: 'Anti-Aging' },
+    { value: 'brightening', label: 'Brightening' },
+    { value: 'oil_control', label: 'Oil Control' },
+    { value: 'smooth_and_repair', label: 'Smooth & Repair' },
 ];
 
 function PersonalInfo() {
-    const [state, dispatchState] = useContext(StateContext);
+    const [state] = useContext(StateContext);
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
     const [editMode, setEditMode] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         bio: '',
         avt_path: '',
         skin_type: '',
-        acne: false,
-        aging: false,
-        dried: false,
-        oily: false,
-        enlarged_pores: false,
-        scarring: false,
-        skin_recovery: false,
-        fragrance: false,
-        alcohol: false,
-        silicones: false,
-        parabens: false,
-        essential_oil: false,
+        skinProblems: {},
+        skincareGoals: {},
+        allergies: [],
     });
 
     useEffect(() => {
@@ -80,52 +78,88 @@ function PersonalInfo() {
 
     const fetchUserData = async () => {
         try {
+            console.log('Hello');
+            setLoading(true);
             const response = await instance.post('/get-user-data-by-id', {
                 user_id: state.userData?.user_id,
             });
-            console.log(response.data);
-            setUserData(response.data);
+            const user = response.data.data;
+            const skinProblems = {
+                acne: user.acne || false,
+                aging: user.aging || false,
+                dried: user.dried || false,
+                oily: user.oily || false,
+                enlarged_pores: user.enlarged_pores || false,
+                scarring: user.scarring || false,
+                skin_recovery: user.skin_recovery || false,
+            };
+
+            const skincareGoals = {
+                hydration: user.hydration || false,
+                acne_control: user.acne_control || false,
+                anti_aging: user.anti_aging || false,
+                brightening: user.brightening || false,
+                oil_control: user.oil_control || false,
+                smooth_and_repair: user.smooth_and_repair || false,
+            };
+
+            setUserData(user);
             setFormData({
-                skin_type: response.data.skin_type,
-                name: response.data.name || '',
-                bio: response.data.bio || '',
-                avt_path: response.data.avt_path || '',
-                skin_type: response.data.skin_type || '',
-                acne: response.data.acne || false,
-                aging: response.data.aging || false,
-                dried: response.data.dried || false,
-                oily: response.data.oily || false,
-                enlarged_pores: response.data.enlarged_pores || false,
-                scarring: response.data.scarring || false,
-                skin_recovery: response.data.skin_recovery || false,
-                fragrance: response.data.fragrance || false,
-                alcohol: response.data.alcohol || false,
-                silicones: response.data.silicones || false,
-                parabens: response.data.parabens || false,
-                essential_oil: response.data.essential_oil || false,
+                name: user.name || '',
+                bio: user.bio || '',
+                avt_path: user.avt_path || '',
+                skin_type: user.skin_type || '',
+                skinProblems,
+                skincareGoals,
+                allergies: user.allergies || [],
             });
         } catch (error) {
             console.error('Error fetching user data:', error);
+            setError('Failed to load user data');
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value,
-        }));
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSkinProblemChange = (problem) => {
         setFormData((prev) => ({
             ...prev,
-            [problem]: !prev[problem],
+            skinProblems: {
+                ...prev.skinProblems,
+                [problem]: !prev.skinProblems[problem],
+            },
         }));
+    };
+
+    const handleSkincareGoalChange = (goal) => {
+        setFormData((prev) => ({
+            ...prev,
+            skincareGoals: {
+                ...prev.skincareGoals,
+                [goal]: !prev.skincareGoals[goal],
+            },
+        }));
+    };
+
+    const handleAllergyChange = (allergyId, isChecked) => {
+        setFormData((prev) => {
+            const newAllergies = isChecked
+                ? [...prev.allergies, allergyId]
+                : prev.allergies.filter((id) => id !== allergyId);
+            return { ...prev, allergies: newAllergies };
+        });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError(null);
+
         try {
             // Update basic info
             await instance.post('/update-info', {
@@ -135,57 +169,52 @@ function PersonalInfo() {
                 avt_path: formData.avt_path,
             });
 
-            // Update skin and allergy info
+            // Update skin, goals and allergy info
             await instance.post('/survey', {
                 user_id: state.userData?.user_id,
-                skinType: formData.skin_type,
-                skinProb: {
-                    acne: formData.acne,
-                    aging: formData.aging,
-                    dried: formData.dried,
-                    oily: formData.oily,
-                    enlarged_pores: formData.enlarged_pores,
-                    scarring: formData.scarring,
-                    skin_recovery: formData.skin_recovery,
-                },
-                allergies: [
-                    formData.fragrance ? 'fragrance' : null,
-                    formData.alcohol ? 'alcohol' : null,
-                    formData.silicones ? 'silicones' : null,
-                    formData.parabens ? 'parabens' : null,
-                    formData.essential_oil ? 'essential_oil' : null,
-                ].filter(Boolean),
+                skin_type: formData.skin_type,
+                skinProb: formData.skinProblems,
+                skincareGoals: formData.skincareGoals,
+                allergies: formData.allergies,
             });
 
             setEditMode(false);
-            fetchUserData(); // Refresh data
+            await fetchUserData();
         } catch (error) {
             console.error('Error updating user data:', error);
+            setError('Failed to update profile. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
     const textColor = 'rgb(169, 80, 80)';
     const buttonColor = 'rgb(169, 80, 80)';
 
+    if (loading && !userData) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
     if (!userData) {
-        return <Typography>Loading...</Typography>;
+        return <Typography>No user data available</Typography>;
     }
 
     return (
         <div>
             <SubHeader />
-
             <div className="personal-wrap">
                 <ProfileSidebar />
-
                 <Box
                     sx={{
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        backgroundColor: '#f5f5f5',
                         flex: 1,
-                        padding: '0 30px ',
+                        padding: '0 30px',
                         backgroundColor: 'white',
                         paddingBottom: '30px',
                     }}
@@ -215,10 +244,43 @@ function PersonalInfo() {
                             </Button>
                         </Box>
 
+                        {error && (
+                            <Alert severity="error" sx={{ mb: 3 }}>
+                                {error}
+                            </Alert>
+                        )}
+
                         {editMode ? (
                             <form onSubmit={handleSubmit}>
                                 <Box sx={{ display: 'flex', gap: 4, mb: 4 }}>
                                     <Box sx={{ flex: 1 }}>
+                                        <TextField
+                                            fullWidth
+                                            label="Name"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            sx={{ mb: 3 }}
+                                        />
+                                        <TextField
+                                            fullWidth
+                                            label="Bio"
+                                            name="bio"
+                                            value={formData.bio}
+                                            onChange={handleInputChange}
+                                            multiline
+                                            rows={3}
+                                            sx={{ mb: 3 }}
+                                        />
+                                        <TextField
+                                            fullWidth
+                                            label="Avatar URL"
+                                            name="avt_path"
+                                            value={formData.avt_path}
+                                            onChange={handleInputChange}
+                                            sx={{ mb: 3 }}
+                                        />
+
                                         <FormControl fullWidth sx={{ mb: 3 }}>
                                             <FormLabel sx={{ color: textColor, mb: 1, fontWeight: 'bold' }}>
                                                 Skin type:
@@ -228,8 +290,8 @@ function PersonalInfo() {
                                                 value={formData.skin_type}
                                                 onChange={handleInputChange}
                                             >
-                                                {SKIN_TYPES.map((type) => (
-                                                    <MenuItem key={type.value} value={type.value}>
+                                                {SKIN_TYPES.map((type, index) => (
+                                                    <MenuItem key={index} value={type.value}>
                                                         {type.label}
                                                     </MenuItem>
                                                 ))}
@@ -241,14 +303,13 @@ function PersonalInfo() {
                                                 Skin problems:
                                             </FormLabel>
                                             <FormGroup>
-                                                {SKIN_PROBLEMS.map((problem) => (
+                                                {SKIN_PROBLEMS.map((problem, index) => (
                                                     <FormControlLabel
-                                                        key={problem.value}
+                                                        key={index}
                                                         control={
                                                             <Checkbox
-                                                                checked={formData[problem.value]}
+                                                                checked={formData.skinProblems[problem.value]}
                                                                 onChange={() => handleSkinProblemChange(problem.value)}
-                                                                name={problem.value}
                                                             />
                                                         }
                                                         label={problem.label}
@@ -259,20 +320,19 @@ function PersonalInfo() {
 
                                         <FormControl fullWidth sx={{ mb: 3 }}>
                                             <FormLabel sx={{ color: textColor, mb: 1, fontWeight: 'bold' }}>
-                                                Ingredient Allergies:
+                                                Skincare Goals:
                                             </FormLabel>
                                             <FormGroup>
-                                                {ALLERGY_OPTIONS.map((allergy) => (
+                                                {SKINCARE_GOALS.map((goal, index) => (
                                                     <FormControlLabel
-                                                        key={allergy.value}
+                                                        key={index}
                                                         control={
                                                             <Checkbox
-                                                                checked={formData[allergy.value]}
-                                                                onChange={() => handleSkinProblemChange(allergy.value)}
-                                                                name={allergy.value}
+                                                                checked={formData.skincareGoals[goal.value]}
+                                                                onChange={() => handleSkincareGoalChange(goal.value)}
                                                             />
                                                         }
-                                                        label={allergy.label}
+                                                        label={goal.label}
                                                     />
                                                 ))}
                                             </FormGroup>
@@ -284,6 +344,7 @@ function PersonalInfo() {
                                     <Button
                                         type="submit"
                                         variant="contained"
+                                        disabled={loading}
                                         sx={{
                                             backgroundColor: buttonColor,
                                             color: 'white',
@@ -293,8 +354,9 @@ function PersonalInfo() {
                                                 backgroundColor: 'rgb(140, 60, 60)',
                                             },
                                         }}
+                                        startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
                                     >
-                                        Save Changes
+                                        {loading ? 'Saving...' : 'Save Changes'}
                                     </Button>
                                 </Box>
                             </form>
@@ -302,7 +364,7 @@ function PersonalInfo() {
                             <Box sx={{ display: 'flex', gap: 4 }}>
                                 <Box sx={{ flex: 1 }}>
                                     <Avatar
-                                        src={`https://res.cloudinary.com/dppaihihm/image/upload/${formData.avt_path}.jpg`}
+                                        src={formData.avt_path || '/default-avatar.png'}
                                         sx={{ width: 150, height: 150, mb: 3 }}
                                     />
                                     <Typography variant="h5" sx={{ mb: 1, fontWeight: 'bold' }}>
@@ -318,7 +380,8 @@ function PersonalInfo() {
                                         Gender: {userData.gender}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Date of Birth: {new Date(userData.dob).toLocaleDateString()}
+                                        Date of Birth:{' '}
+                                        {userData.dob ? new Date(userData.dob).toLocaleDateString() : 'Not specified'}
                                     </Typography>
                                 </Box>
 
@@ -337,20 +400,13 @@ function PersonalInfo() {
                                     </Typography>
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                                         {SKIN_PROBLEMS.map(
-                                            (problem) =>
+                                            (problem, index) =>
                                                 userData[problem.value] && (
-                                                    <Typography
-                                                        key={problem.value}
-                                                        variant="body2"
-                                                        sx={{
-                                                            backgroundColor: '#f0f0f0',
-                                                            px: 1.5,
-                                                            py: 0.5,
-                                                            borderRadius: 1,
-                                                        }}
-                                                    >
-                                                        {problem.label}
-                                                    </Typography>
+                                                    <Chip
+                                                        key={index}
+                                                        label={problem.label}
+                                                        sx={{ backgroundColor: '#f0f0f0' }}
+                                                    />
                                                 ),
                                         )}
                                         {!SKIN_PROBLEMS.some((problem) => userData[problem.value]) && (
@@ -361,27 +417,39 @@ function PersonalInfo() {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mb: 1 }}>
+                                        <strong>Skincare Goals:</strong>
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                                        {SKINCARE_GOALS.map(
+                                            (goal, index) =>
+                                                userData[goal.value] && (
+                                                    <Chip
+                                                        key={index}
+                                                        label={goal.label}
+                                                        sx={{ backgroundColor: '#f0f0f0' }}
+                                                    />
+                                                ),
+                                        )}
+                                        {!SKINCARE_GOALS.some((goal) => userData[goal.value]) && (
+                                            <Typography variant="body2" color="text.secondary">
+                                                No skincare goals specified
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ mb: 1 }}>
                                         <strong>Allergies to Avoid:</strong>
                                     </Typography>
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                        {ALLERGY_OPTIONS.map(
-                                            (allergy) =>
-                                                userData[allergy.value] && (
-                                                    <Typography
-                                                        key={allergy.value}
-                                                        variant="body2"
-                                                        sx={{
-                                                            backgroundColor: '#f0f0f0',
-                                                            px: 1.5,
-                                                            py: 0.5,
-                                                            borderRadius: 1,
-                                                        }}
-                                                    >
-                                                        {allergy.label}
-                                                    </Typography>
-                                                ),
-                                        )}
-                                        {!ALLERGY_OPTIONS.some((allergy) => userData[allergy.value]) && (
+                                        {userData.allergies?.length > 0 ? (
+                                            userData.allergies.map((allergy, index) => (
+                                                <Chip
+                                                    key={index}
+                                                    label={allergy.name}
+                                                    sx={{ backgroundColor: '#f0f0f0' }}
+                                                />
+                                            ))
+                                        ) : (
                                             <Typography variant="body2" color="text.secondary">
                                                 No allergies specified
                                             </Typography>
