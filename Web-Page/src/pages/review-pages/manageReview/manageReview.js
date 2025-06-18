@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+// manageReview.js (enhanced)
+import React, { useContext, useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -15,10 +16,8 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    FormControl,
-    Select,
-    MenuItem,
     Typography,
+    CircularProgress,
 } from '@mui/material';
 import { MdDeleteOutline, MdEdit } from 'react-icons/md';
 import { IoIosSearch } from 'react-icons/io';
@@ -27,98 +26,53 @@ import SubHeader from '../../../components/subHeader/subHeader';
 import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSidebar';
 import StateContext from '../../../context/context.context';
 import instance from '../../../axios/instance';
-
-// Cloudinary Upload Widget Component
-const CloudinaryUploadWidget = ({ uwConfig, setPublicId, disabled }) => {
-    const uploadWidgetRef = useRef(null);
-    const uploadButtonRef = useRef(null);
-    const handleUploadClick = () => {
-        if (uploadWidgetRef.current && !disabled) {
-            uploadWidgetRef.current.open();
-        }
-    };
-
-    useEffect(() => {
-        const initializeUploadWidget = () => {
-            if (window.cloudinary && uploadButtonRef.current) {
-                uploadWidgetRef.current = window.cloudinary.createUploadWidget(
-                    {
-                        ...uwConfig,
-                        cropping: true,
-                        croppingAspectRatio: 1,
-                        showSkipCropButton: false,
-                        singleUploadAutoClose: true,
-                    },
-                    (error, result) => {
-                        if (!error && result && result.event === 'success') {
-                            setPublicId(result.info.public_id);
-                        }
-                    },
-                );
-            }
-        };
-
-        initializeUploadWidget();
-
-        return () => {
-            if (uploadWidgetRef.current) {
-                uploadWidgetRef.current.destroy();
-            }
-        };
-    }, [uwConfig, setPublicId]);
-
-    return (
-        <Button
-            variant="contained"
-            onClick={handleUploadClick}
-            ref={uploadButtonRef}
-            disabled={disabled}
-            sx={{ mt: 1 }}
-        >
-            Upload New Image
-        </Button>
-    );
-};
+import CloudinaryUploadWidget from '../../../components/cloudinaryUploadWidget/cloudinaryUploadWidget';
 
 function ManageReview() {
+    const cloudName = 'dppaihihm';
     const [state] = useContext(StateContext);
-    const [posts, setPosts] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [openEdit, setOpenEdit] = useState(false);
     const [editData, setEditData] = useState(null);
-    const [ingredients, setIngredients] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [newImageId, setNewImageId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Fetch posts and ingredients
     useEffect(() => {
-        instance
-            .post('/get-review-by-user-id', { user_id: state.userData.userId })
-            .then((res) => setPosts(res.data))
-            .catch((err) => console.error('Error fetching posts:', err));
+        fetchReviews();
+    }, []);
 
-        instance
-            .get('/get-all-ingredients')
-            .then((res) => setIngredients(res.data))
-            .catch((err) => console.error('Error fetching ingredients:', err));
-    }, [state.userData.userId]);
+    const fetchReviews = async () => {
+        setIsLoading(true);
+        try {
+            const res = await instance.post('/get-review-by-user-id', { user_id: state.userData.user_id });
+            setReviews(res.data);
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    const filteredPosts = posts.filter((post) => post.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredReviews = reviews.filter((review) =>
+        review.title.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this post?')) {
+        if (window.confirm('Are you sure you want to delete this review?')) {
             try {
                 await instance.delete(`/delete-review/${id}`);
-                setPosts(posts.filter((post) => post.review_id !== id));
+                setReviews(reviews.filter((review) => review.review_id !== id));
             } catch (error) {
-                console.error('Error deleting post:', error);
+                console.error('Error deleting review:', error);
             }
         }
     };
 
-    const handleEdit = (post) => {
-        setEditData(post);
-        setNewImageId(null); // Reset new image when opening edit
+    const handleEdit = (review) => {
+        setEditData(review);
+        setNewImageId(null);
         setOpenEdit(true);
     };
 
@@ -135,29 +89,30 @@ function ManageReview() {
             };
 
             await instance.put(`/update-review/${editData.review_id}`, updatedData);
-            setPosts(posts.map((post) => (post.review_id === editData.review_id ? updatedData : post)));
+            setReviews(reviews.map((review) => 
+                review.review_id === editData.review_id ? updatedData : review
+            ));
             setOpenEdit(false);
             setNewImageId(null);
-            alert('Post updated successfully!');
+            alert('Review updated successfully!');
         } catch (error) {
-            console.error('Error updating post:', error);
+            console.error('Error updating review:', error);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const requiredFields = [
+    const reviewFields = [
         'title',
         'introduction',
         'packaging',
         'uses',
-        'target_user',
+        'targetUser',
         'review',
         'pros',
         'cons',
         'guide',
         'conclusion',
-        'ingredients',
     ];
 
     return (
@@ -166,12 +121,14 @@ function ManageReview() {
             <Box display="flex">
                 <ReviewSidebar />
                 <Box flex={1} p={3}>
-                    <h3>Manage reviews</h3>
+                    <Typography variant="h4" sx={{ color: '#3c4b57', mb: 2 }}>
+                        MANAGE REVIEWS
+                    </Typography>
 
                     {/* Search Bar */}
                     <Box display="flex" alignItems="center" mb={2}>
                         <TextField
-                            label="Search post..."
+                            label="Search reviews..."
                             variant="outlined"
                             fullWidth
                             value={searchQuery}
@@ -182,114 +139,101 @@ function ManageReview() {
                         />
                     </Box>
 
-                    {/* Posts Table */}
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Image</TableCell>
-                                    <TableCell>Title</TableCell>
-                                    <TableCell>Action</TableCell>
-                                    <TableCell>Post Date</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {filteredPosts.length === 0 ? (
+                    {/* Reviews Table */}
+                    {isLoading ? (
+                        <Box display="flex" justifyContent="center" py={4}>
+                            <CircularProgress />
+                        </Box>
+                    ) : (
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
                                     <TableRow>
-                                        <TableCell colSpan={4} align="center">
-                                            No posts found.
-                                        </TableCell>
+                                        <TableCell>Image</TableCell>
+                                        <TableCell>Title</TableCell>
+                                        <TableCell>Type</TableCell>
+                                        <TableCell>Action</TableCell>
+                                        <TableCell>Post Date</TableCell>
                                     </TableRow>
-                                ) : (
-                                    filteredPosts.map((post) => (
-                                        <TableRow key={post.review_id}>
-                                            <TableCell>
-                                                <img
-                                                    src={`https://res.cloudinary.com/dppaihihm/image/upload/${post.img_path}.jpg`}
-                                                    alt={post.title}
-                                                    width="80"
-                                                    height="80"
-                                                    style={{ borderRadius: '8px', objectFit: 'cover' }}
-                                                />
+                                </TableHead>
+                                <TableBody>
+                                    {filteredReviews.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} align="center">
+                                                No reviews found.
                                             </TableCell>
-                                            <TableCell>{post.title}</TableCell>
-                                            <TableCell>
-                                                <IconButton
-                                                    color="primary"
-                                                    onClick={() => handleEdit(post)}
-                                                    disabled={isSubmitting}
-                                                >
-                                                    <MdEdit size={24} />
-                                                </IconButton>
-                                                <IconButton
-                                                    color="error"
-                                                    onClick={() => handleDelete(post.review_id)}
-                                                    disabled={isSubmitting}
-                                                >
-                                                    <MdDeleteOutline size={24} />
-                                                </IconButton>
-                                            </TableCell>
-                                            <TableCell>{new Date(post.createdAt).toLocaleDateString()}</TableCell>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                    ) : (
+                                        filteredReviews.map((review) => (
+                                            <TableRow key={review.review_id}>
+                                                <TableCell>
+                                                    <img
+                                                        src={`https://res.cloudinary.com/${cloudName}/image/upload/${review.img_path}.jpg`}
+                                                        alt={review.title}
+                                                        width="50"
+                                                        height="50"
+                                                        style={{ borderRadius: '4px', objectFit: 'cover' }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>{review.title}</TableCell>
+                                                <TableCell>
+                                                    {review.type_review === 'post' ? 'Post' : 'Review'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <IconButton
+                                                        color="primary"
+                                                        onClick={() => handleEdit(review)}
+                                                        disabled={isSubmitting}
+                                                    >
+                                                        <MdEdit size={24} />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        color="error"
+                                                        onClick={() => handleDelete(review.review_id)}
+                                                        disabled={isSubmitting}
+                                                    >
+                                                        <MdDeleteOutline size={24} />
+                                                    </IconButton>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {new Date(review.createdAt).toLocaleDateString()}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
                 </Box>
             </Box>
 
             {/* Edit Dialog */}
             <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="md">
-                <DialogTitle>Edit Post</DialogTitle>
+                <DialogTitle>Edit Review</DialogTitle>
                 <DialogContent>
                     <Box component="form" sx={{ mt: 2 }}>
-                        {requiredFields
-                            .filter((field) => field !== 'ingredients')
-                            .map((field) => (
-                                <Box key={field} sx={{ mb: 3 }}>
-                                    <Box display="flex" alignItems="center" mb={1}>
-                                        <CgAsterisk style={{ color: 'red', marginRight: 8 }} />
-                                        <Typography variant="subtitle1">
-                                            {field.charAt(0).toUpperCase() + field.slice(1)}
-                                        </Typography>
-                                    </Box>
-                                    <TextField
-                                        fullWidth
-                                        multiline
-                                        rows={4}
-                                        name={field}
-                                        value={editData?.[field] || ''}
-                                        onChange={handleEditChange}
-                                        disabled={isSubmitting}
-                                    />
+                        {reviewFields.map((field) => (
+                            <Box key={field} sx={{ mb: 3 }}>
+                                <Box display="flex" alignItems="center" mb={1}>
+                                    <CgAsterisk style={{ color: 'red', marginRight: 8 }} />
+                                    <Typography variant="subtitle1">
+                                        {field.charAt(0).toUpperCase() + field.slice(1)}
+                                    </Typography>
                                 </Box>
-                            ))}
-
-                        <Box sx={{ mb: 3 }}>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <CgAsterisk style={{ color: 'red', marginRight: 8 }} />
-                                <Typography variant="subtitle1">Ingredients</Typography>
-                            </Box>
-                            <FormControl fullWidth>
-                                <Select
-                                    name="ingredients"
-                                    value={editData?.ingredients || ''}
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    name={field}
+                                    value={editData?.[field] || ''}
                                     onChange={handleEditChange}
                                     disabled={isSubmitting}
-                                >
-                                    <MenuItem value="" disabled>
-                                        Select an ingredient
-                                    </MenuItem>
-                                    {ingredients.map((ingredient) => (
-                                        <MenuItem key={ingredient.ingredient_id} value={ingredient.ingredient_id}>
-                                            {ingredient.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
+                                />
+                            </Box>
+                        ))}
 
+                        {/* Image Upload */}
                         <Box sx={{ mb: 3 }}>
                             <Box display="flex" alignItems="center" mb={1}>
                                 <CgAsterisk style={{ color: 'red', marginRight: 8 }} />
@@ -303,7 +247,7 @@ function ManageReview() {
                                         Current Image:
                                     </Typography>
                                     <img
-                                        src={`https://res.cloudinary.com/dppaihihm/image/upload/${editData.img_path}.jpg`}
+                                        src={`https://res.cloudinary.com/${cloudName}/image/upload/${editData.img_path}.jpg`}
                                         alt="Current"
                                         style={{
                                             maxWidth: '100%',
@@ -317,7 +261,7 @@ function ManageReview() {
                             {/* Cloudinary Upload Widget */}
                             <CloudinaryUploadWidget
                                 uwConfig={{
-                                    cloudName: 'dppaihihm',
+                                    cloudName,
                                     uploadPreset: 'Beauty Web',
                                 }}
                                 setPublicId={setNewImageId}
@@ -331,7 +275,7 @@ function ManageReview() {
                                         New Image Preview:
                                     </Typography>
                                     <img
-                                        src={`https://res.cloudinary.com/dppaihihm/image/upload/${newImageId}.jpg`}
+                                        src={`https://res.cloudinary.com/${cloudName}/image/upload/${newImageId}.jpg`}
                                         alt="New Preview"
                                         style={{
                                             maxWidth: '100%',
@@ -355,7 +299,7 @@ function ManageReview() {
                         Cancel
                     </Button>
                     <Button onClick={handleUpdate} color="primary" variant="contained" disabled={isSubmitting}>
-                        {isSubmitting ? 'Updating...' : 'Update Post'}
+                        {isSubmitting ? 'Updating...' : 'Update Review'}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -54,123 +54,161 @@ function ProductDetails() {
     return (
         <div>
             <Header />
-            <div className="review-product-content-wrap">
-                {/* Title & Like */}
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
+            <div className="review-details-wrap">
+                <div className="review-details-content-wrap">
+                    {/* Title & Like */}
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
                         justifyContent: 'center',
                         position: 'relative',
-                        width: '100%',
-                    }}
-                >
-                    <div className="review-details-title" style={{ textAlign: 'center' }}>
-                        <h3 style={{ margin: 0 }}>{product?.product_name}</h3>
+                        width: '100%'
+                    }}>
+                        <div className="review-details-title" style={{ textAlign: 'center' }}>
+                            <h3 style={{ margin: 0 }}>{product?.product_name}</h3>
+                        </div>
+                        <IconButton 
+                            onClick={handleFavoriteClick}
+                            size="medium"
+                            sx={{ 
+                                position: 'absolute',
+                                right: 0,
+                                '&:hover': {
+                                    backgroundColor: 'transparent'
+                                }
+                            }}
+                        >
+                            {isFavorite ? <Favorite color="error" fontSize="large" /> : <FavoriteBorder fontSize="large" />}
+                        </IconButton>
                     </div>
-                    <IconButton
-                        onClick={handleFavoriteClick}
-                        size="medium"
-                        sx={{
-                            position: 'absolute',
-                            right: 0,
-                            '&:hover': { backgroundColor: 'transparent' },
-                        }}
-                    >
-                        {isFavorite ? <Favorite color="error" fontSize="large" /> : <FavoriteBorder fontSize="large" />}
-                    </IconButton>
-                </div>
 
-                {/* Introduction */}
-                <h5>Product information</h5>
-                <p className="product-infor">{product?.product_info}</p>
+                    {/* Introduction */}
+                    <h5>Product information</h5>
+                    <div className="review-script">
+                        <p>{product?.product_info}</p>
+                    </div>
 
-                {/* Table of Contents */}
-                <Box
-                    sx={{
+                    {/* Table of Contents */}
+                    <Box sx={{ 
+                        position: 'relative',
                         mb: 4,
                         backgroundColor: 'rgb(223,181,182)',
                         borderRadius: '8px',
-                        maxWidth: '400px',
-                    }}
-                >
-                    <IconButton
-                        onClick={() => setOpenToc(!openToc)}
-                        sx={{
-                            width: '100%',
-                            justifyContent: 'flex-start',
-                            py: 2,
-                            px: 3,
-                            color: 'rgb(60,75,87)',
-                            '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' },
-                        }}
-                    >
-                        <MenuIcon sx={{ mr: 1 }} />
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
-                            Table of Contents
-                        </Typography>
-                        {openToc ? <ExpandLess sx={{ ml: 'auto' }} /> : <ExpandMore sx={{ ml: 'auto' }} />}
-                    </IconButton>
-                    <Collapse in={openToc}>
-                        <List>
-                            {TABLE_OF_CONTENTS.map((item) => (
-                                <ListItem key={item.id} disablePadding>
-                                    <ListItemButton onClick={() => handleTocClick(item.id)}>
-                                        <ListItemText primary={item.label} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Collapse>
-                </Box>
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        maxWidth: '400px'
+                    }}>
+                        <IconButton
+                            onClick={() => setOpenToc(!openToc)}
+                            sx={{
+                                width: '100%',
+                                justifyContent: 'flex-start',
+                                py: 2,
+                                px: 3,
+                                color: 'rgb(60,75,87)',
+                                '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' }
+                            }}
+                        >
+                            <MenuIcon sx={{ mr: 1 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
+                                Table of Contents
+                            </Typography>
+                            {openToc ? <ExpandLess sx={{ ml: 'auto' }} /> : <ExpandMore sx={{ ml: 'auto' }} />}
+                        </IconButton>
 
-                {/* Product Image */}
-                <img
-                    src={`https://res.cloudinary.com/${cloudName}/image/upload/${product.picture}.jpg`}
-                    alt={product?.product_name}
-                    className="review-product-image"
-                />
+                        <Collapse in={openToc}>
+                            <List sx={{ py: 0 }}>
+                                {TABLE_OF_CONTENTS.map((item) => (
+                                    <ListItem key={item.id} disablePadding>
+                                        <ListItemButton onClick={() => handleTocClick(item.id)} sx={{ px: 4, py: 1.5 }}>
+                                            <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 'large' }} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Collapse>
+                    </Box>
 
-                {/* Details */}
-                <div id="brand" className="element-title">
-                    <h5>Brand:</h5>
-                    <p>{product?.brand}</p>
-                </div>
-                <div id="product-type" className="element-title">
-                    <h5>Product type:</h5>
-                    <p>{product?.product_type}</p>
-                </div>
-                <div id="capacity" className="element-title">
-                    <h5>Capacity:</h5>
-                    <p>{product?.capacity}</p>
-                </div>
-                <div id="price-range" className="element-title">
-                    <h5>Price range:</h5>
-                    <p>{product?.price_range}</p>
-                </div>
-                <div id="skin-type" className="element-title">
-                    <h5>Skin type:</h5>
-                    <p>{product?.skin_type}</p>
-                </div>
-                <div id="skin-problem" className="element-title">
-                    <h5>Skin problem:</h5>
-                    <p>{product?.skin_problem}</p>
-                </div>
-                <div id="ingredient" className="element-title">
-                    <h5>Ingredient:</h5>
-                    <p>{product?.ingredient}</p>
-                </div>
-                <div id="product-description" className="element-title-coloum">
-                    <h5>Description:</h5>
-                    <p>{product?.product_description}</p>
-                </div>
-                <div id="uses" className="element-title-coloum">
-                    <h5>Uses:</h5>
-                    <p>{product?.uses}</p>
-                </div>
-                <div id="warning" className="element-title-coloum">
-                    <h5>Warning:</h5>
-                    <p>{product?.warning}</p>
+                    {/* Product Image */}
+                    {product.picture && (
+                        <img
+                            src={`https://res.cloudinary.com/${cloudName}/image/upload/${product.picture}.jpg`}
+                            alt={product?.product_name}
+                            className="review-product-image"
+                            height="500"
+                            style={{ maxWidth: '100%', height: 'auto' }}
+                        />
+                    )}
+
+                    {/* Details */}
+                    <div id="brand" className="element-review-details">
+                        <h5>Brand:</h5>
+                        <div className="review-script">
+                            <p>{product?.brand}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="product-type" className="element-review-details">
+                        <h5>Product type:</h5>
+                        <div className="review-script">
+                            <p>{product?.product_type}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="capacity" className="element-review-details">
+                        <h5>Capacity:</h5>
+                        <div className="review-script">
+                            <p>{product?.capacity}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="price-range" className="element-review-details">
+                        <h5>Price range:</h5>
+                        <div className="review-script">
+                            <p>{product?.price_range}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="skin-type" className="element-review-details">
+                        <h5>Skin type:</h5>
+                        <div className="review-script">
+                            <p>{product?.skin_type}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="skin-problem" className="element-review-details">
+                        <h5>Skin problem:</h5>
+                        <div className="review-script">
+                            <p>{product?.skin_problem}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="ingredient" className="element-review-details">
+                        <h5>Ingredient:</h5>
+                        <div className="review-script">
+                            <p>{product?.ingredient}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="product-description" className="element-review-details">
+                        <h5>Description:</h5>
+                        <div className="review-script">
+                            <p>{product?.product_description}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="uses" className="element-review-details">
+                        <h5>Uses:</h5>
+                        <div className="review-script">
+                            <p>{product?.uses}</p>
+                        </div>
+                    </div>
+                    
+                    <div id="warning" className="element-review-details">
+                        <h5>Warning:</h5>
+                        <div className="review-script">
+                            <p>{product?.warning}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <Footer />

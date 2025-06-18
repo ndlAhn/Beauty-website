@@ -1,20 +1,14 @@
+// createProduct.js (simplified version without the table)
 import './createProduct.css';
 import { useContext, useState, useEffect, useRef } from 'react';
 import SubHeader from '../../../components/subHeader/subHeader';
 import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSidebar';
 import { CgAsterisk } from 'react-icons/cg';
 import { IoIosCloudUpload } from 'react-icons/io';
-import { MdCancel, MdEdit, MdDelete } from 'react-icons/md';
+import { MdCancel } from 'react-icons/md';
 import StateContext from '../../../context/context.context';
 import instance from '../../../axios/instance';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
     Button,
     MenuItem,
     Select,
@@ -22,14 +16,11 @@ import {
     TextField,
     FormControl,
     InputLabel,
-    TextareaAutosize,
-    Chip,
     Box,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
-    IconButton,
     InputAdornment,
     Checkbox,
     List,
@@ -37,6 +28,7 @@ import {
     ListItemText,
     ListItemButton,
     CircularProgress,
+    Chip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -48,7 +40,6 @@ function CreateProduct() {
 
     const [publicId, setPublicId] = useState('');
     const [state] = useContext(StateContext);
-    const [products, setProducts] = useState([]);
     const [ingredients, setIngredients] = useState([]);
     const [selectedIngredients, setSelectedIngredients] = useState([]);
     const [formData, setFormData] = useState({
@@ -82,26 +73,15 @@ function CreateProduct() {
             );
         }
 
-        fetchProducts();
         fetchIngredients();
     }, []);
-
-    const fetchProducts = async () => {
-        try {
-            const res = await instance.get('/get-all-products');
-            setProducts(res.data);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-    };
 
     const fetchIngredients = async () => {
         try {
             const res = await instance.get('/get-all-ingredients');
-            console.log(ingredients);
             setIngredients(res.data);
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error fetching ingredients:', error);
         }
     };
 
@@ -184,7 +164,6 @@ function CreateProduct() {
                 }
 
                 alert('Product created successfully!');
-                fetchProducts();
                 setFormData({
                     product_name: '',
                     product_details: '',
@@ -203,19 +182,6 @@ function CreateProduct() {
             }
         } catch (error) {
             console.error('Error submitting product:', error);
-        }
-    };
-
-    const handleDelete = async (productId) => {
-        if (!window.confirm('Are you sure you want to delete this product?')) return;
-
-        try {
-            await instance.delete(`/delete-product/${productId}`);
-            alert('Product deleted successfully!');
-            fetchProducts();
-        } catch (error) {
-            console.error('Error deleting product:', error);
-            alert('Failed to delete product');
         }
     };
 
@@ -381,7 +347,7 @@ function CreateProduct() {
                                                           </ListItemButton>
                                                       </ListItem>
                                                   ))
-                                                : ingredients.map((ingredient, index) => (
+                                                : ingredients.map((ingredient) => (
                                                       <ListItem
                                                           key={ingredient.ingredient_id}
                                                           disablePadding
@@ -465,46 +431,6 @@ function CreateProduct() {
                                 </button>
                             </div>
                         </form>
-
-                        {/* Products Table */}
-                        <TableContainer component={Paper} sx={{ mt: 4 }}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Image</TableCell>
-                                        <TableCell>Product Name</TableCell>
-                                        <TableCell>Product Type</TableCell>
-                                        <TableCell>Skin Type</TableCell>
-                                        <TableCell>Action</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {products.map((product) => (
-                                        <TableRow key={product.product_id}>
-                                            <TableCell>
-                                                <img
-                                                    src={`https://res.cloudinary.com/${cloudName}/image/upload/${product.picture}.jpg`}
-                                                    alt={product.product_name}
-                                                    width="50"
-                                                />
-                                            </TableCell>
-                                            <TableCell>{product.product_name}</TableCell>
-                                            <TableCell>{product.product_type}</TableCell>
-                                            <TableCell>{product.skin_type}</TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    color="error"
-                                                    startIcon={<MdDelete />}
-                                                    onClick={() => handleDelete(product.product_id)}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
                     </div>
                 </div>
             </div>

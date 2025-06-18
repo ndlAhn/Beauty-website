@@ -80,7 +80,7 @@ const CloudinaryUploadWidget = ({ uwConfig, setPublicId, disabled }) => {
     );
 };
 
-function ManageProduct() {
+function Posts() {
     const [state] = useContext(StateContext);
     const [posts, setPosts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -93,7 +93,7 @@ function ManageProduct() {
     // Fetch posts and ingredients
     useEffect(() => {
         instance
-            .post('/get-review-by-user-id', { user_id: state.userData.userId })
+            .post('/get-review-by-user-id', { user_id: state.userData.user_id })
             .then((res) => setPosts(res.data))
             .catch((err) => console.error('Error fetching posts:', err));
 
@@ -101,7 +101,7 @@ function ManageProduct() {
             .get('/get-all-ingredients')
             .then((res) => setIngredients(res.data))
             .catch((err) => console.error('Error fetching ingredients:', err));
-    }, [state.userData.userId]);
+    }, [state.userData.user_id]);
 
     const filteredPosts = posts.filter((post) => post.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -166,7 +166,7 @@ function ManageProduct() {
             <Box display="flex">
                 <ReviewSidebar />
                 <Box flex={1} p={3}>
-                    <h3>Manage products</h3>
+                    <h3>Manage your posts</h3>
 
                     {/* Search Bar */}
                     <Box display="flex" alignItems="center" mb={2}>
@@ -363,4 +363,4 @@ function ManageProduct() {
     );
 }
 
-export default  ManageProduct;
+export default Posts;
