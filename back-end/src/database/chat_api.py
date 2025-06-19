@@ -8,6 +8,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Load dữ liệu
 chat_data = pd.read_csv("chatData.csv")
 
+
+
 # Load model
 encoder = SentenceTransformer('all-MiniLM-L6-v2')
 question_embeddings = encoder.encode(chat_data["Question"].tolist())
