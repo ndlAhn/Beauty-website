@@ -16,17 +16,23 @@ import {
     DialogContent,
     DialogTitle,
     FormControl,
+    InputLabel,
     Select,
     MenuItem,
     Typography,
+    Chip,
+    Stack,
+    Checkbox,
+    FormControlLabel,
+    Autocomplete,
 } from '@mui/material';
-import { MdDeleteOutline, MdEdit } from 'react-icons/md';
+import { MdDeleteOutline, MdEdit, MdAdd } from 'react-icons/md';
 import { IoIosSearch } from 'react-icons/io';
 import { CgAsterisk } from 'react-icons/cg';
 import SubHeader from '../../../components/subHeader/subHeader';
-import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSidebar';
 import StateContext from '../../../context/context.context';
 import instance from '../../../axios/instance';
+import ReviewSidebar from '../../../components/sidebar/review-sidebar/reviewSidebar';
 
 // Cloudinary Upload Widget Component
 const CloudinaryUploadWidget = ({ uwConfig, setPublicId, disabled }) => {
@@ -80,84 +86,154 @@ const CloudinaryUploadWidget = ({ uwConfig, setPublicId, disabled }) => {
     );
 };
 
-function Posts() {
+function ManageProducts() {
     const [state] = useContext(StateContext);
-    const [posts, setPosts] = useState([]);
+    const [products, setProducts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [openEdit, setOpenEdit] = useState(false);
-    const [editData, setEditData] = useState(null);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [currentProduct, setCurrentProduct] = useState(null);
     const [ingredients, setIngredients] = useState([]);
+    const [selectedIngredients, setSelectedIngredients] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [newImageId, setNewImageId] = useState(null);
+    const [isCreateMode, setIsCreateMode] = useState(false);
 
-    // Fetch posts and ingredients
+    // Product types and skin types for dropdowns
+    const productTypes = ['Cleanser', 'Toner', 'Serum', 'Moisturizer', 'Sunscreen', 'Mask', 'Treatment', 'Other'];
+    const skinTypes = ['Dry', 'Oily', 'Combination', 'Normal', 'Sensitive', 'All'];
+    const priceRanges = ['$', '$$', '$$$', '$$$$'];
+
+    // Fetch products and ingredients
     useEffect(() => {
-        instance
-            .post('/get-review-by-user-id', { user_id: state.userData.user_id })
-            .then((res) => setPosts(res.data))
-            .catch((err) => console.error('Error fetching posts:', err));
+        fetchProducts();
+        fetchIngredients();
+    }, []);
 
-        instance
-            .get('/get-all-ingredients')
-            .then((res) => setIngredients(res.data))
-            .catch((err) => console.error('Error fetching ingredients:', err));
-    }, [state.userData.user_id]);
+    const fetchProducts = async () => {
+        try {
+            const res = await instance.get('/get-all-products');
+            console.log(res.data.products);
+            setProducts(res.data.products);
+        } catch (err) {
+            console.error('Error fetching products:', err);
+        }
+    };
 
-    const filteredPosts = posts.filter((post) => post.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    const fetchIngredients = async () => {
+        try {
+            const res = await instance.get('/get-all-ingredients');
+            setIngredients(res.data);
+        } catch (err) {
+            console.error('Error fetching ingredients:', err);
+        }
+    };
+
+    const filteredProducts = products?.filter(
+        (product) =>
+            product.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.brand.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this post?')) {
+        if (window.confirm('Are you sure you want to delete this product?')) {
             try {
-                await instance.delete(`/delete-review/${id}`);
-                setPosts(posts.filter((post) => post.review_id !== id));
+                await instance.delete(`/delete-product/${id}`);
+                setProducts(products?.filter((product) => product.product_id !== id));
             } catch (error) {
-                console.error('Error deleting post:', error);
+                console.error('Error deleting product:', error);
             }
         }
     };
 
-    const handleEdit = (post) => {
-        setEditData(post);
-        setNewImageId(null); // Reset new image when opening edit
-        setOpenEdit(true);
+    const handleEdit = (product) => {
+        setCurrentProduct(product);
+        setSelectedIngredients(product.ingredients?.map((i) => i.ingredient_id) || []);
+        setNewImageId(null);
+        setIsCreateMode(false);
+        setOpenDialog(true);
     };
 
-    const handleEditChange = (e) => {
-        setEditData({ ...editData, [e.target.name]: e.target.value });
+    const handleCreate = () => {
+        setCurrentProduct({
+            product_name: '',
+            brand: '',
+            product_type: '',
+            skin_type: '',
+            price_range: '',
+            capacity: '',
+            uses: '',
+            warning: '',
+            product_description: '',
+            acne: false,
+            aging: false,
+            dried: false,
+            oily: false,
+            skin_recovery: false,
+            hydration: false,
+            acne_control: false,
+            anti_aging: false,
+            brightening: false,
+            oil_control: false,
+            smooth_and_repair: false,
+        });
+        setSelectedIngredients([]);
+        setNewImageId(null);
+        setIsCreateMode(true);
+        setOpenDialog(true);
     };
 
-    const handleUpdate = async () => {
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setCurrentProduct({
+            ...currentProduct,
+            [name]: type === 'checkbox' ? checked : value,
+        });
+    };
+
+    const handleIngredientChange = (event, newValue) => {
+        setSelectedIngredients(newValue);
+    };
+
+    const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            const updatedData = {
-                ...editData,
-                ...(newImageId && { img_path: newImageId }),
+            const productData = {
+                ...currentProduct,
+                picture: newImageId || currentProduct.picture,
+                ingredients: selectedIngredients.map((id) => ({ ingredient_id: id })),
             };
 
-            await instance.put(`/update-review/${editData.review_id}`, updatedData);
-            setPosts(posts.map((post) => (post.review_id === editData.review_id ? updatedData : post)));
-            setOpenEdit(false);
-            setNewImageId(null);
-            alert('Post updated successfully!');
+            if (isCreateMode) {
+                await instance.post('/create-product', productData);
+                alert('Product created successfully!');
+            } else {
+                await instance.put(`/update-product/${currentProduct.product_id}`, productData);
+                alert('Product updated successfully!');
+            }
+
+            fetchProducts();
+            setOpenDialog(false);
         } catch (error) {
-            console.error('Error updating post:', error);
+            console.error('Error saving product:', error);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const requiredFields = [
-        'title',
-        'introduction',
-        'packaging',
-        'uses',
-        'target_user',
-        'review',
-        'pros',
-        'cons',
-        'guide',
-        'conclusion',
-        'ingredients',
+    const requiredFields = ['product_name', 'brand', 'product_type', 'skin_type', 'price_range', 'capacity', 'uses'];
+
+    const benefitFields = [
+        { name: 'acne', label: 'Acne' },
+        { name: 'aging', label: 'Aging' },
+        { name: 'dried', label: 'Dried Skin' },
+        { name: 'oily', label: 'Oily Skin' },
+        { name: 'skin_recovery', label: 'Skin Recovery' },
+        { name: 'hydration', label: 'Hydration' },
+        { name: 'acne_control', label: 'Acne Control' },
+        { name: 'anti_aging', label: 'Anti-Aging' },
+        { name: 'brightening', label: 'Brightening' },
+        { name: 'oil_control', label: 'Oil Control' },
+        { name: 'smooth_and_repair', label: 'Smooth & Repair' },
     ];
 
     return (
@@ -165,13 +241,19 @@ function Posts() {
             <SubHeader />
             <Box display="flex">
                 <ReviewSidebar />
+
                 <Box flex={1} p={3}>
-                    <h3>Manage your posts</h3>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                        <Typography variant="h4">Manage Products</Typography>
+                        <Button variant="contained" startIcon={<MdAdd />} onClick={handleCreate}>
+                            Add New Product
+                        </Button>
+                    </Box>
 
                     {/* Search Bar */}
                     <Box display="flex" alignItems="center" mb={2}>
                         <TextField
-                            label="Search post..."
+                            label="Search products..."
                             variant="outlined"
                             fullWidth
                             value={searchQuery}
@@ -182,54 +264,62 @@ function Posts() {
                         />
                     </Box>
 
-                    {/* Posts Table */}
+                    {/* Products Table */}
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Image</TableCell>
-                                    <TableCell>Title</TableCell>
-                                    <TableCell>Action</TableCell>
-                                    <TableCell>Post Date</TableCell>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>Brand</TableCell>
+                                    <TableCell>Type</TableCell>
+                                    <TableCell>Skin Type</TableCell>
+                                    <TableCell>Price</TableCell>
+                                    <TableCell>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {filteredPosts.length === 0 ? (
+                                {filteredProducts.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} align="center">
-                                            No posts found.
+                                        <TableCell colSpan={7} align="center">
+                                            No products found.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    filteredPosts.map((post) => (
-                                        <TableRow key={post.review_id}>
+                                    filteredProducts.map((product) => (
+                                        <TableRow key={product.product_id}>
                                             <TableCell>
-                                                <img
-                                                    src={`https://res.cloudinary.com/dppaihihm/image/upload/${post.img_path}.jpg`}
-                                                    alt={post.title}
-                                                    width="80"
-                                                    height="80"
-                                                    style={{ borderRadius: '8px', objectFit: 'cover' }}
-                                                />
+                                                {product.picture && (
+                                                    <img
+                                                        src={`https://res.cloudinary.com/dppaihihm/image/upload/${product.picture}.jpg`}
+                                                        alt={product.product_name}
+                                                        width="60"
+                                                        height="60"
+                                                        style={{ borderRadius: '8px', objectFit: 'cover' }}
+                                                    />
+                                                )}
                                             </TableCell>
-                                            <TableCell>{post.title}</TableCell>
+                                            <TableCell>{product.product_name}</TableCell>
+                                            <TableCell>{product.brand}</TableCell>
+                                            <TableCell>{product.product_type}</TableCell>
+                                            <TableCell>{product.skin_type}</TableCell>
+                                            <TableCell>{product.price_range}</TableCell>
                                             <TableCell>
                                                 <IconButton
                                                     color="primary"
-                                                    onClick={() => handleEdit(post)}
+                                                    onClick={() => handleEdit(product)}
                                                     disabled={isSubmitting}
                                                 >
                                                     <MdEdit size={24} />
                                                 </IconButton>
                                                 <IconButton
                                                     color="error"
-                                                    onClick={() => handleDelete(post.review_id)}
+                                                    onClick={() => handleDelete(product.product_id)}
                                                     disabled={isSubmitting}
                                                 >
                                                     <MdDeleteOutline size={24} />
                                                 </IconButton>
                                             </TableCell>
-                                            <TableCell>{new Date(post.createdAt).toLocaleDateString()}</TableCell>
                                         </TableRow>
                                     ))
                                 )}
@@ -239,71 +329,179 @@ function Posts() {
                 </Box>
             </Box>
 
-            {/* Edit Dialog */}
-            <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="md">
-                <DialogTitle>Edit Post</DialogTitle>
+            {/* Product Dialog (Create/Edit) */}
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="md">
+                <DialogTitle>{isCreateMode ? 'Create New Product' : 'Edit Product'}</DialogTitle>
                 <DialogContent>
                     <Box component="form" sx={{ mt: 2 }}>
-                        {requiredFields
-                            .filter((field) => field !== 'ingredients')
-                            .map((field) => (
-                                <Box key={field} sx={{ mb: 3 }}>
-                                    <Box display="flex" alignItems="center" mb={1}>
-                                        <CgAsterisk style={{ color: 'red', marginRight: 8 }} />
-                                        <Typography variant="subtitle1">
-                                            {field.charAt(0).toUpperCase() + field.slice(1)}
-                                        </Typography>
-                                    </Box>
+                        {/* Required Fields */}
+                        {requiredFields.map((field) => (
+                            <Box key={field} sx={{ mb: 3 }}>
+                                <Box display="flex" alignItems="center" mb={1}>
+                                    <CgAsterisk style={{ color: 'red', marginRight: 8 }} />
+                                    <Typography variant="subtitle1">
+                                        {field
+                                            .split('_')
+                                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                                            .join(' ')}
+                                    </Typography>
+                                </Box>
+
+                                {field === 'product_type' ? (
+                                    <FormControl fullWidth>
+                                        <Select
+                                            name={field}
+                                            value={currentProduct?.[field] || ''}
+                                            onChange={handleChange}
+                                            disabled={isSubmitting}
+                                        >
+                                            {productTypes.map((type) => (
+                                                <MenuItem key={type} value={type}>
+                                                    {type}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                ) : field === 'skin_type' ? (
+                                    <FormControl fullWidth>
+                                        <Select
+                                            name={field}
+                                            value={currentProduct?.[field] || ''}
+                                            onChange={handleChange}
+                                            disabled={isSubmitting}
+                                        >
+                                            {skinTypes.map((type) => (
+                                                <MenuItem key={type} value={type}>
+                                                    {type}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                ) : field === 'price_range' ? (
+                                    <FormControl fullWidth>
+                                        <Select
+                                            name={field}
+                                            value={currentProduct?.[field] || ''}
+                                            onChange={handleChange}
+                                            disabled={isSubmitting}
+                                        >
+                                            {priceRanges.map((range) => (
+                                                <MenuItem key={range} value={range}>
+                                                    {range}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                ) : (
                                     <TextField
                                         fullWidth
-                                        multiline
-                                        rows={4}
                                         name={field}
-                                        value={editData?.[field] || ''}
-                                        onChange={handleEditChange}
+                                        value={currentProduct?.[field] || ''}
+                                        onChange={handleChange}
                                         disabled={isSubmitting}
                                     />
-                                </Box>
-                            ))}
-
-                        <Box sx={{ mb: 3 }}>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <CgAsterisk style={{ color: 'red', marginRight: 8 }} />
-                                <Typography variant="subtitle1">Ingredients</Typography>
+                                )}
                             </Box>
-                            <FormControl fullWidth>
-                                <Select
-                                    name="ingredients"
-                                    value={editData?.ingredients || ''}
-                                    onChange={handleEditChange}
-                                    disabled={isSubmitting}
-                                >
-                                    <MenuItem value="" disabled>
-                                        Select an ingredient
-                                    </MenuItem>
-                                    {ingredients.map((ingredient) => (
-                                        <MenuItem key={ingredient.ingredient_id} value={ingredient.ingredient_id}>
-                                            {ingredient.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        ))}
+
+                        {/* Optional Fields */}
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                Product Description
+                            </Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={4}
+                                name="product_description"
+                                value={currentProduct?.product_description || ''}
+                                onChange={handleChange}
+                                disabled={isSubmitting}
+                            />
                         </Box>
 
                         <Box sx={{ mb: 3 }}>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <CgAsterisk style={{ color: 'red', marginRight: 8 }} />
-                                <Typography variant="subtitle1">Image</Typography>
-                            </Box>
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                Warning
+                            </Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                name="warning"
+                                value={currentProduct?.warning || ''}
+                                onChange={handleChange}
+                                disabled={isSubmitting}
+                            />
+                        </Box>
+
+                        {/* Benefits */}
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                Benefits
+                            </Typography>
+                            <Stack direction="row" flexWrap="wrap" gap={1}>
+                                {benefitFields.map((field) => (
+                                    <FormControlLabel
+                                        key={field.name}
+                                        control={
+                                            <Checkbox
+                                                checked={currentProduct?.[field.name] || false}
+                                                onChange={handleChange}
+                                                name={field.name}
+                                                color="primary"
+                                            />
+                                        }
+                                        label={field.label}
+                                    />
+                                ))}
+                            </Stack>
+                        </Box>
+
+                        {/* Ingredients */}
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                Ingredients
+                            </Typography>
+                            <Autocomplete
+                                multiple
+                                options={ingredients}
+                                getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
+                                value={selectedIngredients}
+                                onChange={handleIngredientChange}
+                                renderInput={(params) => (
+                                    <TextField {...params} variant="outlined" placeholder="Select ingredients" />
+                                )}
+                                renderTags={(value, getTagProps) =>
+                                    value.map((option, index) => (
+                                        <Chip
+                                            key={option}
+                                            label={ingredients.find((i) => i.ingredient_id === option)?.name || option}
+                                            {...getTagProps({ index })}
+                                        />
+                                    ))
+                                }
+                                isOptionEqualToValue={(option, value) =>
+                                    option.ingredient_id === value || option === value
+                                }
+                                disabled={isSubmitting}
+                            />
+                        </Box>
+
+                        {/* Image Upload */}
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                Product Image
+                            </Typography>
 
                             {/* Current Image */}
-                            {editData?.img_path && (
+                            {currentProduct?.picture && !newImageId && (
                                 <Box sx={{ mb: 2 }}>
                                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                         Current Image:
                                     </Typography>
                                     <img
-                                        src={`https://res.cloudinary.com/dppaihihm/image/upload/${editData.img_path}.jpg`}
+                                        src={`https://res.cloudinary.com/dppaihihm/image/upload/${currentProduct.picture}.jpg`}
                                         alt="Current"
                                         style={{
                                             maxWidth: '100%',
@@ -347,15 +545,21 @@ function Posts() {
                 <DialogActions>
                     <Button
                         onClick={() => {
-                            setOpenEdit(false);
+                            setOpenDialog(false);
                             setNewImageId(null);
                         }}
                         disabled={isSubmitting}
                     >
                         Cancel
                     </Button>
-                    <Button onClick={handleUpdate} color="primary" variant="contained" disabled={isSubmitting}>
-                        {isSubmitting ? 'Updating...' : 'Update Post'}
+                    <Button onClick={handleSubmit} color="primary" variant="contained" disabled={isSubmitting}>
+                        {isSubmitting
+                            ? isCreateMode
+                                ? 'Creating...'
+                                : 'Updating...'
+                            : isCreateMode
+                            ? 'Create Product'
+                            : 'Update Product'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -363,4 +567,4 @@ function Posts() {
     );
 }
 
-export default Posts;
+export default ManageProducts;
