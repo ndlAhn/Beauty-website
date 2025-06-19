@@ -1,10 +1,4 @@
-import './homepage.css';
-import Header from '../../components/header/header.js';
-import Footer from '../../components/footer/footer.js';
-import Slogan from '../../pages/home/slogan.png';
-import { FaRegHeart, FaExternalLinkAlt } from 'react-icons/fa';
-import ChatBox from '../../components/chatBox/chatBox.js';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Card,
@@ -12,14 +6,24 @@ import {
     CardMedia,
     Typography,
     Grid,
+    Button,
+    CircularProgress,
+    Chip,
+    IconButton,
+    Rating,
     Dialog,
     DialogTitle,
     DialogContent,
-    Button,
-    CircularProgress,
 } from '@mui/material';
+import { FaRegHeart, FaExternalLinkAlt, FaStar, FaStarHalfAlt } from 'react-icons/fa';
 import { FiFilter } from 'react-icons/fi';
+import Header from '../../components/header/header.js';
+import Footer from '../../components/footer/footer.js';
+import ChatBox from '../../components/chatBox/chatBox.js';
+import Slogan from '../../pages/home/slogan.png';
 import instance from '../../axios/instance.js';
+import './homepage.css';
+
 function Homepage() {
     const [products, setProducts] = useState([]);
     const [reviews, setReviews] = useState([]);
@@ -35,17 +39,17 @@ function Homepage() {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Fetch tất cả dữ liệu
+    // Fetch all data
     useEffect(() => {
         const fetchAllData = async () => {
             try {
-                // Fetch products và reviews
+                // Fetch products and reviews
                 const [productsRes, reviewsRes] = await Promise.all([
-                    instance.get('/get-all-products'),
-                    instance.get('/get-all-reviews'),
+                    instance.get('/get-all-products?limit=12'),
+                    instance.get('/get-all-reviews?limit=4'),
                 ]);
-                setProducts(productsRes.data);
-                setReviews(reviewsRes.data);
+                setProducts(productsRes.data.products || []);
+                setReviews(reviewsRes.data || []);
                 setLoading((prev) => ({ ...prev, products: false, reviews: false }));
 
                 // Fetch beauty news
@@ -59,7 +63,7 @@ function Homepage() {
         fetchAllData();
     }, []);
 
-    // Fetch beauty news theo category
+    // Fetch beauty news by category
     const fetchBeautyNews = async (category) => {
         setLoading((prev) => ({ ...prev, news: true }));
         setError(null);
@@ -120,14 +124,35 @@ function Homepage() {
 
     // Helper functions
     const getCloudinaryImage = (publicId) => {
-        return publicId ? `https://res.cloudinary.com/dppaihihm/image/upload/${publicId}.jpg` : null;
+        return publicId
+            ? `https://res.cloudinary.com/dppaihihm/image/upload/w_500,h_500,c_fill/${publicId}.jpg`
+            : '/placeholder-product.png';
     };
 
+    const renderRating = (rating) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(<FaStar key={`full-${i}`} color="#ffc107" />);
+        }
+
+        if (hasHalfStar) {
+            stars.push(<FaStarHalfAlt key="half" color="#ffc107" />);
+        }
+
+        return stars;
+    };
+
+    // Product data processing
     const newArrivals = [...products].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
 
-    const newReviews = [...reviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
-
     const recommendedProducts = [...products].filter((product) => product.price_range === 'highend').slice(0, 4);
+
+    const bestSellers = [...products].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0)).slice(0, 4);
+
+    const newReviews = [...reviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
 
     if (loading.products || loading.reviews) {
         return (
@@ -139,7 +164,7 @@ function Homepage() {
     }
 
     return (
-        <div>
+        <div className="home-container">
             <Header />
             <div className="home-wrap">
                 {/* Banner Slogan */}
@@ -148,9 +173,9 @@ function Homepage() {
                 </div>
 
                 {/* Hot News Section */}
-                <div className="home-news-content">
+                <div className="section-container">
                     <div className="section-header">
-                        <h3>Hot News</h3>
+                        <h2>Hot News</h2>
                         <div className="news-filter">
                             <select
                                 value={newsCategory}
@@ -192,48 +217,215 @@ function Homepage() {
                             ))}
                         </Grid>
                     )}
-                    <div className="home-new-more">
-                        <a href="/news">See all news</a>
+                    <div className="section-footer">
+                        <Button variant="outlined" onClick={() => navigate('/news')} endIcon={<FaExternalLinkAlt />}>
+                            See All News
+                        </Button>
                     </div>
                 </div>
 
-                {/* Các sections khác giữ nguyên... */}
-                <div className="home-news-content">
-                    <h3>New arrivals</h3>
+                {/* New Arrivals Section */}
+                <div className="section-container">
+                    <div className="section-header">
+                        <h2>New Arrivals</h2>
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigate('/products')}
+                            endIcon={<FaExternalLinkAlt />}
+                        >
+                            View All
+                        </Button>
+                    </div>
                     <Grid container spacing={3}>
                         {newArrivals.map((product) => (
                             <Grid item xs={12} sm={6} md={3} key={product.product_id}>
-                                <Card onClick={() => navigate(`/product-detail/${product.product_id}`)}>
+                                <Card
+                                    className="product-card"
+                                    onClick={() => navigate(`/product-detail/${product.product_id}`)}
+                                >
+                                    <div className="product-badge">
+                                        {product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
+                                            <Chip label="NEW" color="primary" size="small" />
+                                        )}
+                                    </div>
                                     <CardMedia
                                         component="img"
-                                        height="200"
-                                        image={getCloudinaryImage(product.picture) || '/placeholder-product.png'}
+                                        height="250"
+                                        image={getCloudinaryImage(product.picture)}
                                         alt={product.product_name}
+                                        className="product-image"
                                     />
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h6">
+                                    <CardContent className="product-content">
+                                        <Typography gutterBottom variant="h6" className="product-name">
                                             {product.product_name}
                                         </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {product.brand} • {product.product_type}
+                                        <Typography variant="subtitle2" className="product-brand">
+                                            {product.brand}
+                                        </Typography>
+                                        <div className="product-rating">
+                                            {renderRating(product.averageRating || 0)}
+                                            <span>({product.reviewCount || 0})</span>
+                                        </div>
+                                        <Typography variant="body2" className="product-price">
+                                            ${product.price || 'N/A'}
+                                        </Typography>
+                                    </CardContent>
+                                    <IconButton className="wishlist-icon">
+                                        <FaRegHeart />
+                                    </IconButton>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </div>
+
+                {/* Best Sellers Section */}
+                <div className="section-container">
+                    <div className="section-header">
+                        <h2>Best Sellers</h2>
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigate('/products?sort=rating')}
+                            endIcon={<FaExternalLinkAlt />}
+                        >
+                            View All
+                        </Button>
+                    </div>
+                    <Grid container spacing={3}>
+                        {bestSellers.map((product) => (
+                            <Grid item xs={12} sm={6} md={3} key={product.product_id}>
+                                <Card
+                                    className="product-card"
+                                    onClick={() => navigate(`/product-detail/${product.product_id}`)}
+                                >
+                                    <div className="product-badge">
+                                        <Chip label="BEST" color="secondary" size="small" />
+                                    </div>
+                                    <CardMedia
+                                        component="img"
+                                        height="250"
+                                        image={getCloudinaryImage(product.picture)}
+                                        alt={product.product_name}
+                                        className="product-image"
+                                    />
+                                    <CardContent className="product-content">
+                                        <Typography gutterBottom variant="h6" className="product-name">
+                                            {product.product_name}
+                                        </Typography>
+                                        <Typography variant="subtitle2" className="product-brand">
+                                            {product.brand}
+                                        </Typography>
+                                        <div className="product-rating">
+                                            <Rating
+                                                value={product.averageRating || 0}
+                                                precision={0.5}
+                                                readOnly
+                                                size="small"
+                                            />
+                                            <span>({product.reviewCount || 0})</span>
+                                        </div>
+                                        <Typography variant="body2" className="product-price">
+                                            ${product.price || 'N/A'}
                                         </Typography>
                                     </CardContent>
                                 </Card>
                             </Grid>
                         ))}
                     </Grid>
-                    <div className="home-new-more">
-                        <a href="/products">See all products</a>
+                </div>
+
+                {/* Recommended Products Section */}
+                <div className="section-container">
+                    <div className="section-header">
+                        <h2>Recommended For You</h2>
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigate('/products?filter=highend')}
+                            endIcon={<FaExternalLinkAlt />}
+                        >
+                            View All
+                        </Button>
                     </div>
+                    <Grid container spacing={3}>
+                        {recommendedProducts.map((product) => (
+                            <Grid item xs={12} sm={6} md={3} key={product.product_id}>
+                                <Card
+                                    className="product-card premium"
+                                    onClick={() => navigate(`/product-detail/${product.product_id}`)}
+                                >
+                                    <div className="product-badge">
+                                        <Chip label="PREMIUM" color="warning" size="small" />
+                                    </div>
+                                    <CardMedia
+                                        component="img"
+                                        height="250"
+                                        image={getCloudinaryImage(product.picture)}
+                                        alt={product.product_name}
+                                        className="product-image"
+                                    />
+                                    <CardContent className="product-content">
+                                        <Typography gutterBottom variant="h6" className="product-name">
+                                            {product.product_name}
+                                        </Typography>
+                                        <Typography variant="subtitle2" className="product-brand">
+                                            {product.brand}
+                                        </Typography>
+                                        <div className="product-features">
+                                            {product.hypoallergenic && <Chip label="Hypoallergenic" size="small" />}
+                                            {product.cruelty_free && <Chip label="Cruelty Free" size="small" />}
+                                        </div>
+                                        <Typography variant="body2" className="product-price">
+                                            ${product.price || 'N/A'}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </div>
+
+                {/* Product Categories Section */}
+                <div className="section-container">
+                    <h2>Shop By Category</h2>
+                    <Grid container spacing={2}>
+                        {['Cleansers', 'Moisturizers', 'Serums', 'Sunscreen'].map((category) => (
+                            <Grid item xs={6} sm={3} key={category}>
+                                <Card
+                                    className="category-card"
+                                    onClick={() => navigate(`/products?category=${category.toLowerCase()}`)}
+                                >
+                                    <CardMedia
+                                        component="img"
+                                        height="150"
+                                        image={`/categories/${category.toLowerCase()}.jpg`}
+                                        alt={category}
+                                    />
+                                    <CardContent>
+                                        <Typography align="center" variant="h6">
+                                            {category}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
                 </div>
 
                 {/* New Reviews Section */}
-                <div className="home-news-content">
-                    <h3>New reviews</h3>
+                <div className="section-container">
+                    <div className="section-header">
+                        <h2>Latest Reviews</h2>
+                        <Button variant="outlined" onClick={() => navigate('/reviews')} endIcon={<FaExternalLinkAlt />}>
+                            View All
+                        </Button>
+                    </div>
                     <Grid container spacing={3}>
                         {newReviews.map((review) => (
                             <Grid item xs={12} sm={6} md={3} key={review.review_id}>
-                                <Card onClick={() => navigate(`/review-detail/${review.review_id}`)}>
+                                <Card
+                                    className="review-card"
+                                    onClick={() => navigate(`/review-detail/${review.review_id}`)}
+                                >
                                     <CardMedia
                                         component="img"
                                         height="140"
@@ -247,45 +439,14 @@ function Homepage() {
                                         <Typography variant="body2" color="text.secondary">
                                             {review.user_id} • {new Date(review.createdAt).toLocaleDateString()}
                                         </Typography>
+                                        <div className="review-rating">
+                                            <Rating value={review.rating || 0} precision={0.5} readOnly size="small" />
+                                        </div>
                                     </CardContent>
                                 </Card>
                             </Grid>
                         ))}
                     </Grid>
-                    <div className="home-new-more">
-                        <a href="/reviews">See all reviews</a>
-                    </div>
-                </div>
-
-                {/* Recommended Products Section */}
-                <div className="home-news-content">
-                    <h3>Recommends</h3>
-                    <Grid container spacing={3}>
-                        {recommendedProducts.map((product) => (
-                            <Grid item xs={12} sm={6} md={3} key={product.product_id}>
-                                <Card onClick={() => navigate(`/product-detail/${product.product_id}`)}>
-                                    <CardMedia
-                                        component="img"
-                                        height="200"
-                                        image={getCloudinaryImage(product.picture) || '/placeholder-product.png'}
-                                        alt={product.product_name}
-                                    />
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h6">
-                                            {product.product_name}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {product.price_range} • {product.product_type}
-                                        </Typography>
-                                    </CardContent>
-                                    <FaRegHeart className="heart-icon" />
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                    <div className="home-new-more">
-                        <a href="/products">See all</a>
-                    </div>
                 </div>
             </div>
 

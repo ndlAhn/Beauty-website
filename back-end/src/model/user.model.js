@@ -62,7 +62,7 @@ module.exports = (sequelize, Sequelize) => {
                 allowNull: true,
             },
             hydration: {
-                type: DataTypes.STRING,
+                type: DataTypes.BOOLEAN,
                 allowNull: true,
             },
             acne_control: {

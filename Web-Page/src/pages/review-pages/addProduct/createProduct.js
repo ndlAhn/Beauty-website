@@ -53,6 +53,12 @@ function CreateProduct() {
         dried: false,
         oily: false,
         skin_recovery: false,
+        hydration: false,
+        acne_control: false,
+        anti_aging: false,
+        brightening: false,
+        oil_control: false,
+        smooth_and_repair: false,
         product_description: '',
         price_range: '',
         warning: '',
@@ -154,7 +160,6 @@ function CreateProduct() {
         }
 
         try {
-            // Prepare the payload according to your service
             const payload = {
                 ...formData,
                 picture: publicId,
@@ -163,9 +168,8 @@ function CreateProduct() {
 
             const response = await instance.post('/create-product', payload);
 
-            if (response.status === 200) {
+            if (response.status === 201) {
                 alert('Product created successfully!');
-                // Reset form
                 setFormData({
                     product_name: '',
                     brand: '',
@@ -178,6 +182,12 @@ function CreateProduct() {
                     dried: false,
                     oily: false,
                     skin_recovery: false,
+                    hydration: false,
+                    acne_control: false,
+                    anti_aging: false,
+                    brightening: false,
+                    oil_control: false,
+                    smooth_and_repair: false,
                     product_description: '',
                     price_range: '',
                     warning: '',
@@ -287,6 +297,30 @@ function CreateProduct() {
                                             onChange={handleChange}
                                         />
                                         <Typography>{problem.label}</Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+
+                            {/* Skin Goals Checkboxes */}
+                            <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
+                                Skin Goals:
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                                {[
+                                    { label: 'Hydration', name: 'hydration' },
+                                    { label: 'Acne Control', name: 'acne_control' },
+                                    { label: 'Anti-Aging', name: 'anti_aging' },
+                                    { label: 'Brightening', name: 'brightening' },
+                                    { label: 'Oil Control', name: 'oil_control' },
+                                    { label: 'Smooth & Repair', name: 'smooth_and_repair' },
+                                ].map((goal) => (
+                                    <Box key={goal.name} sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Checkbox
+                                            name={goal.name}
+                                            checked={formData[goal.name]}
+                                            onChange={handleChange}
+                                        />
+                                        <Typography>{goal.label}</Typography>
                                     </Box>
                                 ))}
                             </Box>

@@ -154,3 +154,246 @@
     border-radius: 8px;
     margin-bottom: 16px;
 }
+
+/* Base Styles */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.home-wrap {
+    flex: 1;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Loading States */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 20px;
+}
+
+.loading-news {
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+/* Banner */
+.slogan-banner {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.slogan-banner img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Sections */
+.section-container {
+    margin: 40px 0;
+    padding: 0 10px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.section-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* News Section */
+.news-card {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+}
+
+.news-title {
+    font-weight: 600;
+    min-height: 60px;
+}
+
+.category-select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Product Cards */
+.product-card {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-card.premium {
+    border: 1px solid #ffc107;
+}
+
+.product-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+}
+
+.product-image {
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+.product-content {
+    flex-grow: 1;
+    padding: 16px;
+}
+
+.product-name {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.product-brand {
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.product-price {
+    font-weight: 700;
+    color: #d32f2f;
+    margin-top: 8px;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 8px 0;
+}
+
+.product-features {
+    display: flex;
+    gap: 5px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+
+.wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #ccc;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    padding: 8px;
+}
+
+.wishlist-icon:hover {
+    color: #f44336;
+}
+
+/* Category Cards */
+.category-card {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    text-align: center;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.category-card:hover {
+    transform: scale(1.03);
+}
+
+/* Review Cards */
+.review-card {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+}
+
+.review-rating {
+    margin-top: 8px;
+}
+
+/* Chat Box */
+.chatbox-wrapper {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .product-card,
+    .news-card,
+    .review-card {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-wrap {
+        padding: 10px;
+    }
+
+    .section-container {
+        margin: 30px 0;
+    }
+}
