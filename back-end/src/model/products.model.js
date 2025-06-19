@@ -20,12 +20,35 @@ module.exports = (sequelize, Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            skin_type: {
-                type: DataTypes.ENUM('oily', 'dry', 'normal', 'combination', 'sensitive', 'all'),
+
+            acne: {
+                type: DataTypes.BOOLEAN,
                 allowNull: false,
+                defaultValue: false,
             },
-            skin_problem: {
-                type: DataTypes.ENUM('acne', 'aging', 'dried', 'oily', 'enlarged pores', 'scarring', 'skin recovery'),
+            aging: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            dried: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            oily: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            skin_recovery: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+
+            skin_type: {
+                type: DataTypes.ENUM('oily', 'dry', 'normal', 'combination', 'sensitive', 'acne'),
                 allowNull: false,
             },
 

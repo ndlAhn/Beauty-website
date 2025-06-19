@@ -1,4 +1,3 @@
-// createProduct.js (simplified version without the table)
 import './createProduct.css';
 import { useContext, useState, useEffect, useRef } from 'react';
 import SubHeader from '../../../components/subHeader/subHeader';
@@ -44,13 +43,16 @@ function CreateProduct() {
     const [selectedIngredients, setSelectedIngredients] = useState([]);
     const [formData, setFormData] = useState({
         product_name: '',
-        product_details: '',
         brand: '',
         product_type: '',
         uses: '',
         capacity: '',
         skin_type: '',
-        skin_problem: '',
+        acne: false,
+        aging: false,
+        dried: false,
+        oily: false,
+        skin_recovery: false,
         product_description: '',
         price_range: '',
         warning: '',
@@ -59,6 +61,7 @@ function CreateProduct() {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (window.cloudinary && uploadButtonRef.current) {
@@ -66,7 +69,6 @@ function CreateProduct() {
                 { cloudName, uploadPreset },
                 (error, result) => {
                     if (!error && result && result.event === 'success') {
-                        console.log('Upload successful:', result.info);
                         setPublicId(result.info.public_id);
                     }
                 },
@@ -110,7 +112,12 @@ function CreateProduct() {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value, type, checked } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
     };
 
     const handleSearchChange = (e) => {
@@ -138,41 +145,39 @@ function CreateProduct() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
         if (!formData.product_name || !publicId) {
             alert('Product name and image are required');
+            setIsSubmitting(false);
             return;
         }
 
         try {
-            const productResponse = await instance.post('/create-product', {
+            // Prepare the payload according to your service
+            const payload = {
                 ...formData,
                 picture: publicId,
-                user_id: state.userData.user_id,
-            });
+                ingredients: selectedIngredients.map((ing) => ({ ingredient_id: ing.ingredient_id })),
+            };
 
-            if (productResponse.status === 200) {
-                const productId = productResponse.data.product_id;
+            const response = await instance.post('/create-product', payload);
 
-                if (selectedIngredients.length > 0) {
-                    await instance.post('/product-ingredients', {
-                        product_id: productId,
-                        ingredients: selectedIngredients.map((ing) => ({
-                            ingredient_id: ing.ingredient_id,
-                        })),
-                    });
-                }
-
+            if (response.status === 200) {
                 alert('Product created successfully!');
+                // Reset form
                 setFormData({
                     product_name: '',
-                    product_details: '',
                     brand: '',
                     product_type: '',
                     uses: '',
                     capacity: '',
                     skin_type: '',
-                    skin_problem: '',
+                    acne: false,
+                    aging: false,
+                    dried: false,
+                    oily: false,
+                    skin_recovery: false,
                     product_description: '',
                     price_range: '',
                     warning: '',
@@ -181,7 +186,10 @@ function CreateProduct() {
                 setSelectedIngredients([]);
             }
         } catch (error) {
-            console.error('Error submitting product:', error);
+            console.error('Error creating product:', error);
+            alert('Error creating product. Please try again.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -196,208 +204,181 @@ function CreateProduct() {
                             CREATE PRODUCT
                         </Typography>
                         <form className="create-product-area" onSubmit={handleSubmit}>
-                            {[
-                                { label: 'Product Name', name: 'product_name' },
-                                { label: 'Product Details', name: 'product_details' },
-                                { label: 'Brand', name: 'brand' },
-                                { label: 'Uses', name: 'uses' },
-                                { label: 'Capacity', name: 'capacity' },
-                                { label: 'Product Description', name: 'product_description' },
-                                { label: 'Warning', name: 'warning' },
-                            ].map((field, index) => (
-                                <TextField
-                                    key={index}
-                                    label={field.label}
-                                    name={field.name}
-                                    value={formData[field.name]}
+                            {/* Product Name */}
+                            <TextField
+                                label="Product Name"
+                                name="product_name"
+                                value={formData.product_name}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                sx={{ my: 1 }}
+                            />
+
+                            {/* Brand */}
+                            <TextField
+                                label="Brand"
+                                name="brand"
+                                value={formData.brand}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                sx={{ my: 1 }}
+                            />
+
+                            {/* Product Type Dropdown */}
+                            <FormControl fullWidth sx={{ my: 1 }} required>
+                                <InputLabel>Product Type</InputLabel>
+                                <Select
+                                    name="product_type"
+                                    value={formData.product_type}
                                     onChange={handleChange}
-                                    fullWidth
-                                    required
-                                    sx={{ my: 1 }}
-                                />
-                            ))}
+                                    label="Product Type"
+                                >
+                                    {[
+                                        'cleanser',
+                                        'toner',
+                                        'serum',
+                                        'moisturizer',
+                                        'sunscreen',
+                                        'mask',
+                                        'exfoliator',
+                                    ].map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
-                            {/* Dropdowns */}
-                            {[
-                                {
-                                    label: 'Product Type',
-                                    name: 'product_type',
-                                    options: ['Cleanser', 'Toner', 'Serum'],
-                                },
-                                { label: 'Skin Type', name: 'skin_type', options: ['Oily', 'Dry', 'Combination'] },
-                                { label: 'Skin Problem', name: 'skin_problem', options: ['Acne', 'Aging'] },
-                                {
-                                    label: 'Price Range',
-                                    name: 'price_range',
-                                    options: ['Drugstore', 'Midrange', 'High-end'],
-                                },
-                            ].map((dropdown, index) => (
-                                <FormControl key={index} fullWidth sx={{ my: 1 }}>
-                                    <InputLabel id={`${index}-label`} sx={{ color: '#3c4b57' }}>
-                                        {dropdown.label}
-                                    </InputLabel>
-                                    <Select
-                                        id={index + 'create-product-select'}
-                                        labelId={`${index}-label`}
-                                        name={dropdown.name}
-                                        value={formData[dropdown.name]}
-                                        onChange={handleChange}
-                                        label={dropdown.label}
-                                    >
-                                        {dropdown.options.map((option) => (
-                                            <MenuItem key={option} value={option.toLowerCase()}>
-                                                {option}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            ))}
+                            {/* Skin Type Dropdown */}
+                            <FormControl fullWidth sx={{ my: 1 }} required>
+                                <InputLabel>Skin Type</InputLabel>
+                                <Select
+                                    name="skin_type"
+                                    value={formData.skin_type}
+                                    onChange={handleChange}
+                                    label="Skin Type"
+                                >
+                                    {['oily', 'dry', 'normal', 'combination', 'sensitive', 'acne'].map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
-                            {/* Ingredients Selection */}
-                            <div className="review-input-area">
-                                <h5>Ingredients:</h5>
-                                <Button variant="outlined" onClick={() => setOpenIngredientDialog(true)} sx={{ ml: 2 }}>
-                                    Add Ingredients
-                                </Button>
-                            </div>
+                            {/* Skin Problems Checkboxes */}
+                            <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
+                                Skin Problems:
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                                {[
+                                    { label: 'Acne', name: 'acne' },
+                                    { label: 'Aging', name: 'aging' },
+                                    { label: 'Dryness', name: 'dried' },
+                                    { label: 'Oiliness', name: 'oily' },
+                                    { label: 'Skin Recovery', name: 'skin_recovery' },
+                                ].map((problem) => (
+                                    <Box key={problem.name} sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Checkbox
+                                            name={problem.name}
+                                            checked={formData[problem.name]}
+                                            onChange={handleChange}
+                                        />
+                                        <Typography>{problem.label}</Typography>
+                                    </Box>
+                                ))}
+                            </Box>
 
-                            {/* Selected Ingredients Chips */}
+                            {/* Price Range Dropdown */}
+                            <FormControl fullWidth sx={{ my: 1 }} required>
+                                <InputLabel>Price Range</InputLabel>
+                                <Select
+                                    name="price_range"
+                                    value={formData.price_range}
+                                    onChange={handleChange}
+                                    label="Price Range"
+                                >
+                                    {['drugstore', 'midrange', 'highend'].map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            {/* Capacity */}
+                            <TextField
+                                label="Capacity"
+                                name="capacity"
+                                value={formData.capacity}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                sx={{ my: 1 }}
+                            />
+
+                            {/* Uses */}
+                            <TextField
+                                label="Uses"
+                                name="uses"
+                                value={formData.uses}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                                multiline
+                                rows={3}
+                                sx={{ my: 1 }}
+                            />
+
+                            {/* Product Description */}
+                            <TextField
+                                label="Product Description"
+                                name="product_description"
+                                value={formData.product_description}
+                                onChange={handleChange}
+                                fullWidth
+                                multiline
+                                rows={3}
+                                sx={{ my: 1 }}
+                            />
+
+                            {/* Warning */}
+                            <TextField
+                                label="Warning"
+                                name="warning"
+                                value={formData.warning}
+                                onChange={handleChange}
+                                fullWidth
+                                multiline
+                                rows={3}
+                                sx={{ my: 1 }}
+                            />
+
+                            {/* Ingredients Section */}
+                            <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
+                                Ingredients:
+                            </Typography>
+                            <Button variant="outlined" onClick={() => setOpenIngredientDialog(true)} sx={{ mb: 2 }}>
+                                Add Ingredients
+                            </Button>
+
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, my: 2 }}>
                                 {selectedIngredients.map((ingredient) => (
                                     <Chip
                                         key={ingredient.ingredient_id}
                                         label={ingredient.name}
                                         onDelete={() => toggleIngredient(ingredient)}
-                                        sx={{
-                                            backgroundColor: '#e3f2fd',
-                                            '& .MuiChip-deleteIcon': {
-                                                color: '#1976d2',
-                                                '&:hover': {
-                                                    color: '#0d47a1',
-                                                },
-                                            },
-                                        }}
+                                        sx={{ m: 0.5 }}
                                     />
                                 ))}
                             </Box>
 
-                            {/* Ingredient Search Dialog */}
-                            <Dialog
-                                open={openIngredientDialog}
-                                onClose={() => {
-                                    setOpenIngredientDialog(false);
-                                    setSearchTerm('');
-                                    setSearchResults([]);
-                                }}
-                                fullWidth
-                                maxWidth="sm"
-                            >
-                                <DialogTitle>Add Ingredients</DialogTitle>
-                                <DialogContent>
-                                    <TextField
-                                        autoFocus
-                                        margin="dense"
-                                        label="Search Ingredients"
-                                        fullWidth
-                                        variant="outlined"
-                                        value={searchTerm}
-                                        onChange={handleSearchChange}
-                                        sx={{ mb: 2 }}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <SearchIcon />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                    />
-
-                                    {isSearching ? (
-                                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                                            <CircularProgress />
-                                        </Box>
-                                    ) : (
-                                        <List
-                                            sx={{
-                                                maxHeight: 400,
-                                                overflow: 'auto',
-                                                border: '1px solid #eee',
-                                                borderRadius: 1,
-                                            }}
-                                        >
-                                            {searchResults.length > 0
-                                                ? searchResults.map((ingredient) => (
-                                                      <ListItem
-                                                          key={ingredient.ingredient_id}
-                                                          disablePadding
-                                                          secondaryAction={
-                                                              <Checkbox
-                                                                  edge="end"
-                                                                  checked={selectedIngredients.some(
-                                                                      (item) =>
-                                                                          item.ingredient_id ===
-                                                                          ingredient.ingredient_id,
-                                                                  )}
-                                                                  onChange={() => toggleIngredient(ingredient)}
-                                                              />
-                                                          }
-                                                      >
-                                                          <ListItemButton onClick={() => toggleIngredient(ingredient)}>
-                                                              <ListItemText primary={ingredient.name} />
-                                                          </ListItemButton>
-                                                      </ListItem>
-                                                  ))
-                                                : ingredients.map((ingredient) => (
-                                                      <ListItem
-                                                          key={ingredient.ingredient_id}
-                                                          disablePadding
-                                                          secondaryAction={
-                                                              <Checkbox
-                                                                  edge="end"
-                                                                  checked={selectedIngredients.some(
-                                                                      (item) =>
-                                                                          item.ingredient_id ===
-                                                                          ingredient.ingredient_id,
-                                                                  )}
-                                                                  onChange={() => toggleIngredient(ingredient)}
-                                                              />
-                                                          }
-                                                      >
-                                                          <ListItemButton onClick={() => toggleIngredient(ingredient)}>
-                                                              <ListItemText primary={ingredient.name} />
-                                                          </ListItemButton>
-                                                      </ListItem>
-                                                  ))}
-                                        </List>
-                                    )}
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button
-                                        onClick={() => {
-                                            setOpenIngredientDialog(false);
-                                            setSearchTerm('');
-                                            setSearchResults([]);
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button onClick={handleAddIngredients} variant="contained">
-                                        Add Selected
-                                    </Button>
-                                </DialogActions>
-                            </Dialog>
-
-                            <textarea
-                                onChange={handleChange}
-                                name="description"
-                                placeholder="Description"
-                                value={formData.description}
-                            ></textarea>
-
                             {/* Image Upload */}
                             <div className="review-input-area">
                                 <span className="asterisk">
-                                    <h5>Picture</h5>
+                                    <h5>Product Image</h5>
                                     <CgAsterisk style={{ color: 'red' }} />
                                 </span>
                                 <button
@@ -406,13 +387,14 @@ function CreateProduct() {
                                     ref={uploadButtonRef}
                                     className="product-upload-btn"
                                 >
-                                    Upload picture
+                                    <IoIosCloudUpload size={20} style={{ marginRight: '8px' }} />
+                                    Upload Image
                                 </button>
                                 {publicId && (
                                     <div className="image-preview">
                                         <img
                                             src={`https://res.cloudinary.com/${cloudName}/image/upload/${publicId}.jpg`}
-                                            alt="Uploaded"
+                                            alt="Uploaded product"
                                             className="preview-img"
                                         />
                                         <button
@@ -425,15 +407,84 @@ function CreateProduct() {
                                     </div>
                                 )}
                             </div>
-                            <div className="post-area">
-                                <button className="post-product-btn" type="submit">
-                                    POST PRODUCT
-                                </button>
-                            </div>
+
+                            {/* Submit Button */}
+                            <Box sx={{ mt: 3 }}>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                    size="large"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <CircularProgress size={24} sx={{ mr: 1 }} />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Create Product'
+                                    )}
+                                </Button>
+                            </Box>
                         </form>
                     </div>
                 </div>
             </div>
+
+            {/* Ingredient Dialog */}
+            <Dialog open={openIngredientDialog} onClose={() => setOpenIngredientDialog(false)} fullWidth maxWidth="sm">
+                <DialogTitle>Select Ingredients</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Search Ingredients"
+                        fullWidth
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={{ mb: 2 }}
+                    />
+
+                    {isSearching ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : (
+                        <List sx={{ maxHeight: 400, overflow: 'auto' }}>
+                            {(searchResults.length > 0 ? searchResults : ingredients).map((ingredient) => (
+                                <ListItem
+                                    key={ingredient.ingredient_id}
+                                    secondaryAction={
+                                        <Checkbox
+                                            edge="end"
+                                            checked={selectedIngredients.some(
+                                                (item) => item.ingredient_id === ingredient.ingredient_id,
+                                            )}
+                                            onChange={() => toggleIngredient(ingredient)}
+                                        />
+                                    }
+                                >
+                                    <ListItemText primary={ingredient.name} />
+                                </ListItem>
+                            ))}
+                        </List>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenIngredientDialog(false)}>Cancel</Button>
+                    <Button onClick={handleAddIngredients} variant="contained">
+                        Add Selected
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
