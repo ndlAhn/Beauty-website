@@ -20,10 +20,6 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Checkbox,
-    FormControl,
-    Select,
-    ListItemText,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CreateIcon from '@mui/icons-material/Create';
@@ -37,6 +33,8 @@ import Header from '../../components/header/header.js';
 import Footer from '../../components/footer/footer.js';
 import instance from '../../axios/instance.js';
 import StateContext from '../../context/context.context.js';
+import CreatePost from '../../components/community/CreatePost';
+import CommunityPost from '../../components/community/CommunityPost';
 
 function Community() {
     // State for posts and filters
@@ -44,64 +42,19 @@ function Community() {
     const [anchorEl, setAnchorEl] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [openPostDialog, setOpenPostDialog] = useState(false);
-    const [newPost, setNewPost] = useState({
-        title: '',
-        content: '',
-    });
+    const [state] = useContext(StateContext);
+    const [posts, setPosts] = useState([]);
 
-    const [state, dispatchState] = useContext(StateContext);
+    // Fetch posts from backend
+    const fetchPosts = async () => {
+        const token = localStorage.getItem('token');
+        const res = await instance.get('/community/posts', { headers: { Authorization: `Bearer ${token}` } });
+        setPosts(res.data);
+    };
 
-    // Sample posts data
-    const [posts, setPosts] = useState([
-        {
-            id: 1,
-            user: 'BeautyExpert',
-            title: 'Best skincare routine for summer',
-            content: 'Here are my top recommendations...',
-            comments: [
-                {
-                    id: 1,
-                    user: 'User1',
-                    text: 'Great tips!',
-                    replies: [{ id: 1, user: 'BeautyExpert', text: 'Thanks!' }],
-                },
-                {
-                    id: 2,
-                    user: 'User2',
-                    text: 'What about for oily skin?',
-                    replies: [],
-                },
-            ],
-            likes: 24,
-            isLiked: false,
-            date: '2025-04-28',
-            isPopular: true,
-        },
-        {
-            id: 2,
-            user: 'MakeupLover',
-            title: 'New foundation review',
-            content: 'Just tried this new product...',
-            comments: [
-                {
-                    id: 3,
-                    user: 'User3',
-                    text: "How's the coverage?",
-                    replies: [],
-                },
-            ],
-            likes: 15,
-            isLiked: false,
-            date: '2025-04-30',
-            isNew: true,
-        },
-    ]);
-
-    const topCreators = [
-        { id: 1, name: 'BeautyGuru', posts: 42, avatar: 'B' },
-        { id: 2, name: 'SkinCareExpert', posts: 38, avatar: 'S' },
-        { id: 3, name: 'MakeupArtist', posts: 29, avatar: 'M' },
-    ];
+    React.useEffect(() => {
+        fetchPosts();
+    }, []);
 
     // Filter menu handlers
     const handleFilterClick = (event) => {
@@ -140,32 +93,6 @@ function Community() {
 
     const handleClosePostDialog = () => {
         setOpenPostDialog(false);
-        setNewPost({ title: '', content: '' });
-    };
-
-    const handleCreatePost = async () => {
-        const response = await instance.post('/create-review', {
-            titile: newPost.title,
-            conclusion: newPost.content,
-            user_id: state.userData.user_id,
-            type_review: 'post',
-        });
-        if (!newPost.title || !newPost.content) return;
-
-        const post = {
-            id: posts.length + 1,
-            user: 'CurrentUser',
-            title: newPost.title,
-            content: newPost.content,
-            comments: [],
-            likes: 0,
-            isLiked: false,
-            date: new Date().toISOString().split('T')[0],
-            isNew: true,
-        };
-
-        setPosts([post, ...posts]);
-        handleClosePostDialog();
     };
 
     // Filter posts based on search and active filter
@@ -200,10 +127,8 @@ function Community() {
     return (
         <Box sx={{ color: '#3C4B57' }}>
             <Header />
-
             <Box sx={{ p: 4 }}>
                 <Grid container spacing={4}>
-                    {/* Left column - Create post and Top Creators */}
                     <Grid item xs={12} md={3}>
                         <Paper elevation={3} sx={{ p: 3, mb: 4, position: 'sticky', top: 20 }}>
                             <Button
@@ -219,41 +144,21 @@ function Community() {
                                         backgroundColor: '#d8a5a5',
                                     },
                                 }}
-                                onClick={handleOpenPostDialog}
+                                onClick={() => setOpenPostDialog(true)}
                             >
                                 Create New Post
                             </Button>
-
-                            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-                                Top Creators
-                            </Typography>
-                            {/*  */}
-                            <Stack spacing={2}>
-                                {topCreators.map((creator) => (
-                                    <Card key={creator.id} variant="outlined">
-                                        <CardHeader
-                                            avatar={<Avatar sx={{ bgcolor: 'primary.main' }}>{creator.avatar}</Avatar>}
-                                            title={creator.name}
-                                            subheader={`${creator.posts} posts`}
-                                        />
-                                    </Card>
-                                ))}
-                            </Stack>
                         </Paper>
                     </Grid>
-
-                    {/* Right column - Main content */}
                     <Grid item xs={12} md={9}>
                         <Paper elevation={3} sx={{ p: 3 }}>
                             <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
                                 Beauty Community
                             </Typography>
-
                             <Typography variant="body1" sx={{ mb: 3 }}>
                                 Welcome to beauty community! Ask our experts anything about beauty, lifestyle, or daily
                                 life. We're here to help—drop your questions below!
                             </Typography>
-
                             <TextField
                                 fullWidth
                                 placeholder="Search posts..."
@@ -268,7 +173,6 @@ function Community() {
                                 }}
                                 sx={{ mb: 3 }}
                             />
-
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                                 <Button
                                     variant="outlined"
@@ -298,132 +202,9 @@ function Community() {
                             <Divider sx={{ my: 2 }} />
 
                             <Stack spacing={3}>
-                                {filteredPosts.length > 0 ? (
-                                    filteredPosts.map((post) => (
-                                        <Card key={post.id} elevation={2}>
-                                            <CardHeader
-                                                avatar={
-                                                    <Avatar sx={{ bgcolor: 'secondary.main' }}>
-                                                        {post.user.charAt(0)}
-                                                    </Avatar>
-                                                }
-                                                title={post.user}
-                                                subheader={post.title}
-                                            />
-
-                                            <CardContent>
-                                                <Typography variant="body1" paragraph>
-                                                    {post.content}
-                                                </Typography>
-
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <IconButton onClick={() => handleLikePost(post.id)}>
-                                                            {post.isLiked ? (
-                                                                <FavoriteIcon color="error" />
-                                                            ) : (
-                                                                <FavoriteBorderIcon />
-                                                            )}
-                                                        </IconButton>
-                                                        <Typography variant="body2">{post.likes}</Typography>
-                                                    </Box>
-
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <ChatBubbleOutlineIcon fontSize="small" />
-                                                        <Typography variant="body2">{post.comments.length}</Typography>
-                                                    </Box>
-
-                                                    <Typography
-                                                        variant="caption"
-                                                        color="text.secondary"
-                                                        sx={{ ml: 'auto' }}
-                                                    >
-                                                        {post.date}
-                                                    </Typography>
-                                                </Box>
-                                            </CardContent>
-
-                                            {post.comments.length > 0 && (
-                                                <Box
-                                                    sx={{
-                                                        bgcolor: 'action.hover',
-                                                        p: 2,
-                                                        borderTop: '1px solid',
-                                                        borderColor: 'divider',
-                                                    }}
-                                                >
-                                                    <Typography variant="subtitle2" gutterBottom>
-                                                        Comments ({post.comments.length})
-                                                    </Typography>
-
-                                                    <Stack spacing={2}>
-                                                        {post.comments.map((comment) => (
-                                                            <Box key={comment.id}>
-                                                                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                                                                    <Avatar
-                                                                        sx={{
-                                                                            width: 24,
-                                                                            height: 24,
-                                                                            fontSize: 12,
-                                                                            bgcolor: 'primary.light',
-                                                                        }}
-                                                                    >
-                                                                        {comment.user.charAt(0)}
-                                                                    </Avatar>
-                                                                    <Typography variant="body2">
-                                                                        <strong>{comment.user}:</strong> {comment.text}
-                                                                    </Typography>
-                                                                </Box>
-
-                                                                <Box
-                                                                    sx={{
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        ml: 5,
-                                                                    }}
-                                                                >
-                                                                    <IconButton size="small" sx={{ mr: 1 }}>
-                                                                        <ReplyIcon fontSize="small" />
-                                                                    </IconButton>
-                                                                    <Typography
-                                                                        variant="caption"
-                                                                        color="text.secondary"
-                                                                    >
-                                                                        Reply
-                                                                    </Typography>
-                                                                </Box>
-
-                                                                {comment.replies.length > 0 && (
-                                                                    <Box sx={{ ml: 5, mt: 1 }}>
-                                                                        {comment.replies.map((reply) => (
-                                                                            <Box
-                                                                                key={reply.id}
-                                                                                sx={{ display: 'flex', gap: 1, mb: 1 }}
-                                                                            >
-                                                                                <Avatar
-                                                                                    sx={{
-                                                                                        width: 24,
-                                                                                        height: 24,
-                                                                                        fontSize: 12,
-                                                                                        bgcolor: 'secondary.light',
-                                                                                    }}
-                                                                                >
-                                                                                    {reply.user.charAt(0)}
-                                                                                </Avatar>
-                                                                                <Typography variant="body2">
-                                                                                    <strong>{reply.user}:</strong>{' '}
-                                                                                    {reply.text}
-                                                                                </Typography>
-                                                                            </Box>
-                                                                        ))}
-                                                                    </Box>
-                                                                )}
-                                                            </Box>
-                                                        ))}
-                                                    </Stack>
-                                                </Box>
-                                            )}
-                                        </Card>
+                                {posts.length > 0 ? (
+                                    posts.map((post) => (
+                                        <CommunityPost key={post.post_id} post={post} onAction={fetchPosts} />
                                     ))
                                 ) : (
                                     <Typography variant="body1" color="text.secondary" textAlign="center" py={4}>
@@ -437,48 +218,16 @@ function Community() {
             </Box>
 
             {/* Create Post Dialog */}
-            <Dialog open={openPostDialog} onClose={handleClosePostDialog} maxWidth="md" fullWidth>
+            <Dialog open={openPostDialog} onClose={() => setOpenPostDialog(false)} maxWidth="md" fullWidth>
                 <DialogTitle>Create new post</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        label="Title"
-                        fullWidth
-                        variant="outlined"
-                        value={newPost.title}
-                        onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                        sx={{ mb: 3 }}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Content"
-                        fullWidth
-                        variant="outlined"
-                        multiline
-                        rows={4}
-                        value={newPost.content}
-                        onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                    <CreatePost
+                        onPostCreated={() => {
+                            setOpenPostDialog(false);
+                            fetchPosts();
+                        }}
                     />
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClosePostDialog} sx={{ color: '#3C4B57' }}>
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleCreatePost}
-                        variant="contained"
-                        sx={{
-                            backgroundColor: '#DFB5B5',
-                            color: '#3C4B57',
-                            '&:hover': {
-                                backgroundColor: '#d8a5a5',
-                            },
-                        }}
-                    >
-                        Post
-                    </Button>
-                </DialogActions>
             </Dialog>
 
             <Footer />

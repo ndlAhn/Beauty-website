@@ -19,13 +19,21 @@ function ProfileSidebar() {
                     <li>
                         <RiProfileLine className="profile-sidebar-icon" />
                         <Link to="/profile" className="sidebar-link">
-                            Profile
+                            My Profile
                         </Link>
                     </li>
                     <li>
-                    <MdOutlineSettings className="pi-icon"/>
-                    <Link to="/personal-information" className="sidebar-link">Personal information</Link>
-                </li>
+                        <RiProfileLine className="profile-sidebar-icon" />
+                        <Link to="/profile/other-user-id" className="sidebar-link">
+                            Public Profile
+                        </Link>
+                    </li>
+                    <li>
+                        <MdOutlineSettings className="pi-icon" />
+                        <Link to="/personal-information" className="sidebar-link">
+                            Personal information
+                        </Link>
+                    </li>
                     <li>
                         <FaRegHeart className="post-icon" />
                         <Link to="/liked-posts" className="sidebar-link">

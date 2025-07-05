@@ -33,22 +33,26 @@ import BeautyFinder from './pages/beautyFinder/beautyFinder';
 import ManageReview from './pages/review-pages/manageReview/manageReview';
 import ManageProducts from './pages/review-pages/manageProduct/manageProduct';
 
+import Cookies from 'js-cookie';
+import CombinedProfile from './pages/profile-page/profile/CombinedProfile';
+
 function App() {
     const [state, dispatchState] = useContext(StateContext);
     const navigate = useNavigate();
     useEffect(() => {
-        // const token = localStorage.getItem('token');
-        // const userId = localStorage.getItem('token');
-        // if (token && userId) {
-        //     instance
-        //         .post('/get-user-data-by-id')
-        //         .then((res) => {
-        //             console.log(res.data);
-        //         })
-        //         .catch((err) => {
-        //             console.log(err);
-        //         });
-        // }
+        // On first load, check for user cookie and fetch user data
+        const userId = Cookies.get('userId');
+        const token = Cookies.get('token');
+        if (userId && token && !state.login) {
+            instance
+                .post('/get-user-data-by-id', { user_id: userId }, { headers: { Authorization: `Bearer ${token}` } })
+                .then((res) => {
+                    dispatchState({ type: 'LOGGED', payload: res.data });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
         if (state.login === false) {
             navigate('/log-in');
         }
@@ -75,8 +79,9 @@ function App() {
             <Route path="/news" element={<News />} />
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/reviews" element={<Review />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/personal-information" element={<PersonalInfo />} />
+            <Route path="/profile" element={<CombinedProfile />} />
+            <Route path="/profile/:userId" element={<CombinedProfile />} />
+            <Route path="/personal-information" element={<CombinedProfile />} />
             <Route path="/liked-posts" element={<LikedPost />} />
             <Route path="/liked-products" element={<LikedProduct />} />
             <Route path="/create-incredient" element={<AddIncredient />} />

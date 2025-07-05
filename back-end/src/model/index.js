@@ -18,6 +18,8 @@ db.Reviews = require('./review.model')(sequelize, Sequelize);
 db.TableOfIngredient = require('./tableOfIngredient.model')(sequelize, Sequelize);
 db.Follower = require('./follower.model')(sequelize, Sequelize);
 db.Alergic = require('./alergic.model')(sequelize, Sequelize);
+db.CommunityPost = require('./communityPost.sequelize')(sequelize, Sequelize);
+db.CommunityComment = require('./communityComment.sequelize')(sequelize, Sequelize);
 //table relationship
 //Product_reviews
 

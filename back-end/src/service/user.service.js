@@ -18,7 +18,7 @@ const handleError = (res, error, message = 'Internal Server Error') => {
 
 exports.create = async (req, res) => {
     try {
-        const { name, username, password, dob, gender } = req.body;
+        const { name, username, password, dob, gender, avt_file_path } = req.body;
 
         if (!name || !username || !password || !dob || !gender) {
             return res.status(400).json({
@@ -45,6 +45,7 @@ exports.create = async (req, res) => {
             password: hashedPassword,
             dob,
             gender,
+            avt_file_path: avt_file_path || null,
         });
 
         // Omit sensitive data from response

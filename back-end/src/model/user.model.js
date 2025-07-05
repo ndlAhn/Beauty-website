@@ -19,6 +19,10 @@ module.exports = (sequelize, Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+            avt_file_path: {
+                type: DataTypes.STRING,
+                allowNull: true, // Avatar is optional
+            },
             gender: {
                 type: DataTypes.STRING,
                 alowNull: false,

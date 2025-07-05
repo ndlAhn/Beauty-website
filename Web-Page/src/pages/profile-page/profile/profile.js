@@ -1,11 +1,11 @@
 import './profile.css';
 import SubHeader from '../../../components/subHeader/subHeader';
 import ProfileSidebar from '../../../components/sidebar/profile-sidebar/profileSidebar';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useContext, useEffect, useState, useRef } from 'react';
 import StateContext from '../../../context/context.context';
 import instance from '../../../axios/instance';
 import { BiEditAlt } from 'react-icons/bi';
-import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -20,10 +20,19 @@ import {
     CircularProgress,
     Snackbar,
     Alert,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    FormLabel,
+    MenuItem,
+    Select,
+    Chip,
 } from '@mui/material';
 import { DialogTitle, DialogContent } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
+import CommunityPost from '../../../components/community/CommunityPost';
 
 function formatDate(isoString) {
     const date = new Date(isoString);
@@ -86,11 +95,43 @@ const CloudinaryUploadWidget = ({ uwConfig, onUploadSuccess, disabled }) => {
     );
 };
 
+const SKIN_TYPES = [
+    { value: 'oily', label: 'Oily skin' },
+    { value: 'dry', label: 'Dry skin' },
+    { value: 'normal', label: 'Normal skin' },
+    { value: 'combination', label: 'Combination skin' },
+    { value: 'sensitive', label: 'Sensitive skin' },
+    { value: 'acne_prone', label: 'Acne-prone skin' },
+];
+const SKIN_PROBLEMS = [
+    { value: 'acne', label: 'Acne' },
+    { value: 'aging', label: 'Aging' },
+    { value: 'dried', label: 'Dried skin' },
+    { value: 'oily', label: 'Oily skin' },
+    { value: 'enlarged_pores', label: 'Enlarged pores' },
+    { value: 'scarring', label: 'Scarring' },
+    { value: 'skin_recovery', label: 'Skin recovery' },
+];
+const SKINCARE_GOALS = [
+    { value: 'hydration', label: 'Hydration' },
+    { value: 'acne_control', label: 'Acne Control' },
+    { value: 'anti_aging', label: 'Anti-Aging' },
+    { value: 'brightening', label: 'Brightening' },
+    { value: 'oil_control', label: 'Oil Control' },
+    { value: 'smooth_and_repair', label: 'Smooth & Repair' },
+];
+
 function Profile() {
+    const { userId } = useParams();
     const [state, dispatchState] = useContext(StateContext);
     const [reviews, setReviews] = useState([]);
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
+    const [user, setUser] = useState(null);
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [followCount, setFollowCount] = useState({ followers: 0, following: 0 });
     const cloudName = 'dppaihihm';
     const [open, setOpen] = useState(false);
     const [tabIndex, setTabIndex] = useState(0);
@@ -110,30 +151,59 @@ function Profile() {
         publicId: '',
         imageUrl: '',
     });
+    const [skinType, setSkinType] = useState(state.userData?.skin_type || '');
+    const [skinProblems, setSkinProblems] = useState(state.userData?.skinProblems || {});
+    const [skincareGoals, setSkincareGoals] = useState(state.userData?.skincareGoals || {});
+    const [allergies, setAllergies] = useState(state.userData?.allergies || []);
     const navigate = useNavigate();
 
     // Fetch dữ liệu ban đầu
     useEffect(() => {
-        if (!state.userData?.user_id) return;
+        if (userId) {
+            // Public profile view
+            setLoading(true);
+            instance
+                .post('/get-user-data-by-id', { user_id: userId })
+                .then((res) => {
+                    setUser(res.data.data);
+                    setFollowCount({
+                        followers: res.data.data.followers || 0,
+                        following: res.data.data.following || 0,
+                    });
+                    return instance.get('/community/posts', {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                    });
+                })
+                .then((postsRes) => {
+                    const userPosts = postsRes.data.filter((p) => p.user_id === userId);
+                    setPosts(userPosts);
+                })
+                .catch(() => {
+                    setUser(null);
+                    setPosts([]);
+                })
+                .finally(() => setLoading(false));
+        } else if (state.userData?.user_id) {
+            // Own profile view
+            // Fetch bài viết
+            instance
+                .post('/get-review-by-user-id', { user_id: state.userData.user_id })
+                .then((res) => setReviews(res.data))
+                .catch(console.error);
 
-        // Fetch bài viết
-        instance
-            .post('/get-review-by-user-id', { user_id: state.userData.user_id })
-            .then((res) => setReviews(res.data))
-            .catch(console.error);
+            // Fetch followers
+            instance
+                .get(`/api/followers/followers/${state.userData.user_id}`)
+                .then((res) => setFollowers(res.data))
+                .catch(console.error);
 
-        // Fetch followers
-        instance
-            .post('/get-followers', { user_id: state.userData.user_id })
-            .then((res) => setFollowers(res.data))
-            .catch(console.error);
-
-        // Fetch following
-        instance
-            .post('/get-following', { user_id: state.userData.user_id })
-            .then((res) => setFollowing(res.data))
-            .catch(console.error);
-    }, [state.userData?.user_id]);
+            // Fetch following
+            instance
+                .get(`/api/followers/following/${state.userData.user_id}`)
+                .then((res) => setFollowing(res.data))
+                .catch(console.error);
+        }
+    }, [userId, state.userData?.user_id]);
 
     const handleUploadSuccess = (imageData) => {
         setNewImageData(imageData);
@@ -219,6 +289,96 @@ function Profile() {
             setIsSubmitting(false);
         }
     };
+
+    // Add this for public profile follow button
+    const handleFollow = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const currentUserId = localStorage.getItem('userId');
+            await instance.post(
+                '/api/followers/follow',
+                { userId: currentUserId, userFollowId: userId },
+                { headers: { Authorization: `Bearer ${token}` } },
+            );
+            setIsFollowing(true);
+            setFollowCount((prev) => ({ ...prev, followers: prev.followers + 1 }));
+        } catch (e) {
+            // handle error
+        }
+    };
+
+    // Render logic
+    if (userId) {
+        // Public profile view
+        if (loading) return <CircularProgress sx={{ mt: 8 }} />;
+        if (!user) return <Typography sx={{ mt: 8 }}>User not found.</Typography>;
+        return (
+            <Box display="flex" flexDirection="column" alignItems="center" mt="50px" minHeight="100vh" bgcolor="#fff">
+                <Button variant="outlined" sx={{ alignSelf: 'flex-start', ml: 2, mb: 2 }} onClick={() => navigate(-1)}>
+                    Back
+                </Button>
+                <Avatar
+                    sx={{ width: 120, height: 120, bgcolor: '#dfb5b5' }}
+                    src={
+                        user.avt_file_path
+                            ? `https://res.cloudinary.com/dppaihihm/image/upload/${user.avt_file_path}.jpg`
+                            : undefined
+                    }
+                />
+                <Typography variant="h5" sx={{ mt: 2, color: '#3c4b57', fontWeight: 500 }}>
+                    {user.name}
+                </Typography>
+                <Typography variant="h6" sx={{ color: '#3c4b57', mt: 1 }}>
+                    {user.bio || 'Share story or quote...'}
+                </Typography>
+                <Box display="flex" justifyContent="center" mt={3}>
+                    {['Posts', 'Followers', 'Following'].map((label, index) => (
+                        <Box key={index} mx={3} textAlign="center">
+                            <Typography variant="h6" sx={{ color: '#3c4b57' }}>
+                                {label === 'Posts'
+                                    ? posts.length
+                                    : label === 'Followers'
+                                    ? followCount.followers
+                                    : followCount.following}
+                            </Typography>
+                            <Typography variant="h6" sx={{ color: '#3c4b57' }}>
+                                {label}
+                            </Typography>
+                        </Box>
+                    ))}
+                </Box>
+                <Button
+                    variant="contained"
+                    sx={{
+                        mt: 3,
+                        backgroundColor: '#DFB5B5',
+                        color: '#3c4b57',
+                        borderRadius: '20px',
+                        px: 4,
+                        py: 1,
+                        textTransform: 'none',
+                        '&:hover': { backgroundColor: '#8a4040' },
+                    }}
+                    onClick={handleFollow}
+                    disabled={isFollowing}
+                >
+                    {isFollowing ? 'Following' : 'Follow'}
+                </Button>
+                <Box width="100%" maxWidth="800px" mt={4} px={2}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                        <Typography variant="h5" sx={{ color: '#3c4b57' }}>
+                            {user.name}'s posts:
+                        </Typography>
+                    </Box>
+                    {posts.length === 0 ? (
+                        <Typography>No posts yet.</Typography>
+                    ) : (
+                        posts.map((post) => <CommunityPost key={post.post_id} post={post} onAction={() => {}} />)
+                    )}
+                </Box>
+            </Box>
+        );
+    }
 
     return (
         <div>
@@ -466,14 +626,7 @@ function Profile() {
                             <Divider />
 
                             <DialogContent>
-                                <Box
-                                    display="flex"
-                                    justifyContent="center"
-                                    mt={2}
-                                    mb={2}
-                                    position="relative"
-                                    sx={{ flexDirection: 'column', alignItems: 'center' }}
-                                >
+                                <Box display="flex" flexDirection="column" alignItems="center">
                                     <Avatar
                                         src={
                                             newImageData.imageUrl ||
@@ -485,19 +638,11 @@ function Profile() {
                                         sx={{ width: 120, height: 120, marginBottom: '10px' }}
                                     />
                                     <CloudinaryUploadWidget
-                                        uwConfig={{
-                                            cloudName: 'dppaihihm',
-                                            uploadPreset: 'Beauty Web',
-                                        }}
+                                        uwConfig={{ cloudName: 'dppaihihm', uploadPreset: 'Beauty Web' }}
                                         onUploadSuccess={handleUploadSuccess}
                                         disabled={isSubmitting}
                                     />
                                 </Box>
-
-                                <Typography variant="subtitle1" gutterBottom>
-                                    About you:
-                                </Typography>
-
                                 <TextField
                                     label="Name"
                                     fullWidth
@@ -505,7 +650,6 @@ function Profile() {
                                     value={displayName}
                                     onChange={(e) => setDisplayName(e.target.value)}
                                 />
-
                                 <TextField
                                     label="Bio"
                                     fullWidth
@@ -516,6 +660,69 @@ function Profile() {
                                     onChange={(e) => setBio(e.target.value)}
                                     placeholder="Share story or quote..."
                                 />
+                                <FormControl fullWidth sx={{ mt: 2 }}>
+                                    <FormLabel>Skin type</FormLabel>
+                                    <Select value={skinType} onChange={(e) => setSkinType(e.target.value)}>
+                                        {SKIN_TYPES.map((type) => (
+                                            <MenuItem key={type.value} value={type.value}>
+                                                {type.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <FormControl fullWidth sx={{ mt: 2 }}>
+                                    <FormLabel>Skin problems</FormLabel>
+                                    <FormGroup>
+                                        {SKIN_PROBLEMS.map((problem) => (
+                                            <FormControlLabel
+                                                key={problem.value}
+                                                control={
+                                                    <Checkbox
+                                                        checked={!!skinProblems[problem.value]}
+                                                        onChange={() =>
+                                                            setSkinProblems((sp) => ({
+                                                                ...sp,
+                                                                [problem.value]: !sp[problem.value],
+                                                            }))
+                                                        }
+                                                    />
+                                                }
+                                                label={problem.label}
+                                            />
+                                        ))}
+                                    </FormGroup>
+                                </FormControl>
+                                <FormControl fullWidth sx={{ mt: 2 }}>
+                                    <FormLabel>Skincare goals</FormLabel>
+                                    <FormGroup>
+                                        {SKINCARE_GOALS.map((goal) => (
+                                            <FormControlLabel
+                                                key={goal.value}
+                                                control={
+                                                    <Checkbox
+                                                        checked={!!skincareGoals[goal.value]}
+                                                        onChange={() =>
+                                                            setSkincareGoals((sg) => ({
+                                                                ...sg,
+                                                                [goal.value]: !sg[goal.value],
+                                                            }))
+                                                        }
+                                                    />
+                                                }
+                                                label={goal.label}
+                                            />
+                                        ))}
+                                    </FormGroup>
+                                </FormControl>
+                                <FormControl fullWidth sx={{ mt: 2 }}>
+                                    <FormLabel>Allergies</FormLabel>
+                                    <TextField
+                                        label="Allergies (comma separated)"
+                                        value={allergies.join(', ')}
+                                        onChange={(e) => setAllergies(e.target.value.split(',').map((a) => a.trim()))}
+                                        fullWidth
+                                    />
+                                </FormControl>
                             </DialogContent>
                         </Dialog>
 

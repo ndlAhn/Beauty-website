@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('./model');
+const communityRoutes = require('./routes/community.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,6 +30,7 @@ require('./controller/productReview.controller')(app);
 require('./controller/reviews.controller')(app);
 require('./controller/ingredient.controller')(app);
 require('./controller/follower.controller')(app);
+app.use('/community', communityRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
