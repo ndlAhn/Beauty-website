@@ -52,6 +52,7 @@ function ProductDetails() {
         { id: 'capacity', label: 'Capacity' },
         { id: 'price-range', label: 'Price Range' },
         { id: 'skin-type', label: 'Skin Type' },
+        { id: 'skin-problems', label: 'Skin Problems' },
         { id: 'benefits', label: 'Benefits' },
         { id: 'ingredients', label: 'Ingredients' },
         { id: 'product-description', label: 'Description' },
@@ -70,19 +71,54 @@ function ProductDetails() {
         }
     };
 
+    const renderSkinTypes = () => {
+        if (!product?.skin_types || product.skin_types.length === 0) {
+            return <p>No skin type information available</p>;
+        }
+
+        return (
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                {product.skin_types.map((type) => (
+                    <Chip 
+                        key={type} 
+                        label={type.charAt(0).toUpperCase() + type.slice(1)} 
+                        variant="outlined" 
+                    />
+                ))}
+            </Stack>
+        );
+    };
+
+    const renderSkinProblems = () => {
+        const problems = [];
+        if (product?.acne_prone) problems.push('Acne-prone');
+        if (product?.dull_skin) problems.push('Dull skin');
+        if (product?.large_pores) problems.push('Large pores');
+        if (product?.uneven) problems.push('Uneven skin tone');
+        if (product?.dark_spot) problems.push('Dark spots & hyperpigmentation');
+        if (product?.redness) problems.push('Redness & irritation');
+        if (product?.dehydrated) problems.push('Dehydrated skin');
+        if (product?.wrinkles) problems.push('Wrinkles & fine lines');
+
+        return problems.length > 0 ? (
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                {problems.map((problem) => (
+                    <Chip key={problem} label={problem} variant="outlined" />
+                ))}
+            </Stack>
+        ) : (
+            <p>No specific skin problems listed</p>
+        );
+    };
+
     const renderBenefits = () => {
         const benefits = [];
-        if (product?.acne) benefits.push('Acne');
-        if (product?.aging) benefits.push('Aging');
-        if (product?.dried) benefits.push('Dry Skin');
-        if (product?.oily) benefits.push('Oily Skin');
-        if (product?.skin_recovery) benefits.push('Skin Recovery');
-        if (product?.hydration) benefits.push('Hydration');
+        if (product?.hydration) benefits.push('Hydration & Moisturizing');
         if (product?.acne_control) benefits.push('Acne Control');
-        if (product?.anti_aging) benefits.push('Anti-Aging');
+        if (product?.anti_aging) benefits.push('Anti-aging');
         if (product?.brightening) benefits.push('Brightening');
         if (product?.oil_control) benefits.push('Oil Control');
-        if (product?.smooth_and_repair) benefits.push('Smooth & Repair');
+        if (product?.smooth_and_repair) benefits.push('Soothing & Repair');
 
         return benefits.length > 0 ? (
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
@@ -108,7 +144,10 @@ function ProductDetails() {
                 <List dense>
                     {product.ingredients?.map((ingredient, index) => (
                         <ListItem key={index}>
-                            <ListItemText primary={ingredient?.name} secondary={ingredient?.function} />
+                            <ListItemText 
+                                primary={ingredient?.name} 
+                                secondary={ingredient?.function} 
+                            />
                         </ListItem>
                     ))}
                 </List>
@@ -266,7 +305,7 @@ function ProductDetails() {
                         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
                             Product Type
                         </Typography>
-                        <Typography>{product.product_type}</Typography>
+                        <Typography textTransform="capitalize">{product.product_type}</Typography>
                     </Box>
 
                     <Box id="capacity" className="element-review-details" sx={{ mb: 4 }}>
@@ -280,14 +319,21 @@ function ProductDetails() {
                         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
                             Price Range
                         </Typography>
-                        <Typography>{product.price_range}</Typography>
+                        <Typography textTransform="capitalize">{product.price_range}</Typography>
                     </Box>
 
                     <Box id="skin-type" className="element-review-details" sx={{ mb: 4 }}>
                         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
                             Skin Type
                         </Typography>
-                        <Typography>{product.skin_type}</Typography>
+                        {renderSkinTypes()}
+                    </Box>
+
+                    <Box id="skin-problems" className="element-review-details" sx={{ mb: 4 }}>
+                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+                            Skin Problems
+                        </Typography>
+                        {renderSkinProblems()}
                     </Box>
 
                     <Box id="benefits" className="element-review-details" sx={{ mb: 4 }}>
