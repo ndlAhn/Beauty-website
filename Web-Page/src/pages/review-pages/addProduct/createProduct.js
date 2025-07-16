@@ -120,22 +120,22 @@ function CreateProduct() {
     // Unified skin types, skin problems, and skin goals (from user model)
     const skinTypeOptions = ['normal', 'dry', 'oily', 'combination', 'sensitive'];
     const skinProblemFields = [
-        { name: 'acne_prone', label: 'Mụn' },
-        { name: 'dull_skin', label: 'Da xỉn màu' },
-        { name: 'large_pores', label: 'Lỗ chân lông to' },
-        { name: 'uneven', label: 'Da không đều màu' },
-        { name: 'dark_spot', label: 'Đốm nâu/thâm' },
-        { name: 'redness', label: 'Đỏ da' },
-        { name: 'dehydrated', label: 'Thiếu nước' },
-        { name: 'wrinkles', label: 'Nếp nhăn' },
+        { name: 'acne_prone', label: 'Acne-prone' },
+        { name: 'dull_skin', label: 'Dull skin' },
+        { name: 'large_pores', label: 'Large pores' },
+        { name: 'uneven', label: 'Uneven skin tone' },
+        { name: 'dark_spot', label: 'Dark spots & hyperpigmentation' },
+        { name: 'redness', label: 'Redness & irritation' },
+        { name: 'dehydrated', label: 'Dehydrated skin' },
+        { name: 'wrinkles', label: 'Wrinkles & fine lines' },
     ];
     const skinGoalFields = [
-        { name: 'hydration', label: 'Thiếu ẩm' },
-        { name: 'acne_control', label: 'Kiểm soát mụn' },
-        { name: 'anti_aging', label: 'Chống lão hóa' },
-        { name: 'brightening', label: 'Làm sáng' },
-        { name: 'oil_control', label: 'Kiểm soát dầu' },
-        { name: 'smooth_and_repair', label: 'Làm mịn & phục hồi' },
+        { name: 'hydration', label: 'Hydration & Moisturizing' },
+        { name: 'acne_control', label: 'Acne Control' },
+        { name: 'anti_aging', label: 'Anti-aging' },
+        { name: 'brightening', label: 'Brightening' },
+        { name: 'oil_control', label: 'Oil Control' },
+        { name: 'smooth_and_repair', label: 'Soothing & Repair' },
     ];
 
     const handleChange = (e) => {
