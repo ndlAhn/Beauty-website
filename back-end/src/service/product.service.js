@@ -73,12 +73,14 @@ module.exports = {
                 'product_name',
                 'brand',
                 'product_type',
-                'skin_type',
+                'skin_types', // now expects array
                 'price_range',
                 'capacity',
                 'uses',
             ];
-            const missingFields = requiredFields.filter((field) => !req.body[field]);
+            const missingFields = requiredFields.filter(
+                (field) => !req.body[field] || (Array.isArray(req.body[field]) && req.body[field].length === 0),
+            );
 
             if (missingFields.length > 0) {
                 return res.status(400).json({
@@ -95,19 +97,22 @@ module.exports = {
                 product_name: req.body.product_name,
                 brand: req.body.brand,
                 product_type: req.body.product_type,
-                skin_type: req.body.skin_type,
+                skin_types: req.body.skin_types, // expects array
                 price_range: req.body.price_range,
                 capacity: req.body.capacity,
                 uses: req.body.uses,
                 warning: req.body.warning || null,
                 product_description: req.body.product_description || null,
                 picture: req.body.picture || null,
-                // Boolean fields with proper defaults
-                acne: req.body.acne ?? false,
-                aging: req.body.aging ?? false,
-                dried: req.body.dried ?? false,
-                oily: req.body.oily ?? false,
-                skin_recovery: req.body.skin_recovery ?? false,
+                // Unified skin problems/goals (from user model)
+                acne_prone: req.body.acne_prone ?? false,
+                dull_skin: req.body.dull_skin ?? false,
+                large_pores: req.body.large_pores ?? false,
+                uneven: req.body.uneven ?? false,
+                dark_spot: req.body.dark_spot ?? false,
+                redness: req.body.redness ?? false,
+                dehydrated: req.body.dehydrated ?? false,
+                wrinkles: req.body.wrinkles ?? false,
                 hydration: req.body.hydration ?? false,
                 acne_control: req.body.acne_control ?? false,
                 anti_aging: req.body.anti_aging ?? false,
@@ -164,7 +169,12 @@ module.exports = {
             for (const [key, value] of Object.entries(filters)) {
                 if (value === 'true' || value === 'false') {
                     whereConditions[key] = value === 'true';
-                } else if (key === 'skin_type' || key === 'price_range') {
+                } else if (key === 'skin_types' && value) {
+                    // Filter products that have at least one matching skin type
+                    whereConditions['skin_types'] = { [Op.contains]: [value] };
+                } else if (key === 'price_range') {
+                    whereConditions[key] = value;
+                } else if (key === 'product_type') {
                     whereConditions[key] = value;
                 }
             }
@@ -320,7 +330,7 @@ module.exports = {
                     product_name: req.body.product_name || product.product_name,
                     brand: req.body.brand || product.brand,
                     product_type: req.body.product_type || product.product_type,
-                    skin_type: req.body.skin_type || product.skin_type,
+                    skin_types: req.body.skin_types || product.skin_types,
                     price_range: req.body.price_range || product.price_range,
                     capacity: req.body.capacity || product.capacity,
                     uses: req.body.uses || product.uses,
@@ -330,13 +340,15 @@ module.exports = {
                             ? req.body.product_description
                             : product.product_description,
                     picture: req.body.picture !== undefined ? req.body.picture : product.picture,
-                    // Boolean fields
-                    acne: req.body.acne !== undefined ? req.body.acne : product.acne,
-                    aging: req.body.aging !== undefined ? req.body.aging : product.aging,
-                    dried: req.body.dried !== undefined ? req.body.dried : product.dried,
-                    oily: req.body.oily !== undefined ? req.body.oily : product.oily,
-                    skin_recovery:
-                        req.body.skin_recovery !== undefined ? req.body.skin_recovery : product.skin_recovery,
+                    // Unified skin problems/goals (from user model)
+                    acne_prone: req.body.acne_prone !== undefined ? req.body.acne_prone : product.acne_prone,
+                    dull_skin: req.body.dull_skin !== undefined ? req.body.dull_skin : product.dull_skin,
+                    large_pores: req.body.large_pores !== undefined ? req.body.large_pores : product.large_pores,
+                    uneven: req.body.uneven !== undefined ? req.body.uneven : product.uneven,
+                    dark_spot: req.body.dark_spot !== undefined ? req.body.dark_spot : product.dark_spot,
+                    redness: req.body.redness !== undefined ? req.body.redness : product.redness,
+                    dehydrated: req.body.dehydrated !== undefined ? req.body.dehydrated : product.dehydrated,
+                    wrinkles: req.body.wrinkles !== undefined ? req.body.wrinkles : product.wrinkles,
                     hydration: req.body.hydration !== undefined ? req.body.hydration : product.hydration,
                     acne_control: req.body.acne_control !== undefined ? req.body.acne_control : product.acne_control,
                     anti_aging: req.body.anti_aging !== undefined ? req.body.anti_aging : product.anti_aging,
@@ -363,10 +375,10 @@ module.exports = {
 
                     // Add new associations if any
                     if (req.body.ingredients.length > 0) {
-                        const productIngredients = req.body.ingredients.map((ingredientId) => ({
+                        const productIngredients = req.body.ingredients.map((ingredient) => ({
                             table_of_ingredient_id: uuidv4(),
                             product_id: req.params.productId,
-                            ingredient_id: ingredientId,
+                            ingredient_id: ingredient.ingredient_id,
                         }));
 
                         await ProductIngredient.bulkCreate(productIngredients, { transaction });

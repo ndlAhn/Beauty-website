@@ -20,6 +20,8 @@ import {
     FormControl,
     InputLabel,
     Pagination,
+    Checkbox,
+    ListItemText,
 } from '@mui/material';
 import { Search, FavoriteBorder } from '@mui/icons-material';
 import instance from '../../axios/instance.js';
@@ -31,7 +33,7 @@ function Products() {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [productType, setProductType] = useState('');
-    const [skinType, setSkinType] = useState('');
+    const [skinType, setSkinType] = useState([]); // now an array for multi-select
     const [priceRange, setPriceRange] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -70,7 +72,7 @@ function Products() {
     useEffect(() => {
         const filters = {};
         if (productType) filters.product_type = productType;
-        if (skinType) filters.skin_type = skinType;
+        if (skinType.length > 0) filters.skin_types = skinType; // send as array
         if (priceRange) filters.price_range = priceRange;
 
         fetchProducts(1, filters);
@@ -105,33 +107,39 @@ function Products() {
         setPage(value);
         fetchProducts(value, {
             product_type: productType,
-            skin_type: skinType,
+            skin_types: skinType,
             price_range: priceRange,
         });
     };
 
+    // Unified skin types, skin problems, and skin goals (from user model)
+    const skinTypeOptions = ['normal', 'dry', 'oily', 'combination', 'sensitive'];
+    const skinProblemFields = [
+        { name: 'acne_prone', label: 'Mụn' },
+        { name: 'dull_skin', label: 'Da xỉn màu' },
+        { name: 'large_pores', label: 'Lỗ chân lông to' },
+        { name: 'uneven', label: 'Da không đều màu' },
+        { name: 'dark_spot', label: 'Đốm nâu/thâm' },
+        { name: 'redness', label: 'Đỏ da' },
+        { name: 'dehydrated', label: 'Thiếu nước' },
+        { name: 'wrinkles', label: 'Nếp nhăn' },
+    ];
+    const skinGoalFields = [
+        { name: 'hydration', label: 'Thiếu ẩm' },
+        { name: 'acne_control', label: 'Kiểm soát mụn' },
+        { name: 'anti_aging', label: 'Chống lão hóa' },
+        { name: 'brightening', label: 'Làm sáng' },
+        { name: 'oil_control', label: 'Kiểm soát dầu' },
+        { name: 'smooth_and_repair', label: 'Làm mịn & phục hồi' },
+    ];
+
     // Handle skin problem filters (using boolean fields from your service)
     const handleSkinProblemFilter = (problem) => {
-        let filtered = [...products];
-
-        switch (problem) {
-            case 'acne':
-                filtered = filtered.filter((p) => p.acne || p.acne_control);
-                break;
-            case 'aging':
-                filtered = filtered.filter((p) => p.aging || p.anti_aging);
-                break;
-            case 'hydration':
-                filtered = filtered.filter((p) => p.hydration || p.dried);
-                break;
-            case 'oil_control':
-                filtered = filtered.filter((p) => p.oily || p.oil_control);
-                break;
-            default:
-                break;
+        if (!problem) {
+            setFilteredProducts(products);
+            return;
         }
-
-        setFilteredProducts(filtered);
+        setFilteredProducts(products.filter((p) => p[problem]));
     };
 
     return (
@@ -194,50 +202,68 @@ function Products() {
                                 <MenuItem value="Serum">Serum</MenuItem>
                                 <MenuItem value="Moisturizer">Moisturizer</MenuItem>
                                 <MenuItem value="Sunscreen">Sunscreen</MenuItem>
+                                <MenuItem value="Mask">Mask</MenuItem>
+                                <MenuItem value="Treatment">Treatment</MenuItem>
+                                <MenuItem value="Other">Other</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                         <FormControl fullWidth>
-                            <InputLabel>Skin Type</InputLabel>
-                            <Select value={skinType} onChange={(e) => setSkinType(e.target.value)} label="Skin Type">
-                                <MenuItem value="">All</MenuItem>
-                                <MenuItem value="Oily">Oily</MenuItem>
-                                <MenuItem value="Dry">Dry</MenuItem>
-                                <MenuItem value="Combination">Combination</MenuItem>
-                                <MenuItem value="Normal">Normal</MenuItem>
-                                <MenuItem value="Sensitive">Sensitive</MenuItem>
+                            <InputLabel>Skin Types</InputLabel>
+                            <Select
+                                multiple
+                                value={skinType}
+                                onChange={(e) =>
+                                    setSkinType(
+                                        typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value,
+                                    )
+                                }
+                                label="Skin Types"
+                                renderValue={(selected) => selected.join(', ')}
+                            >
+                                {skinTypeOptions.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                        <Checkbox checked={skinType.indexOf(option) > -1} />
+                                        <ListItemText primary={option.charAt(0).toUpperCase() + option.slice(1)} />
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
+                    {/* Skin Problem Filters */}
                     <Grid item xs={12} sm={6} md={3}>
                         <FormControl fullWidth>
-                            <InputLabel>Skin Concern</InputLabel>
+                            <InputLabel>Skin Problem</InputLabel>
                             <Select
                                 value=""
                                 onChange={(e) => handleSkinProblemFilter(e.target.value)}
-                                label="Skin Concern"
+                                label="Skin Problem"
                             >
                                 <MenuItem value="">All</MenuItem>
-                                <MenuItem value="acne">Acne</MenuItem>
-                                <MenuItem value="aging">Aging</MenuItem>
-                                <MenuItem value="hydration">Hydration</MenuItem>
-                                <MenuItem value="oil_control">Oil Control</MenuItem>
+                                {skinProblemFields.map((problem) => (
+                                    <MenuItem key={problem.name} value={problem.name}>
+                                        {problem.label}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
+                    {/* Skin Goal Filters */}
                     <Grid item xs={12} sm={6} md={3}>
                         <FormControl fullWidth>
-                            <InputLabel>Price Range</InputLabel>
+                            <InputLabel>Skin Goal</InputLabel>
                             <Select
-                                value={priceRange}
-                                onChange={(e) => setPriceRange(e.target.value)}
-                                label="Price Range"
+                                value=""
+                                onChange={(e) => handleSkinProblemFilter(e.target.value)}
+                                label="Skin Goal"
                             >
                                 <MenuItem value="">All</MenuItem>
-                                <MenuItem value="Drugstore">Drugstore</MenuItem>
-                                <MenuItem value="Midrange">Midrange</MenuItem>
-                                <MenuItem value="High-end">High-end</MenuItem>
+                                {skinGoalFields.map((goal) => (
+                                    <MenuItem key={goal.name} value={goal.name}>
+                                        {goal.label}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
@@ -285,7 +311,11 @@ function Products() {
                                                     {product.brand} • {product.product_type}
                                                 </Typography>
                                                 <Typography variant="body2" sx={{ mt: 1 }}>
-                                                    For: {product.skin_type} skin
+                                                    For:{' '}
+                                                    {Array.isArray(product.skin_types)
+                                                        ? product.skin_types.join(', ')
+                                                        : ''}{' '}
+                                                    skin
                                                 </Typography>
                                             </CardContent>
                                             <FavoriteBorder

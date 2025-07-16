@@ -18,14 +18,16 @@ import {
 } from '@mui/material';
 import { useEffect } from 'react';
 
+// Map survey skin problems to user model fields
 const SKIN_PROBLEMS = [
-    { value: 'acne', label: 'Acne' },
-    { value: 'aging', label: 'Aging' },
-    { value: 'dried', label: 'Dried skin' },
-    { value: 'oily', label: 'Oily skin' },
-    { value: 'enlarged_pores', label: 'Enlarged pores' },
-    { value: 'scarring', label: 'Scarring' },
-    { value: 'skin_recovery', label: 'Skin recovery' },
+    { value: 'acne_prone', label: 'Acne-prone' },
+    { value: 'dull_skin', label: 'Dull skin' },
+    { value: 'large_pores', label: 'Large pores' },
+    { value: 'uneven', label: 'Uneven skin' },
+    { value: 'dark_spot', label: 'Dark spots' },
+    { value: 'redness', label: 'Redness' },
+    { value: 'dehydrated', label: 'Dehydrated' },
+    { value: 'wrinkles', label: 'Wrinkles' },
 ];
 
 const SKIN_TYPES = [
@@ -34,7 +36,6 @@ const SKIN_TYPES = [
     { value: 'normal', label: 'Normal skin' },
     { value: 'combination', label: 'Combination skin' },
     { value: 'sensitive', label: 'Sensitive skin' },
-    { value: 'acne_prone', label: 'Acne-prone skin' },
 ];
 
 const SKIN_GOALS = [
@@ -52,13 +53,14 @@ function Survey() {
     const [skinType, setSkinType] = useState('');
     const [ingredients, setIngredients] = useState([]);
     const [selectedProblems, setSelectedProblems] = useState({
-        acne: false,
-        aging: false,
-        dried: false,
-        oily: false,
-        enlarged_pores: false,
-        scarring: false,
-        skin_recovery: false,
+        acne_prone: false,
+        dull_skin: false,
+        large_pores: false,
+        uneven: false,
+        dark_spot: false,
+        redness: false,
+        dehydrated: false,
+        wrinkles: false,
     });
     const [selectedGoals, setSelectedGoals] = useState({
         hydration: false,

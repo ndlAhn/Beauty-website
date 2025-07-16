@@ -17,66 +17,51 @@ module.exports = (sequelize, Sequelize) => {
                 allowNull: false,
             },
             product_type: {
-                type: DataTypes.STRING,
+                type: DataTypes.STRING, // e.g. 'Facial Mask', 'Moisturizer', etc.
                 allowNull: false,
             },
 
-            acne: {
+            // Skin problems and goals (unified with user model)
+            acne_prone: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-            aging: {
+            dull_skin: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-            dried: {
+            large_pores: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-            oily: {
+            uneven: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-            skin_recovery: {
+            dark_spot: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-
-            skin_type: {
-                type: DataTypes.ENUM('oily', 'dry', 'normal', 'combination', 'sensitive', 'acne'),
+            redness: {
+                type: DataTypes.BOOLEAN,
                 allowNull: false,
+                defaultValue: false,
             },
-
-            price_range: {
-                type: DataTypes.ENUM('drugstore', 'midrange', 'highend'),
+            dehydrated: {
+                type: DataTypes.BOOLEAN,
                 allowNull: false,
+                defaultValue: false,
             },
-            capacity: {
-                type: DataTypes.STRING,
+            wrinkles: {
+                type: DataTypes.BOOLEAN,
                 allowNull: false,
+                defaultValue: false,
             },
-            uses: {
-                type: DataTypes.TEXT,
-                allowNull: false,
-            },
-            warning: {
-                type: DataTypes.TEXT,
-                allowNull: true,
-            },
-            product_description: {
-                type: DataTypes.TEXT,
-                allowNull: true,
-            },
-            picture: {
-                type: DataTypes.STRING,
-                allowNull: true,
-            },
-
             hydration: {
                 type: DataTypes.BOOLEAN,
                 allowNull: true,
@@ -105,6 +90,37 @@ module.exports = (sequelize, Sequelize) => {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
+            },
+
+            skin_types: {
+                type: DataTypes.JSON, // Array of skin types: ['normal', 'dry', 'oily', 'combination', 'sensitive']
+                allowNull: false,
+                defaultValue: [],
+            },
+
+            price_range: {
+                type: DataTypes.ENUM('drugstore', 'midrange', 'highend'),
+                allowNull: false,
+            },
+            capacity: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            uses: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            warning: {
+                type: DataTypes.TEXT,
+                allowNull: true,
+            },
+            product_description: {
+                type: DataTypes.TEXT,
+                allowNull: true,
+            },
+            picture: {
+                type: DataTypes.STRING,
+                allowNull: true,
             },
         },
         {

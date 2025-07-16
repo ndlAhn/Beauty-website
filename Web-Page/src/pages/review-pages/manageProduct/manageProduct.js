@@ -25,6 +25,7 @@ import {
     Checkbox,
     FormControlLabel,
     Autocomplete,
+    ListItemText,
 } from '@mui/material';
 import { MdDeleteOutline, MdEdit, MdAdd } from 'react-icons/md';
 import { IoIosSearch } from 'react-icons/io';
@@ -100,8 +101,28 @@ function ManageProducts() {
 
     // Product types and skin types for dropdowns
     const productTypes = ['Cleanser', 'Toner', 'Serum', 'Moisturizer', 'Sunscreen', 'Mask', 'Treatment', 'Other'];
-    const skinTypes = ['Dry', 'Oily', 'Combination', 'Normal', 'Sensitive', 'All'];
+    const skinTypeOptions = ['normal', 'dry', 'oily', 'combination', 'sensitive'];
     const priceRanges = ['$', '$$', '$$$', '$$$$'];
+
+    // Skin problem fields (should match user model)
+    const skinProblemFields = [
+        { name: 'acne_prone', label: 'Mụn' },
+        { name: 'dull_skin', label: 'Da xỉn màu' },
+        { name: 'large_pores', label: 'Lỗ chân lông to' },
+        { name: 'uneven', label: 'Da không đều màu' },
+        { name: 'dark_spot', label: 'Đốm nâu/thâm' },
+        { name: 'redness', label: 'Đỏ da' },
+        { name: 'dehydrated', label: 'Thiếu nước' },
+        { name: 'wrinkles', label: 'Nếp nhăn' },
+    ];
+    const skinGoalFields = [
+        { name: 'hydration', label: 'Thiếu ẩm' },
+        { name: 'acne_control', label: 'Kiểm soát mụn' },
+        { name: 'anti_aging', label: 'Chống lão hóa' },
+        { name: 'brightening', label: 'Làm sáng' },
+        { name: 'oil_control', label: 'Kiểm soát dầu' },
+        { name: 'smooth_and_repair', label: 'Làm mịn & phục hồi' },
+    ];
 
     // Fetch products and ingredients
     useEffect(() => {
@@ -146,7 +167,10 @@ function ManageProducts() {
     };
 
     const handleEdit = (product) => {
-        setCurrentProduct(product);
+        setCurrentProduct({
+            ...product,
+            skin_types: Array.isArray(product.skin_types) ? product.skin_types : [],
+        });
         setSelectedIngredients(product.ingredients?.map((i) => i.ingredient_id) || []);
         setNewImageId(null);
         setIsCreateMode(false);
@@ -158,7 +182,7 @@ function ManageProducts() {
             product_name: '',
             brand: '',
             product_type: '',
-            skin_type: '',
+            skin_types: [],
             price_range: '',
             capacity: '',
             uses: '',
@@ -184,10 +208,17 @@ function ManageProducts() {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setCurrentProduct({
-            ...currentProduct,
-            [name]: type === 'checkbox' ? checked : value,
-        });
+        if (name === 'skin_types') {
+            setCurrentProduct({
+                ...currentProduct,
+                skin_types: typeof value === 'string' ? value.split(',') : value,
+            });
+        } else {
+            setCurrentProduct({
+                ...currentProduct,
+                [name]: type === 'checkbox' ? checked : value,
+            });
+        }
     };
 
     const handleIngredientChange = (event, newValue) => {
@@ -202,7 +233,11 @@ function ManageProducts() {
                 picture: newImageId || currentProduct.picture,
                 ingredients: selectedIngredients.map((id) => ({ ingredient_id: id })),
             };
-
+            if (!productData.skin_types || productData.skin_types.length === 0) {
+                alert('Please select at least one skin type');
+                setIsSubmitting(false);
+                return;
+            }
             if (isCreateMode) {
                 await instance.post('/create-product', productData);
                 alert('Product created successfully!');
@@ -210,7 +245,6 @@ function ManageProducts() {
                 await instance.put(`/update-product/${currentProduct.product_id}`, productData);
                 alert('Product updated successfully!');
             }
-
             fetchProducts();
             setOpenDialog(false);
         } catch (error) {
@@ -221,20 +255,6 @@ function ManageProducts() {
     };
 
     const requiredFields = ['product_name', 'brand', 'product_type', 'skin_type', 'price_range', 'capacity', 'uses'];
-
-    const benefitFields = [
-        { name: 'acne', label: 'Acne' },
-        { name: 'aging', label: 'Aging' },
-        { name: 'dried', label: 'Dried Skin' },
-        { name: 'oily', label: 'Oily Skin' },
-        { name: 'skin_recovery', label: 'Skin Recovery' },
-        { name: 'hydration', label: 'Hydration' },
-        { name: 'acne_control', label: 'Acne Control' },
-        { name: 'anti_aging', label: 'Anti-Aging' },
-        { name: 'brightening', label: 'Brightening' },
-        { name: 'oil_control', label: 'Oil Control' },
-        { name: 'smooth_and_repair', label: 'Smooth & Repair' },
-    ];
 
     return (
         <Box>
@@ -302,7 +322,9 @@ function ManageProducts() {
                                             <TableCell>{product.product_name}</TableCell>
                                             <TableCell>{product.brand}</TableCell>
                                             <TableCell>{product.product_type}</TableCell>
-                                            <TableCell>{product.skin_type}</TableCell>
+                                            <TableCell>
+                                                {Array.isArray(product.skin_types) ? product.skin_types.join(', ') : ''}
+                                            </TableCell>
                                             <TableCell>{product.price_range}</TableCell>
                                             <TableCell>
                                                 <IconButton
@@ -346,7 +368,6 @@ function ManageProducts() {
                                             .join(' ')}
                                     </Typography>
                                 </Box>
-
                                 {field === 'product_type' ? (
                                     <FormControl fullWidth>
                                         <Select
@@ -362,17 +383,30 @@ function ManageProducts() {
                                             ))}
                                         </Select>
                                     </FormControl>
-                                ) : field === 'skin_type' ? (
+                                ) : field === 'skin_types' ? (
                                     <FormControl fullWidth>
+                                        <InputLabel>Skin Types</InputLabel>
                                         <Select
-                                            name={field}
-                                            value={currentProduct?.[field] || ''}
+                                            name="skin_types"
+                                            multiple
+                                            value={currentProduct?.skin_types || []}
                                             onChange={handleChange}
+                                            label="Skin Types"
+                                            renderValue={(selected) =>
+                                                selected
+                                                    .map((option) => option.charAt(0).toUpperCase() + option.slice(1))
+                                                    .join(', ')
+                                            }
                                             disabled={isSubmitting}
                                         >
-                                            {skinTypes.map((type) => (
-                                                <MenuItem key={type} value={type}>
-                                                    {type}
+                                            {skinTypeOptions.map((option) => (
+                                                <MenuItem key={option} value={option}>
+                                                    <Checkbox
+                                                        checked={currentProduct?.skin_types?.indexOf(option) > -1}
+                                                    />
+                                                    <ListItemText
+                                                        primary={option.charAt(0).toUpperCase() + option.slice(1)}
+                                                    />
                                                 </MenuItem>
                                             ))}
                                         </Select>
@@ -435,13 +469,35 @@ function ManageProducts() {
                             />
                         </Box>
 
-                        {/* Benefits */}
+                        {/* Skin Problems */}
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                                Benefits
+                                Skin Problems
                             </Typography>
                             <Stack direction="row" flexWrap="wrap" gap={1}>
-                                {benefitFields.map((field) => (
+                                {skinProblemFields.map((field) => (
+                                    <FormControlLabel
+                                        key={field.name}
+                                        control={
+                                            <Checkbox
+                                                checked={currentProduct?.[field.name] || false}
+                                                onChange={handleChange}
+                                                name={field.name}
+                                                color="primary"
+                                            />
+                                        }
+                                        label={field.label}
+                                    />
+                                ))}
+                            </Stack>
+                        </Box>
+                        {/* Skin Goals */}
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                Skin Goals
+                            </Typography>
+                            <Stack direction="row" flexWrap="wrap" gap={1}>
+                                {skinGoalFields.map((field) => (
                                     <FormControlLabel
                                         key={field.name}
                                         control={

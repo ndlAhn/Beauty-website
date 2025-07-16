@@ -45,9 +45,9 @@ function CreateProduct() {
         product_name: '',
         brand: '',
         product_type: '',
+        skin_types: [], // now an array
         uses: '',
         capacity: '',
-        skin_type: '',
         acne: false,
         aging: false,
         dried: false,
@@ -117,13 +117,40 @@ function CreateProduct() {
         }
     };
 
+    // Unified skin types, skin problems, and skin goals (from user model)
+    const skinTypeOptions = ['normal', 'dry', 'oily', 'combination', 'sensitive'];
+    const skinProblemFields = [
+        { name: 'acne_prone', label: 'Mụn' },
+        { name: 'dull_skin', label: 'Da xỉn màu' },
+        { name: 'large_pores', label: 'Lỗ chân lông to' },
+        { name: 'uneven', label: 'Da không đều màu' },
+        { name: 'dark_spot', label: 'Đốm nâu/thâm' },
+        { name: 'redness', label: 'Đỏ da' },
+        { name: 'dehydrated', label: 'Thiếu nước' },
+        { name: 'wrinkles', label: 'Nếp nhăn' },
+    ];
+    const skinGoalFields = [
+        { name: 'hydration', label: 'Thiếu ẩm' },
+        { name: 'acne_control', label: 'Kiểm soát mụn' },
+        { name: 'anti_aging', label: 'Chống lão hóa' },
+        { name: 'brightening', label: 'Làm sáng' },
+        { name: 'oil_control', label: 'Kiểm soát dầu' },
+        { name: 'smooth_and_repair', label: 'Làm mịn & phục hồi' },
+    ];
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value,
-        }));
+        if (name === 'skin_types') {
+            setFormData((prev) => ({
+                ...prev,
+                skin_types: typeof value === 'string' ? value.split(',') : value,
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value,
+            }));
+        }
     };
 
     const handleSearchChange = (e) => {
@@ -158,6 +185,11 @@ function CreateProduct() {
             setIsSubmitting(false);
             return;
         }
+        if (!formData.skin_types || formData.skin_types.length === 0) {
+            alert('Please select at least one skin type');
+            setIsSubmitting(false);
+            return;
+        }
 
         try {
             const payload = {
@@ -174,9 +206,9 @@ function CreateProduct() {
                     product_name: '',
                     brand: '',
                     product_type: '',
+                    skin_types: [], // reset to empty array
                     uses: '',
                     capacity: '',
-                    skin_type: '',
                     acne: false,
                     aging: false,
                     dried: false,
@@ -261,18 +293,25 @@ function CreateProduct() {
                                 </Select>
                             </FormControl>
 
-                            {/* Skin Type Dropdown */}
+                            {/* Skin Types Multi-Select */}
                             <FormControl fullWidth sx={{ my: 1 }} required>
-                                <InputLabel>Skin Type</InputLabel>
+                                <InputLabel>Skin Types</InputLabel>
                                 <Select
-                                    name="skin_type"
-                                    value={formData.skin_type}
+                                    name="skin_types"
+                                    multiple
+                                    value={formData.skin_types}
                                     onChange={handleChange}
-                                    label="Skin Type"
+                                    label="Skin Types"
+                                    renderValue={(selected) =>
+                                        selected
+                                            .map((option) => option.charAt(0).toUpperCase() + option.slice(1))
+                                            .join(', ')
+                                    }
                                 >
-                                    {['oily', 'dry', 'normal', 'combination', 'sensitive', 'acne'].map((option) => (
+                                    {skinTypeOptions.map((option) => (
                                         <MenuItem key={option} value={option}>
-                                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                                            <Checkbox checked={formData.skin_types.indexOf(option) > -1} />
+                                            <ListItemText primary={option.charAt(0).toUpperCase() + option.slice(1)} />
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -283,17 +322,11 @@ function CreateProduct() {
                                 Skin Problems:
                             </Typography>
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
-                                {[
-                                    { label: 'Acne', name: 'acne' },
-                                    { label: 'Aging', name: 'aging' },
-                                    { label: 'Dryness', name: 'dried' },
-                                    { label: 'Oiliness', name: 'oily' },
-                                    { label: 'Skin Recovery', name: 'skin_recovery' },
-                                ].map((problem) => (
+                                {skinProblemFields.map((problem) => (
                                     <Box key={problem.name} sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Checkbox
                                             name={problem.name}
-                                            checked={formData[problem.name]}
+                                            checked={formData[problem.name] || false}
                                             onChange={handleChange}
                                         />
                                         <Typography>{problem.label}</Typography>
@@ -306,18 +339,11 @@ function CreateProduct() {
                                 Skin Goals:
                             </Typography>
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
-                                {[
-                                    { label: 'Hydration', name: 'hydration' },
-                                    { label: 'Acne Control', name: 'acne_control' },
-                                    { label: 'Anti-Aging', name: 'anti_aging' },
-                                    { label: 'Brightening', name: 'brightening' },
-                                    { label: 'Oil Control', name: 'oil_control' },
-                                    { label: 'Smooth & Repair', name: 'smooth_and_repair' },
-                                ].map((goal) => (
+                                {skinGoalFields.map((goal) => (
                                     <Box key={goal.name} sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Checkbox
                                             name={goal.name}
-                                            checked={formData[goal.name]}
+                                            checked={formData[goal.name] || false}
                                             onChange={handleChange}
                                         />
                                         <Typography>{goal.label}</Typography>

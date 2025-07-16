@@ -18,9 +18,31 @@ const handleError = (res, error, message = 'Internal Server Error') => {
 
 exports.create = async (req, res) => {
     try {
-        const { name, username, password, dob, gender, avt_file_path } = req.body;
+        const {
+            name,
+            username,
+            password,
+            dob,
+            gender,
+            avt_file_path,
+            skin_type,
+            acne_prone,
+            dull_skin,
+            large_pores,
+            uneven,
+            dark_spot,
+            redness,
+            dehydrated,
+            wrinkles,
+            hydration,
+            acne_control,
+            anti_aging,
+            brightening,
+            oil_control,
+            smooth_and_repair,
+        } = req.body;
 
-        if (!name || !username || !password || !dob || !gender) {
+        if (!name || !username || !password || !dob || !gender || !skin_type) {
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required',
@@ -46,6 +68,21 @@ exports.create = async (req, res) => {
             dob,
             gender,
             avt_file_path: avt_file_path || null,
+            skin_type,
+            acne_prone: acne_prone || false,
+            dull_skin: dull_skin || false,
+            large_pores: large_pores || false,
+            uneven: uneven || false,
+            dark_spot: dark_spot || false,
+            redness: redness || false,
+            dehydrated: dehydrated || false,
+            wrinkles: wrinkles || false,
+            hydration: hydration || false,
+            acne_control: acne_control || false,
+            anti_aging: anti_aging || false,
+            brightening: brightening || false,
+            oil_control: oil_control || false,
+            smooth_and_repair: smooth_and_repair || false,
         });
 
         // Omit sensitive data from response
@@ -371,8 +408,13 @@ exports.handleSurvey = async (req, res) => {
             }),
         };
 
+        // Always set skin_type to a valid value if missing
+        if (!updateData.skin_type) {
+            updateData.skin_type = user.skin_type || 'normal';
+        }
         await Users.update(updateData, {
             where: { user_id },
+            validate: false,
         });
 
         // Process allergies
@@ -394,6 +436,12 @@ exports.handleSurvey = async (req, res) => {
         const updatedUser = await Users.findByPk(user_id, {
             attributes: { exclude: ['password'] },
         });
+
+        // If skin_type is still null after update, set it to a default (e.g., 'normal')
+        const updatedUserCheck = await Users.findByPk(user_id);
+        if (!updatedUserCheck.skin_type) {
+            await updatedUserCheck.update({ skin_type: 'normal' });
+        }
 
         res.status(200).json({
             success: true,

@@ -11,6 +11,11 @@ module.exports = (sequelize, Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+            skin_type: {
+                type: DataTypes.ENUM('normal', 'dry', 'oily', 'combination', 'sensitive'),
+                allowNull: false, // Skin type is required
+                defaultValue: 'normal', // Default skin type
+            },
             password: {
                 type: DataTypes.STRING,
                 allowNull: false,
@@ -33,30 +38,45 @@ module.exports = (sequelize, Sequelize) => {
             },
             role: {
                 type: DataTypes.ENUM('user', 'admin'),
-                defaultValue: 'user',
+                defaultValue: 'admin',
                 allowNull: false,
             },
-            acne: {
+            acne_prone: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-            aging: {
+            dull_skin: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-            dried: {
+            large_pores: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-            oily: {
+            uneven: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
             },
-            skin_recovery: {
+            dark_spot: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            redness: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            dehydrated: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            wrinkles: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,

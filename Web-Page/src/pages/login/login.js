@@ -13,6 +13,7 @@ function Login() {
     const [errorMessage, setErrorMessage] = useState('');
     const [state, dispatchState] = useContext(StateContext);
     const [avatarPublicId, setAvatarPublicId] = useState('');
+    const [skinType, setSkinType] = useState('normal');
 
     // Dùng useRef() để tối ưu việc truy xuất input
     const usernameRef = useRef(null);
@@ -22,6 +23,15 @@ function Login() {
     const genderRef = useRef(null);
     const rePasswordRef = useRef(null);
     const avtRef = useRef(null);
+
+    // Add skin type options for registration
+    const SKIN_TYPES = [
+        { value: 'normal', label: 'Normal' },
+        { value: 'dry', label: 'Dry' },
+        { value: 'oily', label: 'Oily' },
+        { value: 'combination', label: 'Combination' },
+        { value: 'sensitive', label: 'Sensitive' },
+    ];
 
     // 🛠️ Hàm xử lý đăng ký
     const handleRegister = async (e) => {
@@ -36,6 +46,7 @@ function Login() {
         // Avatar upload
         let avt_file_path = avatarPublicId;
 
+        // Required fields from user model
         const formData = {
             name: nameRef.current.value,
             username: usernameRef.current.value,
@@ -43,6 +54,23 @@ function Login() {
             dob: dobRef.current.value,
             gender: genderRef.current.value,
             avt_file_path,
+            skin_type: skinType,
+            // Optional fields, backend will use defaults
+            acne_prone: false,
+            dull_skin: false,
+            large_pores: false,
+            uneven: false,
+            dark_spot: false,
+            redness: false,
+            dehydrated: false,
+            wrinkles: false,
+            hydration: false,
+            acne_control: false,
+            anti_aging: false,
+            brightening: false,
+            oil_control: false,
+            smooth_and_repair: false,
+            role: 'user',
         };
 
         try {
@@ -151,6 +179,15 @@ function Login() {
                                         style={{ maxWidth: 100, maxHeight: 100, borderRadius: '50%', marginTop: 8 }}
                                     />
                                 )}
+
+                                <label>Skin Type</label>
+                                <select value={skinType} onChange={(e) => setSkinType(e.target.value)} required>
+                                    {SKIN_TYPES.map((type) => (
+                                        <option key={type.value} value={type.value}>
+                                            {type.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <button type="submit" className="login-btn">
