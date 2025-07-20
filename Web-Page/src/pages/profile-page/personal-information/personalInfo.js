@@ -35,16 +35,25 @@ const SKIN_TYPES = [
     { value: 'sensitive', label: 'Sensitive skin' },
     { value: 'acne_prone', label: 'Acne-prone skin' },
 ];
-
 const SKIN_PROBLEMS = [
-    { value: 'acne', label: 'Acne' },
-    { value: 'aging', label: 'Aging' },
-    { value: 'dried', label: 'Dried skin' },
-    { value: 'oily', label: 'Oily skin' },
-    { value: 'enlarged_pores', label: 'Enlarged pores' },
-    { value: 'scarring', label: 'Scarring' },
-    { value: 'skin_recovery', label: 'Skin recovery' },
+    { value: 'acne_prone', label: 'Acne-prone' },
+    { value: 'dull_skin', label: 'Dull skin' },
+    { value: 'large_pores', label: 'Large pores' },
+    { value: 'uneven', label: 'Uneven' },
+    { value: 'dark_spot', label: 'Dark spot' },
+    { value: 'redness', label: 'Redness' },
+    { value: 'dehydrated', label: 'Dehydrated' },
+    { value: 'wrinkles', label: 'Wrinkles' },
 ];
+// const SKIN_PROBLEMS = [
+//     { value: 'acne', label: 'Acne' },
+//     { value: 'aging', label: 'Aging' },
+//     { value: 'dried', label: 'Dried skin' },
+//     { value: 'oily', label: 'Oily skin' },
+//     { value: 'enlarged_pores', label: 'Enlarged pores' },
+//     { value: 'scarring', label: 'Scarring' },
+//     { value: 'skin_recovery', label: 'Skin recovery' },
+// ];
 
 const SKINCARE_GOALS = [
     { value: 'hydration', label: 'Hydration' },
@@ -85,13 +94,14 @@ function PersonalInfo() {
             });
             const user = response.data.data;
             const skinProblems = {
-                acne: user.acne || false,
-                aging: user.aging || false,
-                dried: user.dried || false,
-                oily: user.oily || false,
-                enlarged_pores: user.enlarged_pores || false,
-                scarring: user.scarring || false,
-                skin_recovery: user.skin_recovery || false,
+                acne_prone: user.acne_prone || false,
+                dull_skin: user.dull_skin || false,
+                large_pores: user.large_pores || false,
+                uneven: user.uneven || false,
+                dark_spot: user.dark_spot || false,
+                redness: user.redness || false,
+                dehydrated: user.dehydrated || false,
+                wrinkles: user.wrinkles || false,
             };
 
             const skincareGoals = {
@@ -155,38 +165,52 @@ function PersonalInfo() {
         });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
+    // ...existing code...
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-        try {
-            // Update basic info
-            await instance.post('/update-info', {
-                user_id: state.userData?.user_id,
-                name: formData.name,
-                bio: formData.bio,
-                avt_path: formData.avt_path,
-            });
+    try {
+        // Update basic info
+        await instance.post('/update-info', {
+            user_id: state.userData?.user_id,
+            name: formData.name,
+            bio: formData.bio,
+            avt_path: formData.avt_path,
+        });
 
-            // Update skin, goals and allergy info
-            await instance.post('/survey', {
-                user_id: state.userData?.user_id,
-                skin_type: formData.skin_type,
-                skinProb: formData.skinProblems,
-                skincareGoals: formData.skincareGoals,
-                allergies: formData.allergies,
-            });
+        // Update skin, goals and allergy info
+        await instance.post('/survey', {
+            user_id: state.userData?.user_id,
+            skin_type: formData.skin_type,
+            acne_prone: formData.skinProblems.acne_prone || false,
+            dull_skin: formData.skinProblems.dull_skin || false,
+            large_pores: formData.skinProblems.large_pores || false,
+            uneven: formData.skinProblems.uneven || false,
+            dark_spot: formData.skinProblems.dark_spot || false,
+            redness: formData.skinProblems.redness || false,
+            dehydrated: formData.skinProblems.dehydrated || false,
+            wrinkles: formData.skinProblems.wrinkles || false,
+            hydration: formData.skincareGoals.hydration || false,
+            acne_control: formData.skincareGoals.acne_control || false,
+            anti_aging: formData.skincareGoals.anti_aging || false,
+            brightening: formData.skincareGoals.brightening || false,
+            oil_control: formData.skincareGoals.oil_control || false,
+            smooth_and_repair: formData.skincareGoals.smooth_and_repair || false,
+            allergies: formData.allergies,
+        });
 
-            setEditMode(false);
-            await fetchUserData();
-        } catch (error) {
-            console.error('Error updating user data:', error);
-            setError('Failed to update profile. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
+        setEditMode(false);
+        await fetchUserData();
+    } catch (error) {
+        console.error('Error updating user data:', error);
+        setError('Failed to update profile. Please try again.');
+    } finally {
+        setLoading(false);
+    }
+};
+// ...existing code...
 
     const textColor = 'rgb(169, 80, 80)';
     const buttonColor = 'rgb(169, 80, 80)';

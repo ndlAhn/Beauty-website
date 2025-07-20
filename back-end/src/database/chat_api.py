@@ -5,8 +5,11 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Load dữ liệu
-chat_data = pd.read_csv("chatData.csv")
+import os
+
+base_dir = os.path.dirname(__file__)
+chat_data = pd.read_csv(os.path.join(base_dir, "chatData.csv"))
+
 
 
 

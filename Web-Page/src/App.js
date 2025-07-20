@@ -37,6 +37,7 @@ import Cookies from 'js-cookie';
 import CombinedProfile from './pages/profile-page/profile/CombinedProfile';
 
 function App() {
+    
     const [state, dispatchState] = useContext(StateContext);
     const navigate = useNavigate();
     useEffect(() => {

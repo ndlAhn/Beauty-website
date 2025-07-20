@@ -367,88 +367,146 @@ exports.updateInfo = async (req, res) => {
         handleError(res, err, 'Error updating user info');
     }
 };
-
 exports.handleSurvey = async (req, res) => {
     try {
-        const { user_id, skinType, skinProb, skinGoals, allergies } = req.body;
+        const {
+            user_id,
+            skin_type,
+            acne_prone,
+            dull_skin,
+            large_pores,
+            uneven,
+            dark_spot,
+            redness,
+            dehydrated,
+            wrinkles,
+            hydration,
+            acne_control,
+            anti_aging,
+            brightening,
+            oil_control,
+            smooth_and_repair,
+            allergies
+        } = req.body;
 
         if (!user_id) {
-            return res.status(400).json({
-                success: false,
-                message: 'User ID is required',
-            });
+            return res.status(400).json({ success: false, message: 'User ID is required' });
         }
 
         const user = await Users.findByPk(user_id);
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found',
-            });
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
 
         const updateData = {
-            skin_type: skinType || null,
-            ...(skinProb && {
-                acne: skinProb.acne || false,
-                aging: skinProb.aging || false,
-                dried: skinProb.dried || false,
-                oily: skinProb.oily || false,
-                enlarged_pores: skinProb.enlarged_pores || false,
-                scarring: skinProb.scarring || false,
-                skin_recovery: skinProb.skin_recovery || false,
-            }),
-            ...(skinGoals && {
-                hydration: skinGoals.hydration || null,
-                acne_control: skinGoals.acne_control || false,
-                anti_aging: skinGoals.anti_aging || false,
-                brightening: skinGoals.brightening || false,
-                oil_control: skinGoals.oil_control || false,
-                smooth_and_repair: skinGoals.smooth_and_repair || false,
-            }),
+            skin_type,
+            acne_prone,
+            dull_skin,
+            large_pores,
+            uneven,
+            dark_spot,
+            redness,
+            dehydrated,
+            wrinkles,
+            hydration,
+            acne_control,
+            anti_aging,
+            brightening,
+            oil_control,
+            smooth_and_repair,
         };
 
-        // Always set skin_type to a valid value if missing
-        if (!updateData.skin_type) {
-            updateData.skin_type = user.skin_type || 'normal';
-        }
-        await Users.update(updateData, {
-            where: { user_id },
-            validate: false,
-        });
+        await Users.update(updateData, { where: { user_id } });
 
-        // Process allergies
-        if (Array.isArray(allergies)) {
-            await Alergic.destroy({
-                where: { user_id },
-            });
+        // Xử lý allergies nếu có (nếu bạn dùng bảng riêng)
+        // ...
 
-            if (allergies.length > 0) {
-                const allergiesToAdd = allergies.map((ingredient_id) => ({
-                    alergic_id: uuidv4(),
-                    user_id,
-                    ingredient_id,
-                }));
-                await Alergic.bulkCreate(allergiesToAdd);
-            }
-        }
-
-        const updatedUser = await Users.findByPk(user_id, {
-            attributes: { exclude: ['password'] },
-        });
-
-        // If skin_type is still null after update, set it to a default (e.g., 'normal')
-        const updatedUserCheck = await Users.findByPk(user_id);
-        if (!updatedUserCheck.skin_type) {
-            await updatedUserCheck.update({ skin_type: 'normal' });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'Survey data saved successfully',
-            data: updatedUser,
-        });
+        res.status(200).json({ success: true, message: 'Survey data saved successfully' });
     } catch (err) {
         handleError(res, err, 'Error saving survey data');
     }
 };
+// exports.handleSurvey = async (req, res) => {
+//     try {
+//         const { user_id, skinType, skinProb, skinGoals, allergies } = req.body;
+
+//         if (!user_id) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'User ID is required',
+//             });
+//         }
+
+//         const user = await Users.findByPk(user_id);
+//         if (!user) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: 'User not found',
+//             });
+//         }
+
+//         const updateData = {
+//             skin_type: skinType || null,
+//             ...(skinProb && {
+//                 acne: skinProb.acne || false,
+//                 aging: skinProb.aging || false,
+//                 dried: skinProb.dried || false,
+//                 oily: skinProb.oily || false,
+//                 enlarged_pores: skinProb.enlarged_pores || false,
+//                 scarring: skinProb.scarring || false,
+//                 skin_recovery: skinProb.skin_recovery || false,
+//             }),
+//             ...(skinGoals && {
+//                 hydration: skinGoals.hydration || null,
+//                 acne_control: skinGoals.acne_control || false,
+//                 anti_aging: skinGoals.anti_aging || false,
+//                 brightening: skinGoals.brightening || false,
+//                 oil_control: skinGoals.oil_control || false,
+//                 smooth_and_repair: skinGoals.smooth_and_repair || false,
+//             }),
+//         };
+
+//         // Always set skin_type to a valid value if missing
+//         if (!updateData.skin_type) {
+//             updateData.skin_type = user.skin_type || 'normal';
+//         }
+//         await Users.update(updateData, {
+//             where: { user_id },
+//             validate: false,
+//         });
+
+//         // Process allergies
+//         if (Array.isArray(allergies)) {
+//             await Alergic.destroy({
+//                 where: { user_id },
+//             });
+
+//             if (allergies.length > 0) {
+//                 const allergiesToAdd = allergies.map((ingredient_id) => ({
+//                     alergic_id: uuidv4(),
+//                     user_id,
+//                     ingredient_id,
+//                 }));
+//                 await Alergic.bulkCreate(allergiesToAdd);
+//             }
+//         }
+
+//         const updatedUser = await Users.findByPk(user_id, {
+//             attributes: { exclude: ['password'] },
+//         });
+
+//         // If skin_type is still null after update, set it to a default (e.g., 'normal')
+//         const updatedUserCheck = await Users.findByPk(user_id);
+//         if (!updatedUserCheck.skin_type) {
+//             await updatedUserCheck.update({ skin_type: 'normal' });
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//             message: 'Survey data saved successfully',
+//             data: updatedUser,
+//         });
+//     } catch (err) {
+//         handleError(res, err, 'Error saving survey data');
+//     }
+// };

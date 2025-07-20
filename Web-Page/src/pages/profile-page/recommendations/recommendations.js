@@ -1,194 +1,454 @@
-import './recommendations.css';
-import { FiFilter } from "react-icons/fi";
-import { FaRegHeart } from "react-icons/fa";
+import React, { useEffect, useState, useContext, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Typography, Grid, Card, CardContent, CardMedia,
+  Pagination, CircularProgress, Box, Chip, Button,
+  Container, Paper, TextField, InputAdornment,
+  FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText
+} from '@mui/material';
+import { Search, FavoriteBorder } from '@mui/icons-material';
 import Header from '../../../components/header/header';
 import Footer from '../../../components/footer/footer';
+import StateContext from '../../../context/context.context';
+import './recommendations.css';
+
+const ITEMS_PER_PAGE = 12;
+const CLOUD_NAME = 'dppaihihm';
+
 function Recommendations() {
-    return(
-        <div>
-            <Header />
-            <div className='news-wrap'>
-                <div className='new-content-wrap'>
-                    <div className='news-filter-wrap'>
-                        <div className="news-filter-content">
-                        <FiFilter className='news-filter' />
-                        </div>
-                    </div>
-                    <h3>Recommendation</h3>
-                    <div className="home-news-content">
-                        <p className='products-descript'>Welcome to Beauty Insight's skincare product recommendations!
-                        Our Website curate a selection of the best products tailored to your skin type and concerns. 
-                        Whether you need hydration, anti-aging solutions, acne treatments, or daily essentials, we've got you covered.
-                        Explore top-rated cleansers, moisturizers, serums, and more, all backed by expert reviews and user feedback. 
-                        Achieve your best skin with our personalized recommendations and discover the perfect products to enhance your skincare routine.
-                        </p>
-                        
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Cleansing</h3>
-                        <p className='products-descript'>Discover the essential step to flawless skin with Beauty Insight's cleansing guide. Proper cleansing removes impurities, excess oil, and makeup, ensuring a fresh and healthy complexion.
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Facial cleanser</h3>
-                        <p className='products-descript'>
-                        Revitalize your skin with the perfect facial cleanser from Beauty Insight. Our experts help you choose the ideal cleanser for your skin type, whether it's oily, dry, sensitive, or combination. 
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Toner</h3>
-                        <p className='products-descript'>
-                        Balance and refresh your skin with the appropriate toner. Beauty Insight guides you in selecting the ideal toner for your skin type, helping to tighten pores, remove residual impurities, and restore your skin's natural pH balance
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Mask</h3>
-                        <p className='products-descript'>
-                        Discover top-rated masks. Incorporate this essential step into your skincare routine for a glowing, refreshed complexion.
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Exfoliate facial skin</h3>
-                        <p className='products-descript'>
-                        The best exfoliants for your skin type, helping to remove dead skin cells, unclog pores, and promote cell renewal.
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Essence/Serum</h3>
-                        <p className='product-descript'>
-                        the ideal products to address your specific skin concerns, whether it's hydration, brightening, or anti-aging.
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Lotion</h3>
-                        <p className='products-descript'>
-                        Hydrate and nourish your skin with the perfect lotion
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Mineral spray</h3>
-                        <p className='products-descript'>
-                        the ideal mineral spray to hydrate, soothe, and nourish your skin throughout the day.
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Sunscreen</h3>
-                        <p className='products-descript'>
-                        the ideal sunscreen for your skin type, offering broad-spectrum protection against harmful UV rays.
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                    <div className="home-news-content">
-                        <h3>Skin problem</h3>
-                        <p className='products-descript'>
-                        Tackle your skin problems head-on with expert advice from Beauty Insight. Whether you're dealing with acne, dryness, redness, or uneven texture, our experts provide solutions tailored to your skin type and concerns.
-                        </p>
-                        <div className="home-news">
-                        <div className="home-new-picture">
-                            <p>Product's picture</p>
-                        </div>
-                            <p className="home-new-title">Product's name</p>
-                            <FaRegHeart />
-                        </div>
-                        <div className="home-new-more">
-                        <a href="/products" className="home-new-more-text">See all</a>
-                        </div>
-                    </div>
-                </div>
-                
+  const cloudName = 'dppaihihm';
+  const [state] = useContext(StateContext);
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [productType, setProductType] = useState('');
+  const [skinType, setSkinType] = useState([]);
+  const [priceRange, setPriceRange] = useState('');
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const skinTypeOptions = ['normal', 'dry', 'oily', 'combination', 'sensitive'];
+  const skinProblemFields = [
+    { name: 'acne_prone', label: 'Mụn' },
+    { name: 'dull_skin', label: 'Da xỉn màu' },
+    { name: 'large_pores', label: 'Lỗ chân lông to' },
+    { name: 'uneven', label: 'Da không đều màu' },
+    { name: 'dark_spot', label: 'Đốm nâu/thâm' },
+    { name: 'redness', label: 'Đỏ da' },
+    { name: 'dehydrated', label: 'Thiếu nước' },
+    { name: 'wrinkles', label: 'Nếp nhăn' },
+  ];
+  const skinGoalFields = [
+    { name: 'hydration', label: 'Thiếu ẩm' },
+    { name: 'acne_control', label: 'Kiểm soát mụn' },
+    { name: 'anti_aging', label: 'Chống lão hóa' },
+    { name: 'brightening', label: 'Làm sáng' },
+    { name: 'oil_control', label: 'Kiểm soát dầu' },
+    { name: 'smooth_and_repair', label: 'Làm mịn & phục hồi' },
+  ];
+
+  const fetchRecommendations = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const username = state.userData?.username;
+      if (!username) {
+        throw new Error('Please login to view recommendations');
+      }
+
+      const response = await fetch(`http://localhost:3001/api/recommend/${username}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status} status`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Server returned unexpected format: ${text.substring(0, 50)}...`);
+      }
+
+      const { data } = await response.json();
+      
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format received');
+      }
+
+      // Ensure all products have required fields
+      const validatedProducts = data.map(product => ({
+        ...product,
+        product_type: product.product_type || 'Uncategorized',
+        skin_types: Array.isArray(product.skin_types) ? product.skin_types : [],
+        price: product.price || 0,
+        picture: product.picture || null
+      }));
+
+      setProducts(validatedProducts);
+      setFilteredProducts(validatedProducts);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setError(err.message);
+      setProducts([]);
+      setFilteredProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [state.userData]);
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [fetchRecommendations]);
+
+  // Handle filter changes
+  useEffect(() => {
+    let filtered = [...products];
+    
+    if (productType) {
+      filtered = filtered.filter(product => 
+        product.product_type.toLowerCase() === productType.toLowerCase()
+      );
+    }
+    
+    if (skinType.length > 0) {
+      filtered = filtered.filter(product => 
+        skinType.some(type => 
+          product.skin_types.map(t => t.toLowerCase()).includes(type.toLowerCase())
+        )
+      );
+    }
+    
+    if (priceRange) {
+      const [min, max] = priceRange.split('-').map(Number);
+      filtered = filtered.filter(product => {
+        const price = product.price || 0;
+        return price >= min && (max ? price <= max : true);
+      });
+    }
+    
+    setFilteredProducts(filtered);
+    setPage(1); // Reset to first page when filters change
+  }, [products, productType, skinType, priceRange]);
+
+  // Handle search
+  const handleSearch = () => {
+    if (!searchTerm.trim()) {
+      setFilteredProducts(products);
+      return;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    const filtered = products.filter(product => 
+      product.product_name?.toLowerCase().includes(searchLower) ||
+      product.brand?.toLowerCase().includes(searchLower)
+    );
+    
+    setFilteredProducts(filtered);
+    setPage(1);
+  };
+
+  // Handle skin problem filters
+  const handleSkinProblemFilter = (problem) => {
+    if (!problem) {
+      setFilteredProducts(products);
+      return;
+    }
+    setFilteredProducts(products.filter((p) => p[problem]));
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const currentProducts = filteredProducts.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
+  return (
+    <div className="recommendation-page">
+      <Header />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Search bar */}
+        <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} sm={9}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Search for a product..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <Button
+                variant="contained"
+                onClick={handleSearch}
+                fullWidth
+                sx={{
+                  height: '56px',
+                  backgroundColor: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1565c0'
+                  }
+                }}
+              >
+                Search
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        {/* Filters */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Product Type</InputLabel>
+              <Select
+                value={productType}
+                onChange={(e) => setProductType(e.target.value)}
+                label="Product Type"
+              >
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="Cleanser">Cleanser</MenuItem>
+                <MenuItem value="Toner">Toner</MenuItem>
+                <MenuItem value="Serum">Serum</MenuItem>
+                <MenuItem value="Moisturizer">Moisturizer</MenuItem>
+                <MenuItem value="Sunscreen">Sunscreen</MenuItem>
+                <MenuItem value="Mask">Mask</MenuItem>
+                <MenuItem value="Treatment">Treatment</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Skin Types</InputLabel>
+              <Select
+                multiple
+                value={skinType}
+                onChange={(e) =>
+                  setSkinType(
+                    typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value,
+                  )
+                }
+                label="Skin Types"
+                renderValue={(selected) => selected.join(', ')}
+              >
+                {skinTypeOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    <Checkbox checked={skinType.indexOf(option) > -1} />
+                    <ListItemText primary={option.charAt(0).toUpperCase() + option.slice(1)} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Skin Problem</InputLabel>
+              <Select
+                value=""
+                onChange={(e) => handleSkinProblemFilter(e.target.value)}
+                label="Skin Problem"
+              >
+                <MenuItem value="">All</MenuItem>
+                {skinProblemFields.map((problem) => (
+                  <MenuItem key={problem.name} value={problem.name}>
+                    {problem.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Skin Goal</InputLabel>
+              <Select
+                value=""
+                onChange={(e) => handleSkinProblemFilter(e.target.value)}
+                label="Skin Goal"
+              >
+                <MenuItem value="">All</MenuItem>
+                {skinGoalFields.map((goal) => (
+                  <MenuItem key={goal.name} value={goal.name}>
+                    {goal.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+
+        {/* Product display */}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress size={60} />
+          </Box>
+        ) : error ? (
+          <Box sx={{ 
+            textAlign: 'center', 
+            p: 3,
+            backgroundColor: '#fff8f8',
+            borderRadius: 2,
+            maxWidth: 600,
+            mx: 'auto',
+            my: 4
+          }}>
+            <Typography variant="h6" color="error" gutterBottom>
+              {error.includes('login') ? 'Authentication Required' : 'Error'}
+            </Typography>
+            <Typography sx={{ mb: 2 }}>{error}</Typography>
+            <Button
+              variant="contained"
+              onClick={fetchRecommendations}
+            >
+              Retry
+            </Button>
+          </Box>
+        ) : (
+          <>
+            <div className='recommendation-header'>
+              <Typography variant="h4" component="h2" gutterBottom>
+                Personalized Recommendations
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                These products are specially selected based on your skin profile.
+              </Typography>
             </div>
-            <Footer />
-        </div>
-    )
+
+            <Grid container spacing={3}>
+              {currentProducts.length > 0 ? (
+                currentProducts.map((product) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={product.product_id}>
+                    <Card
+                      sx={{
+                        maxWidth: 300,
+                        mx: 'auto',
+                        boxShadow: 3,
+                        cursor: 'pointer',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        position: 'relative',
+                        transition: 'transform 0.3s',
+                        '&:hover': { transform: 'scale(1.03)' }
+                      }}
+                      onClick={() => navigate(`/product-detail/${product.product_id}`)}
+                    >
+                      {product.matchPercentage && (
+                        <Chip 
+                          label={`${Math.round(product.matchPercentage)}% match`}
+                          color="primary"
+                          size="small"
+                          sx={{
+                            position: 'absolute',
+                            top: 10,
+                            left: 10,
+                            zIndex: 1,
+                            fontWeight: 'bold'
+                          }}
+                        />
+                      )}
+                      
+                      <CardMedia
+  component="img"
+  height="200"
+  image={
+    product.picture
+      ? `https://res.cloudinary.com/${cloudName}/image/upload/${product.picture}.jpg`
+      : 'https://via.placeholder.com/300'
+  }
+  alt={product.product_name || 'Product image'}
+  sx={{ 
+    objectFit: 'contain', 
+    p: 1,
+    backgroundColor: '#f5f5f5'
+  }}
+  onError={(e) => {
+    e.target.src = 'https://via.placeholder.com/300?text=Image+Error';
+  }}
+/>
+                      
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6" fontWeight="bold" noWrap>
+                          {product.product_name || 'Unnamed Product'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {product.brand} • {product.product_type}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          For: {product.skin_types?.join(', ') || 'All skin types'}
+                        </Typography>
+                      </CardContent>
+                      
+                      <FavoriteBorder sx={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        color: 'white',
+                        backgroundColor: 'rgba(0,0,0,0.3)',
+                        borderRadius: '50%',
+                        p: 0.5,
+                        '&:hover': { color: 'red' }
+                      }} />
+                    </Card>
+                  </Grid>
+                ))
+              ) : (
+                <Typography
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{ 
+                    textAlign: 'center', 
+                    width: '100%', 
+                    mt: 4,
+                    p: 3,
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: 2
+                  }}
+                >
+                  {products.length === 0 
+                    ? 'No recommendations available. Please update your skin profile.'
+                    : 'No products match your current filters.'}
+                </Typography>
+              )}
+            </Grid>
+
+            {totalPages > 1 && (
+              <Grid container justifyContent="center" sx={{ mt: 4, mb: 4 }}>
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="large"
+                  showFirstButton
+                  showLastButton
+                />
+              </Grid>
+            )}
+          </>
+        )}
+      </Container>
+      <Footer />
+    </div>
+  );
 }
 
 export default Recommendations;

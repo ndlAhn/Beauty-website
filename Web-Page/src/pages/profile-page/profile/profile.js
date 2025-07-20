@@ -248,47 +248,54 @@ function Profile() {
         }
     };
 
-    const handleSaveProfile = async () => {
-        setIsSubmitting(true);
-        try {
-            const updateData = {
-                name: displayName,
-                bio: bio,
-                ...(newImageData.publicId && { avt_path: newImageData.publicId }),
-            };
+    // ...existing code...
+const handleSaveProfile = async () => {
+    setIsSubmitting(true);
+    try {
+        const updateData = {
+            name: displayName,
+            bio: bio,
+            ...(newImageData.publicId && { avt_path: newImageData.publicId }),
+            skin_type: skinType,
+            skinProblems: skinProblems, // Đảm bảo trường này được gửi lên backend
+            skincareGoals: skincareGoals,
+            allergies: allergies,
+        };
 
-            const response = await instance.post('/update-info', {
-                ...updateData,
-                user_id: state.userData?.user_id,
+        const response = await instance.post('/update-info', {
+            ...updateData,
+            user_id: state.userData?.user_id,
+        });
+
+        if (response.data.success) {
+            // Cập nhật lại state front-end
+            dispatchState({
+                type: 'UPDATE_USER',
+                payload: {
+                    ...state.userData,
+                    ...updateData,
+                },
             });
 
-            if (response.data.success) {
-                dispatchState({
-                    type: 'UPDATE_USER',
-                    payload: {
-                        ...state.userData,
-                        ...updateData,
-                    },
-                });
-
-                setSnackbar({
-                    open: true,
-                    message: 'Profile updated successfully!',
-                    severity: 'success',
-                });
-                handleCloseEditDialog();
-            }
-        } catch (error) {
-            console.error('Error updating profile:', error);
             setSnackbar({
                 open: true,
-                message: 'Failed to update profile. Please try again.',
-                severity: 'error',
+                message: 'Profile updated successfully!',
+                severity: 'success',
             });
-        } finally {
-            setIsSubmitting(false);
+            handleCloseEditDialog();
         }
-    };
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        setSnackbar({
+            open: true,
+            message: 'Failed to update profile. Please try again.',
+            severity: 'error',
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
+};
+// ...existing code...
 
     // Add this for public profile follow button
     const handleFollow = async () => {
