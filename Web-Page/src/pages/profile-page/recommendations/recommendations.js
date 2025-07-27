@@ -79,7 +79,6 @@ function Recommendations() {
         throw new Error('Invalid data format received');
       }
 
-      // Ensure all products have required fields
       const validatedProducts = data.map(product => ({
         ...product,
         product_type: product.product_type || 'Uncategorized',
@@ -104,7 +103,6 @@ function Recommendations() {
     fetchRecommendations();
   }, [fetchRecommendations]);
 
-  // Handle filter changes
   useEffect(() => {
     let filtered = [...products];
     
@@ -131,10 +129,9 @@ function Recommendations() {
     }
     
     setFilteredProducts(filtered);
-    setPage(1); // Reset to first page when filters change
+    setPage(1);
   }, [products, productType, skinType, priceRange]);
 
-  // Handle search
   const handleSearch = () => {
     if (!searchTerm.trim()) {
       setFilteredProducts(products);
@@ -151,7 +148,6 @@ function Recommendations() {
     setPage(1);
   };
 
-  // Handle skin problem filters
   const handleSkinProblemFilter = (problem) => {
     if (!problem) {
       setFilteredProducts(products);
@@ -175,7 +171,6 @@ function Recommendations() {
     <div className="recommendation-page">
       <Header />
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Search bar */}
         <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={9}>
@@ -214,7 +209,6 @@ function Recommendations() {
           </Grid>
         </Paper>
 
-        {/* Filters */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
             <FormControl fullWidth>
@@ -295,7 +289,6 @@ function Recommendations() {
           </Grid>
         </Grid>
 
-        {/* Product display */}
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
             <CircularProgress size={60} />
@@ -345,9 +338,7 @@ function Recommendations() {
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
-                        position: 'relative',
-                        transition: 'transform 0.3s',
-                        '&:hover': { transform: 'scale(1.03)' }
+                        position: 'relative'
                       }}
                       onClick={() => navigate(`/product-detail/${product.product_id}`)}
                     >
@@ -367,46 +358,35 @@ function Recommendations() {
                       )}
                       
                       <CardMedia
-  component="img"
-  height="200"
-  image={
-    product.picture
-      ? `https://res.cloudinary.com/${cloudName}/image/upload/${product.picture}.jpg`
-      : 'https://via.placeholder.com/300'
-  }
-  alt={product.product_name || 'Product image'}
-  sx={{ 
-    objectFit: 'contain', 
-    p: 1,
-    backgroundColor: '#f5f5f5'
-  }}
-  onError={(e) => {
-    e.target.src = 'https://via.placeholder.com/300?text=Image+Error';
-  }}
-/>
+                        component="img"
+                        height="200"
+                        image='https://via.placeholder.com/300'
+                        
+                        alt={product.product_name || 'Product image'}
+                        sx={{ objectFit: 'contain', p: 1 }}
+                        
+                      />
                       
                       <CardContent sx={{ flexGrow: 1 }}>
                         <Typography variant="h6" fontWeight="bold" noWrap>
                           {product.product_name || 'Unnamed Product'}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {product.brand} • {product.product_type}
                         </Typography>
                         <Typography variant="body2" sx={{ mt: 1 }}>
                           For: {product.skin_types?.join(', ') || 'All skin types'}
                         </Typography>
                       </CardContent>
                       
-                      <FavoriteBorder sx={{
-                        position: 'absolute',
-                        top: 10,
-                        right: 10,
-                        color: 'white',
-                        backgroundColor: 'rgba(0,0,0,0.3)',
-                        borderRadius: '50%',
-                        p: 0.5,
-                        '&:hover': { color: 'red' }
-                      }} />
+                      <FavoriteBorder
+                        sx={{
+                          position: 'absolute',
+                          top: 10,
+                          right: 10,
+                          color: 'white',
+                          backgroundColor: 'rgba(0,0,0,0.3)',
+                          borderRadius: '50%',
+                          p: 0.5,
+                        }}
+                      />
                     </Card>
                   </Grid>
                 ))

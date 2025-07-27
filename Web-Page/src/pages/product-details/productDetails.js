@@ -75,18 +75,6 @@ function ProductDetails() {
         if (!product?.skin_types || product.skin_types.length === 0) {
             return <p>No skin type information available</p>;
         }
-
-        return (
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                {product.skin_types.map((type) => (
-                    <Chip 
-                        key={type} 
-                        label={type.charAt(0).toUpperCase() + type.slice(1)} 
-                        variant="outlined" 
-                    />
-                ))}
-            </Stack>
-        );
     };
 
     const renderSkinProblems = () => {
@@ -132,28 +120,25 @@ function ProductDetails() {
     };
 
     const renderIngredients = () => {
-        if (!product?.ingredients || product.ingredients.length === 0) {
-            return <p>No ingredient information available</p>;
-        }
+    if (!product?.ingredients || product.ingredients.length === 0) {
+        return <p>No ingredient information available</p>;
+    }
 
-        return (
-            <div>
-                <Typography variant="subtitle1" gutterBottom>
-                    Total Ingredients: {product.ingredients.length}
-                </Typography>
-                <List dense>
-                    {product.ingredients?.map((ingredient, index) => (
-                        <ListItem key={index}>
-                            <ListItemText 
-                                primary={ingredient?.name} 
-                                secondary={ingredient?.function} 
-                            />
-                        </ListItem>
-                    ))}
-                </List>
-            </div>
-        );
-    };
+    return (
+        <div>
+            <Typography variant="subtitle1" gutterBottom>
+                Total Ingredients: {product.ingredients.length}
+            </Typography>
+            <List dense>
+                {product.ingredients?.map((ingredient, index) => (
+                    <ListItem key={index}>
+                        <ListItemText primary={ingredient?.name} />
+                    </ListItem>
+                ))}
+            </List>
+        </div>
+    );
+};
 
     if (loading) {
         return (
@@ -343,12 +328,18 @@ function ProductDetails() {
                         {renderBenefits()}
                     </Box>
 
-                    <Box id="ingredients" className="element-review-details" sx={{ mb: 4 }}>
-                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-                            Ingredients
-                        </Typography>
-                        {renderIngredients()}
-                    </Box>
+                    <div>
+            <Typography variant="subtitle1" gutterBottom>
+                Total Ingredients: {product.ingredients.length}
+            </Typography>
+            <List dense>
+                {product.ingredients?.map((ingredient, index) => (
+                    <ListItem key={index}>
+                        <ListItemText primary={ingredient?.name} />
+                    </ListItem>
+                ))}
+            </List>
+        </div>
 
                     <Box id="product-description" className="element-review-details" sx={{ mb: 4 }}>
                         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
